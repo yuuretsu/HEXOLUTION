@@ -11,6 +11,7 @@ import { SelectedItem } from "components/selected-item";
 import { Chart } from "ui/chart";
 import { HiAdjustmentsHorizontal, HiFingerPrint, HiSquaresPlus, HiSun, HiCog6Tooth } from "react-icons/hi2";
 import type { IconType } from "react-icons";
+import { IconButton } from "ui/icon-button/icon-button";
 
 type ChartData<Fields extends string> = { [Field in Fields]: [number, number][] };
 
@@ -203,23 +204,7 @@ export const App: FC = () => {
         }}
       >
         <PlayPause />
-        <button
-          className="blur-bg"
-          onClick={() => setIsOpen(!isOpen)}
-          style={{
-            width: 48,
-            height: 48,
-            backgroundColor: "transparent",
-            borderRadius: 16,
-            border: "none",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            color: "white"
-          }}
-        >
-          <HiCog6Tooth size={"1.5rem"} style={{ display: "block" }} />
-        </button>
+        <IconButton onClick={() => setIsOpen(!isOpen)} Icon={HiCog6Tooth} />
       </div>
     </>
   );
