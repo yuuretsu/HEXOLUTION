@@ -10,8 +10,9 @@ import { useWorkerEvent } from "use-worker-event";
 import { SelectedItem } from "components/selected-item";
 import { Chart } from "ui/chart";
 import { HiAdjustmentsHorizontal, HiFingerPrint, HiSquaresPlus, HiSun, HiCog6Tooth } from "react-icons/hi2";
+import { SiGithub } from "react-icons/si"
 import type { IconType } from "react-icons";
-import { IconButton } from "ui/icon-button/icon-button";
+import { IconButton } from "ui/icon-button";
 
 type ChartData<Fields extends string> = { [Field in Fields]: [number, number][] };
 
@@ -203,6 +204,7 @@ export const App: FC = () => {
           gap: 8,
         }}
       >
+        <IconButton as="a" href="https://github.com/yuuretsu/HEXOLUTION" target="_blank" Icon={SiGithub} />
         <PlayPause />
         <IconButton onClick={() => setIsOpen(!isOpen)} Icon={HiCog6Tooth} />
       </div>

@@ -1,21 +1,34 @@
-import type { FC } from "react";
+import type { ElementType, ComponentPropsWithoutRef, ReactElement } from "react";
 import type { IconType } from "react-icons";
 import styles from "./icon-button.module.css";
 
-export const IconButton: FC<{
-  onClick?: () => void,
-  Icon: IconType,
-}> = (({
+interface IconButtonOwnProps<E extends ElementType> {
+  as?: E;
+  Icon: IconType;
+  onClick?: () => void;
+  className?: string;
+}
+
+type IconButtonProps<E extends ElementType> = IconButtonOwnProps<E> &
+  Omit<ComponentPropsWithoutRef<E>, keyof IconButtonOwnProps<E>>;
+
+export function IconButton<E extends ElementType = "button">({
+  as,
+  Icon,
   onClick,
-  Icon
-}) => {
+  className,
+  ...props
+}: IconButtonProps<E>): ReactElement {
+  const Tag = (as || "button") as ElementType;
+
   return (
-    <button
-      className={`blur-bg ${styles.button}`}
-      disabled={!onClick}
+    <Tag
+      className={`blur-bg ${styles.button} ${className || ""}`}
       onClick={onClick}
+      {...(Tag === "button" ? { disabled: !onClick } : {})}
+      {...props}
     >
       <Icon size={"1.5rem"} style={{ display: "block" }} />
-    </button>
-  )
-});
+    </Tag>
+  );
+}
