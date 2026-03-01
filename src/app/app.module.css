@@ -1,0 +1,34 @@
+.sidebar {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  width: min-content;
+  /* width: 600px; */
+  max-height: calc(100% - 16px * 2);
+  padding-bottom: calc(48px + 16px);
+  border-radius: 16px;
+  /* box-shadow: 0 0 32px rgba(20, 20, 20, 1);
+  backdrop-filter: blur(32px);
+  background-color: rgba(0, 0, 0, 0.5); */
+  color: white;
+  /* padding-left: 24px;
+  padding-right: 24px;
+  padding-top: 16px;
+  padding-bottom: 16px; */
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Скрытие полосы прокрутки */
+.sidebar::-webkit-scrollbar {
+  display: none;
+}
+
+.sidebar {
+  -ms-overflow-style: none;
+  /* IE и Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
