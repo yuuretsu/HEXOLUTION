@@ -364,7 +364,6 @@ export const HexagonsGl = forwardRef<HexagonsGlHandle, HexagonsGlProps>(
       }
 
       if (e.ctrlKey) {
-        e.preventDefault();
         const zoomFactor = e.deltaY > 0 ? 0.95 : 1.05;
         updateZoom(
           (e.clientX - rect.left) * dpr,
