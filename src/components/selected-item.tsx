@@ -74,7 +74,9 @@ export const SelectedItem: FC = () => {
   const selectedItem = useWorkerEvent("selectedItemUpdate");
 
   if (!selectedItem) return (
-    <div>Click an entity to view its properties</div>
+    <div style={{ fontSize: "0.75rem", color: "rgba(255, 255, 255, 0.7)", fontStyle: "italic" }}>
+      Click an entity to view its properties
+    </div>
   )
 
   const [r, g, b, a] = selectedItem.color;
