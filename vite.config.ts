@@ -7,7 +7,6 @@ import checker from 'vite-plugin-checker'
 export default defineConfig({
   base: "./",
   build: {
-    minify: false,
     rollupOptions: {
       output: {
         manualChunks: {

@@ -130,7 +130,7 @@ const loop = () => {
   });
 
   if (selectedItem) {
-    const commonData = { type: selectedItem.constructor.name, color: selectedItem.getColor() };
+    const commonData = { type: selectedItem.CLASS_NAME, color: selectedItem.getColor() };
     if (selectedItem instanceof Creature) {
       server.emit("selectedItemUpdate", {
         ...commonData,
