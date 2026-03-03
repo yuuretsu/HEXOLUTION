@@ -65,7 +65,7 @@ const BlockTitle: FC<PropsWithChildren<{ Icon?: IconType }>> = ({
         <Icon
           size="1.5rem"
           style={{
-            fill: `url(#${gradientId})`, // Магия здесь
+            fill: `url(#${gradientId})`,
           }}
         />
       )}

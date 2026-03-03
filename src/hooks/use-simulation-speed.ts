@@ -38,7 +38,6 @@ export const useSimulationSpeed = () => {
 
   const togglePlayPause = useCallback(() => {
     if (isPlaying) {
-      // Пауза
       workerApi.call("setSpeed", [0]);
       setSpeed(0);
       setIsPlaying(false);
