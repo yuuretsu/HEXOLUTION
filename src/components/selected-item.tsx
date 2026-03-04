@@ -22,6 +22,9 @@ const Program: FC<ProgramProps> = ({ program, pointer }) => {
 
           const handler = getGeneHandler(n);
 
+          // const text = triplet.map((x) => ["A", "T", "G", "C"][x]).join("")
+          const symbols = triplet.map((x) => ["A", "T", "G", "C"][x]);
+
           const color = {
             [photosynthesis.name]: COLOR_PHOTOSYNTHESIS,
             [attack.name]: COLOR_ATTACK,
@@ -29,16 +32,25 @@ const Program: FC<ProgramProps> = ({ program, pointer }) => {
             [moveForward.name]: COLOR_MOVE_FORWARD,
             [push.name]: COLOR_PUSH,
             [checkFwd.name]: [255, 255, 0, 255],
-          }[handler.name] || [0, 0, 0, 0];
-
-          const [r, g, b] = color;
-
-          const text = triplet.map((x) => ["A", "T", "G", "C"][x]).join("")
+          }[handler.name];
 
           return (
             <div key={i}>
-              <div style={{ backgroundColor: `rgba(${r}, ${g}, ${b}, 0.3)`, textAlign: "center" }}>
-                {text}
+              <div
+                style={{
+                  backgroundColor: color ? `rgba(${color[0]}, ${color[1]}, ${color[2]}, 0.3)` : "rgba(255, 255, 255, 0.1)",
+                  color: color ? `rgba(${color[0]}, ${color[1]}, ${color[2]})` : "rgba(255, 255, 255, 0.1)",
+                  textAlign: "center",
+                  display: "flex",
+                  justifyContent: "space-around",
+                  fontWeight: "bold"
+                }}
+              >
+                {symbols.map((x, i) => {
+                  return (
+                    <div key={i}>{x}</div>
+                  )
+                })}
               </div>
             </div>
           );
