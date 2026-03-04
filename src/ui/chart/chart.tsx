@@ -1,3 +1,5 @@
+import { Fragment } from "react/jsx-runtime";
+
 type TimeDataPoint = [number, number];
 
 interface Series {
@@ -28,22 +30,40 @@ export const Chart = ({
   const rangeY = maxY || 1;
 
   return (
-    <svg viewBox={`0 0 ${width} ${height}`} width="100%">
+    <svg viewBox={`0 0 ${width} ${height}`} style={{ display: "block" }} width="100%">
       {series.map(({ label, color, points: sPoints }) => (
-        <polyline
-          key={label}
-          fill="none"
-          stroke={color}
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          points={sPoints
-            .map(([x, y]) =>
-              `${((x - minX) / rangeX) * width},${height - (y / rangeY) * height}`
-            )
-            .join(' ')
-          }
-        />
+        <Fragment>
+
+          <polyline
+            key={label}
+            style={{ filter: "blur(8px) saturate(4)" }}
+            fill="none"
+            stroke={color}
+            strokeWidth="4"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            points={sPoints
+              .map(([x, y]) =>
+                `${((x - minX) / rangeX) * width},${height - (y / rangeY) * height}`
+              )
+              .join(' ')
+            }
+          />
+          <polyline
+            key={label}
+            fill="none"
+            stroke={color}
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            points={sPoints
+              .map(([x, y]) =>
+                `${((x - minX) / rangeX) * width},${height - (y / rangeY) * height}`
+              )
+              .join(' ')
+            }
+          />
+        </Fragment>
       ))}
     </svg>
   );
