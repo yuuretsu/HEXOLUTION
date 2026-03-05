@@ -32,10 +32,8 @@ export const Chart = ({
   return (
     <svg viewBox={`0 0 ${width} ${height}`} style={{ display: "block" }} width="100%">
       {series.map(({ label, color, points: sPoints }) => (
-        <Fragment>
-
+        <Fragment key={label}>
           <polyline
-            key={label}
             style={{ filter: "blur(8px) saturate(4)" }}
             fill="none"
             stroke={color}
@@ -50,7 +48,6 @@ export const Chart = ({
             }
           />
           <polyline
-            key={label}
             fill="none"
             stroke={color}
             strokeWidth="2"
