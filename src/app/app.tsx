@@ -160,8 +160,8 @@ export const App: FC = () => {
               <Chart
                 height={128}
                 series={[
-                  { label: "creatures", points: chartData.creatures, color: "rgb(100, 255, 200)" },
-                  { label: "food", points: chartData.food, color: "rgb(255, 255, 150)" }
+                  { label: "creatures", data: chartData.creatures, color: "rgb(100, 255, 200)" },
+                  { label: "food", data: chartData.food, color: "rgb(255, 255, 150)" }
                 ]}
               />
             </div>
