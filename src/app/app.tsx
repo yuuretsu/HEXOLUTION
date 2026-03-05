@@ -155,35 +155,14 @@ export const App: FC = () => {
             Entities
           </BlockTitle>
           <Entries entries={data.worldEntries} />
-          <div style={{ position: "relative" }}>
-            <div style={{ marginBottom: 0, borderRadius: 8, overflow: "hidden", backgroundColor: "rgba(255, 255, 255, 0.1)" }}>
-              <Chart
-                height={128}
-                series={[
-                  { label: "creatures", data: chartData.creatures, color: "rgb(100, 255, 200)" },
-                  { label: "food", data: chartData.food, color: "rgb(255, 255, 150)" }
-                ]}
-              />
-            </div>
-            <div
-              style={{
-                position: "absolute",
-                bottom: 4, left: 4,
-                display: "flex",
-                gap: 8,
-                textTransform: "uppercase",
-                fontSize: 16 * 0.75
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                <div style={{ width: 8, height: 2, backgroundColor: "rgb(100, 255, 200)" }} />
-                creatures
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                <div style={{ width: 8, height: 2, backgroundColor: "rgb(255, 255, 150)" }} />
-                food
-              </div>
-            </div>
+          <div style={{ marginBottom: 0, borderRadius: 8, overflow: "hidden", backgroundColor: "rgba(255, 255, 255, 0.1)" }}>
+            <Chart
+              height={128}
+              series={[
+                { label: "creatures", data: chartData.creatures, color: "rgb(100, 255, 200)" },
+                { label: "food", data: chartData.food, color: "rgb(255, 255, 150)" }
+              ]}
+            />
           </div>
           <div>world age: {data.worldAge}</div>
         </Block>

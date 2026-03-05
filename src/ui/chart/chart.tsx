@@ -62,7 +62,18 @@ const simplify = (data: DataPoint[], limit: number): DataPoint[] => {
   return result;
 };
 
-const ChartLine = memo(({ data, color, width, height, minX, scaleX, scaleY, maxPoints }: any) => {
+interface ChartLineProps {
+  data: DataPoint[];
+  color: string;
+  width: number;
+  height: number;
+  minX: number;
+  scaleX: number;
+  scaleY: number;
+  maxPoints: number;
+}
+
+const ChartLine = memo(({ data, color, width, height, minX, scaleX, scaleY, maxPoints }: ChartLineProps) => {
   const pointsString = useMemo(() => {
     const points = simplify(data, maxPoints);
     let path = "";
@@ -126,24 +137,54 @@ export const Chart = ({
   if (!scene) return null;
 
   return (
-    <svg
-      viewBox={`0 0 ${width} ${height}`}
-      style={{ display: "block" }}
-      width="100%"
-    >
-      {series.map((s) => (
-        <ChartLine
-          key={s.label}
-          data={s.data}
-          color={s.color}
-          width={width}
-          height={height}
-          minX={scene.minX}
-          scaleX={scene.sx}
-          scaleY={scene.sy}
-          maxPoints={maxPoints}
-        />
-      ))}
-    </svg>
+    <div style={{ position: "relative" }}>
+      <svg
+        viewBox={`0 0 ${width} ${height}`}
+        style={{ display: "block" }}
+        width="100%"
+      >
+        {series.map((s) => (
+          <ChartLine
+            key={s.label}
+            data={s.data}
+            color={s.color}
+            width={width}
+            height={height}
+            minX={scene.minX}
+            scaleX={scene.sx}
+            scaleY={scene.sy}
+            maxPoints={maxPoints}
+          />
+        ))}
+      </svg>
+      <div
+        style={{
+          position: "absolute",
+          bottom: 4,
+          left: 4,
+          display: "flex",
+          gap: 8,
+          textTransform: "uppercase",
+          fontSize: 16 * 0.75
+        }}
+      >
+        {series.map((s) => (
+          <div
+            key={s.label}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 4,
+              backgroundColor: "rgba(255, 255, 255, 0.2)",
+              borderRadius: 4,
+              padding: "0 0.25rem",
+            }}
+          >
+            <div style={{ width: 2, height: 8, backgroundColor: s.color }} />
+            {s.label}
+          </div>
+        ))}
+      </div>
+    </div>
   );
 };
