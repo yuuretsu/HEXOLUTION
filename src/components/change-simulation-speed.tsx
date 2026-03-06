@@ -15,7 +15,7 @@ export const ChangeSimulationSpeed: FC = () => {
       onChange={handleSpeedChange}
       options={[
         { text: "1/128", value: 1 / 128 },
-        { text: "1/64", value: 1 / 4 },
+        { text: "1/16", value: 1 / 16 },
         { text: "1", value: 1 },
         { text: "2", value: 2 },
         { text: "4", value: 4 },
