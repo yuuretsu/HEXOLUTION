@@ -112,12 +112,14 @@ export const App: FC = () => {
   const [data, chartData] = useWorldData();
   const [isOpen, setIsOpen] = useState(false);
 
-  const worldAgeDivider = data.worldSize.width * data.worldSize.height;
+  const worldAgeDivider = (data.worldSize.width * data.worldSize.height) || 1;
 
   const fullAge = Math.floor(data.worldAge / worldAgeDivider);
+  const fractionalPrecision = 3;
   const fractionalPart = (data.worldAge % worldAgeDivider)
     .toString()
-    .padStart(worldAgeDivider.toString().length - 1, '0');
+    .padStart(fractionalPrecision, '0')
+    .slice(0, fractionalPrecision);
 
   return (
     <>
@@ -136,7 +138,10 @@ export const App: FC = () => {
           <BlockTitle Icon={HiAdjustmentsHorizontal}>
             Settings
           </BlockTitle>
-          <ChangeSimulationSpeed />
+          <div>
+            <div>SIMULATION STEPS PER FRAME</div>
+            <ChangeSimulationSpeed />
+          </div>
           <div>
             <div>VIEW MODE</div>
             <ChangeViewMode />
@@ -175,8 +180,8 @@ export const App: FC = () => {
             <div>
               world age
             </div>
-            <div>
-              {fullAge}<span style={{ opacity: 0.5 }}>{fractionalPart}</span>
+            <div style={{ fontVariantNumeric: "tabular-nums" }}>
+              {fullAge}<span style={{ opacity: 0.5 }}>.{fractionalPart}</span>
             </div>
           </div>
         </Block>

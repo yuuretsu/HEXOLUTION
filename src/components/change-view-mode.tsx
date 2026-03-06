@@ -14,10 +14,11 @@ export const ChangeViewMode = () => {
     <Radio
       value={viewMode}
       onChange={handleChange}
-      options={["normal", "energy", "genome-hash"].map((mode) => ({
-        text: mode,
-        value: mode,
-      }))}
+      options={[
+        { text: "Normal", value: "normal" },
+        { text: "Energy", value: "energy" },
+        { text: "Genome Hash", value: "genome-hash" },
+      ]}
     />
   )
 };

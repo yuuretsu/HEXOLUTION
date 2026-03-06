@@ -22,15 +22,15 @@ const RadioItem: FC<RadioItemProps> = ({ isActive, onClick, children }) => {
   );
 };
 
-export type RadioProps = {
-  options: { text: string, value: string }[];
-  value: string;
-  onChange: (value: string) => void;
+export type RadioProps<T = string> = {
+  options: { text: string, value: T }[];
+  value: T;
+  onChange: (value: T) => void;
 }
 
-export const Radio: FC<RadioProps> = ({ options, value, onChange }) => {
+export const Radio = <T,>({ options, value, onChange }: RadioProps<T>) => {
   return (
-    <div style={{ display: "flex", flexWrap: "wrap", gap: 4, textTransform: "uppercase" }}>
+    <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
       {options.map((option, i) => (
         <RadioItem key={i} isActive={option.value === value} onClick={() => onChange(option.value)}>
           {option.text}
