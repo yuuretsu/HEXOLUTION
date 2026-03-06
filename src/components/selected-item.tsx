@@ -1,4 +1,4 @@
-import { attack, checkFwd, COLOR_ATTACK, COLOR_MOVE_FORWARD, COLOR_PHOTOSYNTHESIS, COLOR_PUSH, getGeneHandler, moveForward, photosynthesis, push, reproduce } from "creature/genes";
+import { attackForward, inspectForward, COLOR_ATTACK, COLOR_MOVE_FORWARD, COLOR_PHOTOSYNTHESIS, COLOR_PUSH, getGeneHandler, moveForward, absorbLight, displaceForward, reproduce } from "creature/genes";
 import type { FC } from "react";
 import { Hexagon } from "ui/hexagon";
 import { useWorkerEvent } from "use-worker-event";
@@ -26,12 +26,12 @@ const Program: FC<ProgramProps> = ({ program, pointer }) => {
           const symbols = triplet.map((x) => ["A", "T", "G", "C"][x]);
 
           const color = {
-            [photosynthesis.name]: COLOR_PHOTOSYNTHESIS,
-            [attack.name]: COLOR_ATTACK,
+            [absorbLight.name]: COLOR_PHOTOSYNTHESIS,
+            [attackForward.name]: COLOR_ATTACK,
             [reproduce.name]: [255, 255, 255, 255],
             [moveForward.name]: COLOR_MOVE_FORWARD,
-            [push.name]: COLOR_PUSH,
-            [checkFwd.name]: [255, 255, 0, 255],
+            [displaceForward.name]: COLOR_PUSH,
+            [inspectForward.name]: [255, 255, 0, 255],
           }[handler.name];
 
           return (

@@ -14,7 +14,7 @@ export const moveForward: GeneHandler = (creature, world, x, y) => {
   return { isFinished: true };
 }
 
-export const rotateR: GeneHandler = (creature, _grid, _x, _y) => {
+export const rotateRight: GeneHandler = (creature, _grid, _x, _y) => {
   creature.direction += 1;
   return { isFinished: false };
 }
@@ -31,7 +31,7 @@ export const reproduce: GeneHandler = (creature, world, x, y) => {
   return { isFinished: true };
 };
 
-export const photosynthesis: GeneHandler = (creature, world, _x, _y) => {
+export const absorbLight: GeneHandler = (creature, world, _x, _y) => {
   lerpRgb(creature.color, COLOR_PHOTOSYNTHESIS, 0.01);
   sendEnergy(creature, world, 2)
   const max = world.grid.width * world.grid.height * 0.01;
@@ -41,7 +41,7 @@ export const photosynthesis: GeneHandler = (creature, world, _x, _y) => {
   return { isFinished: true };
 }
 
-export const attack: GeneHandler = (creature, world, x, y) => {
+export const attackForward: GeneHandler = (creature, world, x, y) => {
   lerpRgb(creature.color, COLOR_ATTACK, 0.02);
   sendEnergy(creature, world, 10);
   const coordsFwd = world.grid.getCoordsByNarrow(x, y, creature.direction);
@@ -54,7 +54,7 @@ export const attack: GeneHandler = (creature, world, x, y) => {
   return { isFinished: true };
 }
 
-export const checkEnergy: GeneHandler = (creature, _world, _x, _y) => {
+export const checkSelfEnergy: GeneHandler = (creature, _world, _x, _y) => {
   const treshold = creature.tape.readFloat();
   const jumpA = creature.tape.readInt();
   const jumpB = creature.tape.readInt();
@@ -66,7 +66,7 @@ export const checkEnergy: GeneHandler = (creature, _world, _x, _y) => {
   return { isFinished: false };
 }
 
-export const lookForward: GeneHandler = (creature, world, x, y) => {
+export const scanForward: GeneHandler = (creature, world, x, y) => {
   const distance = Math.floor(creature.tape.readFloat() * 10) + 1;
   const jumpIfEmpty = creature.tape.readInt();
   const jumpIfFriend = creature.tape.readInt();
@@ -92,7 +92,7 @@ export const lookForward: GeneHandler = (creature, world, x, y) => {
   return { isFinished: false };
 };
 
-export const checkFwd: GeneHandler = (creature, world, x, y) => {
+export const inspectForward: GeneHandler = (creature, world, x, y) => {
   const jumpIfEmpty = creature.tape.readInt();
   const jumpIfFriend = creature.tape.readInt();
   const jumpIfEnemy = creature.tape.readInt();
@@ -117,12 +117,12 @@ export const checkFwd: GeneHandler = (creature, world, x, y) => {
   return { isFinished: false };
 };
 
-export const restart: GeneHandler = (creature, _world, _x, _y) => {
+export const resetGenomePointer: GeneHandler = (creature, _world, _x, _y) => {
   creature.tape.pointer = 0;
   return { isFinished: true };
 }
 
-export const push: GeneHandler = (creature, world, x, y) => {
+export const displaceForward: GeneHandler = (creature, world, x, y) => {
   lerpRgb(creature.color, COLOR_PUSH, 0.01);
   sendEnergy(creature, world, 10);
   const coordsFwd = world.grid.getCoordsByNarrow(x, y, creature.direction);
