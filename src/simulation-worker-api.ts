@@ -23,6 +23,7 @@ export type WorldData = {
   worldEnergy: number,
   itemsEnergy: number,
   worldAge: number,
+  worldSize: { width: number, height: number },
   worldEntries: [string, number][],
 }
 

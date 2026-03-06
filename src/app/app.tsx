@@ -19,7 +19,7 @@ type ChartData<Fields extends string> = { [Field in Fields]: [number, number][] 
 type ChartDataApp = ChartData<"creatures" | "food">;
 
 const useWorldData = () => {
-  const [data, setData] = useState<WorldData>({ worldEnergy: 0, itemsEnergy: 0, worldEntries: [], worldAge: 0 });
+  const [data, setData] = useState<WorldData>({ worldEnergy: 0, itemsEnergy: 0, worldEntries: [], worldAge: 0, worldSize: { width: 0, height: 0 } });
   const [chartData, setChartData] = useState<ChartDataApp>({ creatures: [], food: [] });
 
   const addChartData = (name: keyof ChartDataApp, value: [number, number]) => {
@@ -112,6 +112,13 @@ export const App: FC = () => {
   const [data, chartData] = useWorldData();
   const [isOpen, setIsOpen] = useState(false);
 
+  const worldAgeDivider = data.worldSize.width * data.worldSize.height;
+
+  const fullAge = Math.floor(data.worldAge / worldAgeDivider);
+  const fractionalPart = (data.worldAge % worldAgeDivider)
+    .toString()
+    .padStart(worldAgeDivider.toString().length - 1, '0');
+
   return (
     <>
       <WorldImage
@@ -164,7 +171,14 @@ export const App: FC = () => {
               ]}
             />
           </div>
-          <div>world age: {data.worldAge}</div>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <div>
+              world age
+            </div>
+            <div>
+              {fullAge}<span style={{ opacity: 0.5 }}>{fractionalPart}</span>
+            </div>
+          </div>
         </Block>
         <Block>
           <BlockTitle Icon={HiFingerPrint}>

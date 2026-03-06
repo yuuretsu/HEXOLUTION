@@ -125,7 +125,8 @@ const loop = () => {
   server.emit("data", {
     worldEnergy: world.energy,
     itemsEnergy,
-    worldAge: age / (W_COUNT * H_COUNT),
+    worldAge: age,
+    worldSize: { width: W_COUNT, height: H_COUNT },
     worldEntries: counter.getMostCommon(5)
   });
 
