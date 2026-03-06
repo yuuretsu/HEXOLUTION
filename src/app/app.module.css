@@ -4,8 +4,7 @@
   right: 16px;
   width: min-content;
   /* width: 600px; */
-  max-height: calc(100% - 16px * 2);
-  padding-bottom: calc(48px + 16px);
+  max-height: calc(100% - 16px * 2 - 48px - 16px);
   border-radius: 16px;
   /* box-shadow: 0 0 32px rgba(20, 20, 20, 1);
   backdrop-filter: blur(32px);
