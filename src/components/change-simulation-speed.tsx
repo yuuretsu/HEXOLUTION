@@ -14,13 +14,14 @@ export const ChangeSimulationSpeed: FC = () => {
       value={speed}
       onChange={handleSpeedChange}
       options={[
+        { text: "0 (paused)", value: 0 },
         { text: "1/128", value: 1 / 128 },
         { text: "1/16", value: 1 / 16 },
         { text: "1", value: 1 },
-        { text: "2", value: 2 },
         { text: "4", value: 4 },
         { text: "8", value: 8 },
         { text: "16", value: 16 },
+        { text: "64", value: 64 },
       ]}
     />
   );
