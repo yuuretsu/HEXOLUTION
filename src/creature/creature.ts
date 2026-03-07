@@ -103,7 +103,7 @@ export class Creature extends WorldItemDynamic {
       const result = handle(this, world, x, y);
       if (result.isFinished) break;
     }
-    sendEnergy(this, world, Math.floor(this.age * 0.002));
+    sendEnergy(this, world, Math.floor(this.age * 0.0005));
     this.age += 1;
   }
 
