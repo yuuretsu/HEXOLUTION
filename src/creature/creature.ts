@@ -17,7 +17,7 @@ export class Food extends WorldItemDynamic {
 
   getColor(): Rgba {
     const color: Rgba = [25, 25, 50, 0]
-    lerpRgb(color, [75, 75, 50, 255], (this.energy / 1000) ** 2);
+    lerpRgb(color, [75, 75, 50, 255], (this.energy / MAX_CELL_ENERGY) ** 2);
     return color;
   }
 
