@@ -60,6 +60,23 @@ export const roundToEven = (n: number) => {
   return Math.round(n / 2) * 2;
 }
 
+export const randomLightColor = (): Rgba => {
+  return [
+    50 + Math.floor(Math.random() * 206),
+    50 + Math.floor(Math.random() * 206),
+    50 + Math.floor(Math.random() * 206),
+    255,
+  ];
+};
+
+export const mutateColor = (color: Rgba, rate: number): Rgba => {
+  const mutateChannel = (c: number) => {
+    const delta = Math.round((Math.random() - 0.5) * 2 * rate);
+    return Math.max(50, Math.min(255, c + delta));
+  };
+  return [mutateChannel(color[0]), mutateChannel(color[1]), mutateChannel(color[2]), 255];
+};
+
 export const hslaToRgba = (h: number, s: number, l: number, a: number): Rgba => {
   h /= 360;
   s /= 100;

@@ -40,4 +40,5 @@ export type SelectedItemData = {
   pointer?: number;
   age?: number;
   energy?: number;
+  coloration?: Rgba;
 };
