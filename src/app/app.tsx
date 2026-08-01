@@ -1,6 +1,6 @@
 import { useState, type FC } from "react";
 import { WorldImage } from "components/world-image";
-import { workerApi } from "simulation-worker-api";
+import { workerApi } from "app/worker-client";
 import { AppControls } from "./components/app-controls";
 import { Sidebar } from "./components/sidebar";
 import { useWorldData } from "./hooks/use-world-data";

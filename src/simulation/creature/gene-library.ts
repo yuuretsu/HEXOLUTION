@@ -1,5 +1,5 @@
-import { lerp, lerpRgb } from "utils";
-import { sendEnergy, World } from "world";
+import { lerp, lerpRgb } from "shared/utils";
+import { sendEnergy, World } from "simulation/world";
 import { Creature } from "./creature";
 import type { GeneHandler } from "./gene-types";
 import { COLOR_ATTACK, COLOR_MOVE_FORWARD, COLOR_PHOTOSYNTHESIS, COLOR_PUSH } from "./constants";

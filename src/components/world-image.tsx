@@ -1,5 +1,5 @@
 import { useEffect, type FC } from "react";
-import { workerApi } from "simulation-worker-api";
+import { workerApi } from "app/worker-client";
 import { HexagonsGl, useHexagonsApi } from "ui/hexagons-gl";
 
 export type WorldImageProps = {

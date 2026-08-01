@@ -10,7 +10,7 @@ import { ChangeSimulationSpeed } from "components/change-simulation-speed";
 import { ChangeViewMode } from "components/change-view-mode";
 import { SelectedItem } from "components/selected-item";
 import { Chart } from "ui/chart";
-import type { WorldData } from "simulation-worker-api";
+import type { WorldData } from "app/worker-client";
 import styles from "../app.module.css";
 import type { ChartData } from "../hooks/use-world-data";
 import { Block } from "./block";

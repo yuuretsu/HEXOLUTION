@@ -1,4 +1,4 @@
-import type { World } from "world";
+import type { World } from "simulation/world";
 import type { Creature } from "./creature";
 
 export const scanRay = (creature: Creature, world: World, x: number, y: number, distance: number) => {

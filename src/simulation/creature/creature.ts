@@ -1,11 +1,11 @@
-import { Dichotomy } from "dichotomy";
-import { getRandomBase4, Tape } from "tape";
-import type { Rgba } from "types";
-import { createRandom, hslaToRgba, lerpRgb } from "utils";
-import { sendEnergy, WorldItemDynamic, type World } from "world";
+import { Dichotomy } from "simulation/dichotomy";
+import { getRandomBase4, Tape } from "simulation/tape";
+import type { Rgba } from "shared/types";
+import { createRandom, hslaToRgba, lerpRgb } from "shared/utils";
+import { sendEnergy, WorldItemDynamic, type World } from "simulation/world";
 import { getGeneHandler } from "./genes";
-import { MAX_CELL_ENERGY } from "../constants";
-import { Food } from "food";
+import { MAX_CELL_ENERGY } from "shared/constants";
+import { Food } from "simulation/food";
 
 export class Creature extends WorldItemDynamic {
   readonly CLASS_NAME = "Creature";

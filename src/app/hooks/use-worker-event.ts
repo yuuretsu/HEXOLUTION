@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { workerApi, type ApiEvents } from "simulation-worker-api";
+import { workerApi, type ApiEvents } from "app/worker-client";
 
 export const useWorkerEvent = <Name extends keyof ApiEvents>(name: Name) => {
   const [data, setData] = useState<ApiEvents[Name] | null>(null);
