@@ -18,6 +18,11 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+  transition-duration: 0.3s;
+}
+
+.sidebarHidden {
+  transform: translate(calc(362px + 16px), 0);
 }
 
 /* Скрытие полосы прокрутки */
@@ -30,4 +35,25 @@
   /* IE и Edge */
   scrollbar-width: none;
   /* Firefox */
+}
+
+.chartWrapper {
+  margin-bottom: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.worldAgeRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.worldAgeValue {
+  font-variant-numeric: tabular-nums;
+}
+
+.worldAgeFraction {
+  opacity: 0.5;
 }

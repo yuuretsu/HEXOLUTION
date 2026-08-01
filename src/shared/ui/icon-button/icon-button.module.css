@@ -10,3 +10,7 @@
   color: white;
   cursor: pointer;
 }
+
+.icon {
+  display: block;
+}

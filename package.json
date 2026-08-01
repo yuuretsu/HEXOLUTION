@@ -16,6 +16,7 @@
     "build-icon": "electron-icon-builder --input=./public/icon.png --output=build --flatten"
   },
   "dependencies": {
+    "clsx": "^2.1.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-icons": "^5.5.0"

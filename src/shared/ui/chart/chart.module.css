@@ -1,0 +1,35 @@
+.wrapper {
+  position: relative;
+}
+
+.svg {
+  display: block;
+}
+
+.blurLine {
+  filter: blur(8px) saturate(4);
+}
+
+.legend {
+  position: absolute;
+  bottom: 4px;
+  left: 4px;
+  display: flex;
+  gap: 8px;
+  text-transform: uppercase;
+  font-size: 12px;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  padding: 0 0.25rem;
+}
+
+.legendSwatch {
+  width: 2px;
+  height: 8px;
+}

@@ -3,6 +3,7 @@ import type { FC } from "react";
 import { Hexagon } from "shared/ui/hexagon";
 import { useWorkerEvent } from "shared/hooks/use-worker-event";
 import { base4toInt, chunk } from "shared/utils";
+import styles from "./selected-entity.module.css";
 
 type ProgramProps = {
   program: number[];
@@ -14,10 +15,8 @@ const Program: FC<ProgramProps> = ({ program, pointer }) => {
 
   return (
     <div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(8, 1fr)", borderRadius: 8, overflow: "hidden" }}>
+      <div className={styles.programGrid}>
         {triplets.map((triplet, i) => {
-          const bgc = Math.floor(pointer / 3) === i ? "rgba(0, 255, 255, 0.5)" : "rgba(255, 255, 255, 0.1)";
-
           const n = base4toInt(triplet[0], triplet[1], triplet[2]);
 
           const handler = getGeneHandler(n);
@@ -37,13 +36,10 @@ const Program: FC<ProgramProps> = ({ program, pointer }) => {
           return (
             <div key={i}>
               <div
+                className={styles.programCell}
                 style={{
                   backgroundColor: color ? `rgba(${color[0]}, ${color[1]}, ${color[2]}, 0.3)` : "rgba(255, 255, 255, 0.1)",
                   color: color ? `rgba(${color[0]}, ${color[1]}, ${color[2]})` : "rgba(255, 255, 255, 0.1)",
-                  textAlign: "center",
-                  display: "flex",
-                  justifyContent: "space-around",
-                  fontWeight: "bold"
                 }}
                 title={handler.name}
               >
@@ -65,8 +61,8 @@ const Program: FC<ProgramProps> = ({ program, pointer }) => {
 export const WorldEntityCreature: FC<{ item: any }> = ({ item }) => {
   const program = item.program as number[];
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      <table style={{ width: "100%" }}>
+    <div className={styles.creatureInfo}>
+      <table className={styles.infoTable}>
         <tbody>
           <tr>
             <th>ENERGY</th>
@@ -79,9 +75,12 @@ export const WorldEntityCreature: FC<{ item: any }> = ({ item }) => {
           <tr>
             <th>COLORATION</th>
             <td>
-              <div style={{ display: "flex", alignItems: "center", gap: 6, width: "fit-content", marginLeft: "auto" }}>
-                <span style={{ display: "inline-block", width: 12, height: 12, borderRadius: 2, backgroundColor: `rgba(${item.coloration[0]}, ${item.coloration[1]}, ${item.coloration[2]}, ${item.coloration[3] / 255})` }} />
-                <span style={{}}>
+              <div className={styles.colorationRow}>
+                <span
+                  className={styles.colorationSwatch}
+                  style={{ backgroundColor: `rgba(${item.coloration[0]}, ${item.coloration[1]}, ${item.coloration[2]}, ${item.coloration[3] / 255})` }}
+                />
+                <span>
                   {item.coloration[0]}, {item.coloration[1]}, {item.coloration[2]}
                 </span>
               </div>
@@ -98,7 +97,7 @@ export const SelectedEntity: FC = () => {
   const selectedItem = useWorkerEvent("selectedItemUpdate");
 
   if (!selectedItem) return (
-    <div style={{ fontSize: "0.75rem", color: "rgba(255, 255, 255, 0.7)", fontStyle: "italic" }}>
+    <div className={styles.emptyHint}>
       Click an entity to view its properties
     </div>
   )
@@ -106,10 +105,10 @@ export const SelectedEntity: FC = () => {
   const [r, g, b] = selectedItem.color;
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+    <div className={styles.creatureInfo}>
+      <div className={styles.selectedHeader}>
         <Hexagon size={8} color={`rgba(${r}, ${g}, ${b}`} strokeColor="white" strokeWidth={0.5} />
-        <h3 style={{ margin: 0 }}>{selectedItem.type.toUpperCase()}</h3>
+        <h3 className={styles.selectedTitle}>{selectedItem.type.toUpperCase()}</h3>
       </div>
       {selectedItem.type === "Creature" && <WorldEntityCreature item={selectedItem} />}
       {/* <pre style={{ margin: 0 }}>

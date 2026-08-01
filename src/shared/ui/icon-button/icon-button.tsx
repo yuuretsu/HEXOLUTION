@@ -1,5 +1,6 @@
 import type { ElementType, ComponentPropsWithoutRef, ReactElement } from "react";
 import type { IconType } from "react-icons";
+import clsx from "clsx";
 import styles from "./icon-button.module.css";
 
 interface IconButtonOwnProps<E extends ElementType> {
@@ -23,12 +24,12 @@ export function IconButton<E extends ElementType = "button">({
 
   return (
     <Tag
-      className={`blur-bg ${styles.button} ${className || ""}`}
+      className={clsx("blur-bg", styles.button, className)}
       onClick={onClick}
       {...(Tag === "button" ? { disabled: !onClick } : {})}
       {...props}
     >
-      <Icon size={"1.5rem"} style={{ display: "block" }} />
+      <Icon size={"1.5rem"} className={styles.icon} />
     </Tag>
   );
 }

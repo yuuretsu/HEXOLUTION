@@ -18,7 +18,7 @@ export abstract class WorldItemStatic {
   }
 
   getColoration(): Rgba {
-    return [50, 50, 50, 255];
+    return [100, 100, 100, 255];
   }
 
   handleAttack(world: World, strength: number): { energy: number } {

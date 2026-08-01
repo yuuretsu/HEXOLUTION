@@ -1,4 +1,5 @@
 import { type FC } from 'react';
+import styles from './hexagon.module.css';
 
 export type HexagonProps = {
   size: number;
@@ -34,7 +35,7 @@ export const Hexagon: FC<HexagonProps> = ({
       width={totalW}
       height={totalH}
       viewBox={`0 0 ${totalW} ${totalH}`}
-      style={{ display: 'block' }}
+      className={styles.svg}
     >
       <polygon
         points={points}
