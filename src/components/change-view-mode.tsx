@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { workerApi } from "app/worker-client";
-import { Radio } from "ui/radio";
+import { workerApi } from "shared/worker-client";
+import { Radio } from "shared/ui/radio";
 
 export const ChangeViewMode = () => {
   const [viewMode, setViewMode] = useState<string>("normal");

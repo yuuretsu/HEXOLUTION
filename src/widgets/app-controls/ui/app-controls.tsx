@@ -2,7 +2,7 @@ import type { FC } from "react";
 import { HiCog6Tooth } from "react-icons/hi2";
 import { SiGithub } from "react-icons/si";
 import { PlayPause } from "components/play-pause";
-import { IconButton } from "ui/icon-button";
+import { IconButton } from "shared/ui/icon-button";
 import styles from "./app-controls.module.css";
 
 type AppControlsProps = {

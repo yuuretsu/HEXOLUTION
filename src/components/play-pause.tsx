@@ -1,6 +1,6 @@
 import { useSimulationSpeed } from "app/hooks/use-simulation-speed";
 import { HiPlay, HiPause } from "react-icons/hi2";
-import { IconButton } from "ui/icon-button";
+import { IconButton } from "shared/ui/icon-button";
 
 export const PlayPause: React.FC = () => {
   const { isPlaying, togglePlayPause } = useSimulationSpeed();

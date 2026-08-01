@@ -1,9 +1,9 @@
 import { useState, type FC } from "react";
 import { WorldImage } from "components/world-image";
-import { workerApi } from "app/worker-client";
-import { Sidebar } from "./components/sidebar";
 import { useWorldData } from "./hooks/use-world-data";
 import { AppControls } from "widgets/app-controls";
+import { Sidebar } from "widgets/sidebar";
+import { workerApi } from "shared/worker-client";
 
 export const App: FC = () => {
   const [data, chartData] = useWorldData();

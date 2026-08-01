@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { Radio } from "ui/radio";
-import { Range } from "ui/range";
+import { Radio } from "shared/ui/radio";
+import { Range } from "shared/ui/range";
 
 export const ChangeControlMode: React.FC = () => {
   const [isTouchpadMode, setIsTouchpadMode] = useState(() => {

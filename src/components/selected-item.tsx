@@ -1,6 +1,6 @@
 import { attackForward, inspectForward, COLOR_ATTACK, COLOR_MOVE_FORWARD, COLOR_PHOTOSYNTHESIS, COLOR_PUSH, getGeneHandler, moveForward, absorbLight, displaceForward, reproduce } from "simulation/creature/genes";
 import type { FC } from "react";
-import { Hexagon } from "ui/hexagon";
+import { Hexagon } from "shared/ui/hexagon";
 import { useWorkerEvent } from "app/hooks/use-worker-event";
 import { base4toInt, chunk } from "shared/utils";
 
