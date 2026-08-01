@@ -34,7 +34,7 @@ export const populateWorld = async (world: World, renderProgress: () => void) =>
     await new Promise((resolve) => setTimeout(resolve, 0));
   }
 
-  for (let i = 0; i < 100_000; i++) {
+  for (let i = 0; i < 50_000; i++) {
     const x = Math.floor(Math.random() * width);
     const y = Math.floor(Math.random() * height);
     if (!world.grid.get(x, y)) {

@@ -7,7 +7,7 @@ import { FrameRenderer } from "./frame-renderer";
 import { serializeSelectedItem } from "./selected-item";
 import { populateWorld } from "./world-generator";
 
-const worldWidth = 200;
+const worldWidth = 128;
 const worldHeight = roundToEven(worldWidth / HEX_ASPECT);
 
 type SimulationEvents = {

@@ -30,7 +30,7 @@ const classifyTarget = (target: WorldItem | null, creature: Creature): ScanCateg
 
 export const moveForward: GeneHandler = (creature, world, x, y) => {
   lerpRgb(creature.color, COLOR_MOVE_FORWARD, 0.01);
-  sendEnergy(creature, world, 5);
+  sendEnergy(creature, world, 2);
   const coordsFwd = world.grid.getCoordsByNarrow(x, y, creature.direction);
   if (world.grid.get(...coordsFwd)) return { isFinished: true };
   world.grid.swap(x, y, ...coordsFwd)
@@ -59,7 +59,7 @@ export const absorbLight: GeneHandler = (creature, world, _x, _y) => {
   sendEnergy(creature, world, 2)
   const max = world.grid.width * world.grid.height * 0.01;
   const e = Math.round(Math.min(50, world.energy / max * 1) * creature.autotrophOrHeterotroph.left ** 2);
-  creature.autotrophOrHeterotroph.left = lerp(creature.autotrophOrHeterotroph.left, 1, 0.0001);
+  creature.autotrophOrHeterotroph.left = lerp(creature.autotrophOrHeterotroph.left, 1, 0.002);
   sendEnergy(world, creature, e)
   return { isFinished: true };
 }
@@ -71,7 +71,7 @@ export const attackForward: GeneHandler = (creature, world, x, y) => {
   const target = world.grid.get(...coordsFwd);
   if (!target) return { isFinished: true };
   const strength = Math.round(200 * creature.autotrophOrHeterotroph.right ** 2);
-  creature.autotrophOrHeterotroph.right = lerp(creature.autotrophOrHeterotroph.right, 1, 0.0001);
+  creature.autotrophOrHeterotroph.right = lerp(creature.autotrophOrHeterotroph.right, 1, 0.002);
   const result = target.handleAttack(world, strength);
   sendEnergy(result, creature, result.energy);
   return { isFinished: true };

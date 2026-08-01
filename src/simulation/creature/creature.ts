@@ -57,7 +57,7 @@ export class Creature extends WorldItemDynamic {
     const color = [...this.color] as Rgba;
     lerpRgb(color, [100, 100, 100, 255], 0.5);
     for (let i = 0; i < tapeData.length; i++) {
-      if (Math.random() > 0.0001) continue;
+      if (Math.random() > 0.001) continue;
       tapeData[i] = getRandomBase4();
     }
     const coloration = mutateColor(this.coloration, 10);
