@@ -21,7 +21,6 @@ const Program: FC<ProgramProps> = ({ program, pointer }) => {
 
           const handler = getGeneHandler(n);
 
-          // const text = triplet.map((x) => ["A", "T", "G", "C"][x]).join("")
           const symbols = triplet.map((x) => ["A", "T", "G", "C"][x]);
 
           const color = {
@@ -111,9 +110,6 @@ export const SelectedEntity: FC = () => {
         <h3 className={styles.selectedTitle}>{selectedItem.type.toUpperCase()}</h3>
       </div>
       {selectedItem.type === "Creature" && <WorldEntityCreature item={selectedItem} />}
-      {/* <pre style={{ margin: 0 }}>
-        {JSON.stringify(selectedItem, null, 2)}
-      </pre> */}
     </div>
   );
 };

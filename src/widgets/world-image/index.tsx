@@ -31,7 +31,6 @@ export const WorldImage: FC<WorldImageProps> = ({ onClickPixel, isTouchpadMode =
 
   return (
     <HexagonsGl
-      // isWrap={false}
       ref={apiRef}
       onClickPixel={onClickPixel}
       isTouchpadMode={isTouchpadMode}
