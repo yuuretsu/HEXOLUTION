@@ -1,5 +1,5 @@
 import { useState, type FC } from "react";
-import { WorldImage } from "components/world-image";
+import { WorldImage } from "widgets/world-image";
 import { useWorldData } from "./hooks/use-world-data";
 import { AppControls } from "widgets/app-controls";
 import { Sidebar } from "widgets/sidebar";
