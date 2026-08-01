@@ -17,8 +17,7 @@ export const fillCircle = <T>(
   sr: number,
   value?: (x: number, y: number) => T | undefined
 ) => {
-  const HEX_ASPECT = 0.866;
-  const w = grid.width;
+    const w = grid.width;
   const h = grid.height;
   const rSq = sr * sr;
   const rCeilY = Math.floor(sr / HEX_ASPECT);
