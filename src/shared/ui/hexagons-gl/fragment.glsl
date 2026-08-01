@@ -30,6 +30,14 @@ void main() {
         cubeRounded.z = -cubeRounded.x - cubeRounded.y;
     }
 
+    float centerX = hexSize * (SQRT3 * cubeRounded.x + SQRT3/2.0 * cubeRounded.z);
+    float centerY = hexSize * (3.0/2.0 * cubeRounded.z);
+    vec2 centerPos = vec2(centerX, centerY);
+
+    float dist = distance(pixelPos, centerPos);
+    float circleRadius = hexSize * (SQRT3 * 0.5);
+    float circleMask = smoothstep(circleRadius, circleRadius - 1.5, dist);
+
     float col = cubeRounded.x + (cubeRounded.z - mod(abs(cubeRounded.z), 2.0)) * 0.5;
     float row = cubeRounded.z;
 
@@ -42,7 +50,11 @@ void main() {
 
     vec2 gridIndex = vec2(col, row);
     vec2 wrappedIndex = mod(mod(gridIndex, uWorldSize) + uWorldSize, uWorldSize);
-
     vec2 targetTexCoord = (wrappedIndex + 0.5) / uWorldSize;
-    gl_FragColor = texture2D(uScene, targetTexCoord);
+
+    vec4 texColor = texture2D(uScene, targetTexCoord);
+
+    float brightness = mix(0.9, 1.0, circleMask);
+
+    gl_FragColor = vec4(texColor.rgb * brightness, texColor.a);
 }
