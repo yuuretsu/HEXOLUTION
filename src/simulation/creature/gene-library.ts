@@ -1,9 +1,29 @@
 import { lerp, lerpRgb } from "shared/utils";
 import { sendEnergy, World } from "simulation/world";
+import type { WorldItem } from "simulation/world";
 import { Creature } from "./creature";
+import { Food } from "simulation/food";
+import { Stone } from "simulation/stone";
 import type { GeneHandler } from "./gene-types";
 import { COLOR_ATTACK, COLOR_MOVE_FORWARD, COLOR_PHOTOSYNTHESIS, COLOR_PUSH } from "./constants";
 import { scanRay } from "./utils";
+
+type ScanCategory = "empty" | "friend" | "enemy" | "food" | "stone";
+
+const classifyTarget = (target: WorldItem | null, creature: Creature): ScanCategory => {
+  if (!target) return "empty";
+  if (target instanceof Creature) {
+    let diff = 0;
+    const maxLen = Math.max(creature.tape.data.length, target.tape.data.length);
+    for (let i = 0; i < maxLen; i++) {
+      if (creature.tape.data[i] !== target.tape.data[i]) diff++;
+    }
+    return diff / maxLen > 0.1 ? "enemy" : "friend";
+  }
+  if (target instanceof Food) return "food";
+  if (target instanceof Stone) return "stone";
+  return "stone";
+};
 
 export const moveForward: GeneHandler = (creature, world, x, y) => {
   lerpRgb(creature.color, COLOR_MOVE_FORWARD, 0.01);
@@ -68,51 +88,33 @@ export const checkSelfEnergy: GeneHandler = (creature, _world, _x, _y) => {
 
 export const scanForward: GeneHandler = (creature, world, x, y) => {
   const distance = Math.floor(creature.tape.readFloat() * 10) + 1;
-  const jumpIfEmpty = creature.tape.readInt();
-  const jumpIfFriend = creature.tape.readInt();
-  const jumpIfEnemy = creature.tape.readInt();
-  const jumpIfOther = creature.tape.readInt();
+  const jumps = {
+    empty: creature.tape.readInt(),
+    friend: creature.tape.readInt(),
+    enemy: creature.tape.readInt(),
+    food: creature.tape.readInt(),
+    stone: creature.tape.readInt(),
+  };
 
   const target = scanRay(creature, world, x, y, distance);
-
-  if (!target) {
-    creature.tape.jump(jumpIfEmpty);
-  } else if (target instanceof Creature) {
-    let diff = 0;
-    const maxLen = Math.max(creature.tape.data.length, target.tape.data.length);
-    for (let i = 0; i < maxLen; i++) {
-      if (creature.tape.data[i] !== target.tape.data[i]) diff++;
-    }
-    if (diff / maxLen > 0.1) creature.tape.jump(jumpIfEnemy);
-    else creature.tape.jump(jumpIfFriend);
-  } else {
-    creature.tape.jump(jumpIfOther);
-  }
+  const category = classifyTarget(target, creature);
+  creature.tape.jump(jumps[category]);
 
   return { isFinished: false };
 };
 
 export const inspectForward: GeneHandler = (creature, world, x, y) => {
-  const jumpIfEmpty = creature.tape.readInt();
-  const jumpIfFriend = creature.tape.readInt();
-  const jumpIfEnemy = creature.tape.readInt();
-  const jumpIfOther = creature.tape.readInt();
+  const jumps = {
+    empty: creature.tape.readInt(),
+    friend: creature.tape.readInt(),
+    enemy: creature.tape.readInt(),
+    food: creature.tape.readInt(),
+    stone: creature.tape.readInt(),
+  };
 
   const target = scanRay(creature, world, x, y, 1);
-
-  if (!target) {
-    creature.tape.jump(jumpIfEmpty);
-  } else if (target instanceof Creature) {
-    let diff = 0;
-    const maxLen = Math.max(creature.tape.data.length, target.tape.data.length);
-    for (let i = 0; i < maxLen; i++) {
-      if (creature.tape.data[i] !== target.tape.data[i]) diff++;
-    }
-    if (diff / maxLen > 0.1) creature.tape.jump(jumpIfEnemy);
-    else creature.tape.jump(jumpIfFriend);
-  } else {
-    creature.tape.jump(jumpIfOther);
-  }
+  const category = classifyTarget(target, creature);
+  creature.tape.jump(jumps[category]);
 
   return { isFinished: false };
 };
