@@ -1,0 +1,8 @@
+.appControls {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  height: 48px;
+  display: flex;
+  gap: 8px;
+}

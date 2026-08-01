@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { workerApi, type ApiEvents } from "app/worker-client";
+import { workerApi, type WorkerApiEvents } from "shared/worker-client";
 
-export const useWorkerEvent = <Name extends keyof ApiEvents>(name: Name) => {
-  const [data, setData] = useState<ApiEvents[Name] | null>(null);
+export const useWorkerEvent = <Name extends keyof WorkerApiEvents>(name: Name) => {
+  const [data, setData] = useState<WorkerApiEvents[Name] | null>(null);
 
   useEffect(() => {
     const unsubscribe = workerApi.on(name, setData);

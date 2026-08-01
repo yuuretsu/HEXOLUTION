@@ -5,17 +5,16 @@ import {
   HiSquaresPlus,
   HiSun,
 } from "react-icons/hi2";
-import { ChangeControlMode } from "components/change-control-mode";
-import { ChangeSimulationSpeed } from "components/change-simulation-speed";
-import { ChangeViewMode } from "components/change-view-mode";
-import { SelectedItem } from "components/selected-item";
-import { Chart } from "ui/chart";
-import type { WorldData } from "app/worker-client";
-import styles from "../app.module.css";
-import type { ChartData } from "../hooks/use-world-data";
-import { Block } from "./block";
-import { BlockTitle } from "./block-title";
-import { Entries } from "./entries";
+import { ChangeControlMode } from "features/change-control-mode";
+import { ChangeSimulationSpeed } from "features/change-simulation-speed";
+import { ChangeViewMode } from "features/change-view-mode";
+import { Chart } from "shared/ui/chart";
+import styles from "./sidebar.module.css";
+import type { ChartData } from "app/hooks/use-world-data";
+import type { WorldData } from "shared/worker-protocol";
+import { Block } from "shared/ui/block";
+import { Entries } from "shared/ui/entries";
+import { SelectedEntity } from "entities/selected-entity";
 
 type SidebarProps = {
   data: WorldData;
@@ -35,12 +34,11 @@ export const Sidebar: FC<SidebarProps> = ({ data, chartData, isOpen }) => {
     <div
       className={styles.sidebar}
       style={{
-        transform: isOpen ? "" : "translate(70%, 80%) scale(0)",
-        transitionDuration: "0.5s",
+        transform: isOpen ? "" : "translate(calc(362px + 16px), 0)",
+        transitionDuration: "0.3s",
       }}
     >
-      <Block>
-        <BlockTitle Icon={HiAdjustmentsHorizontal}>Settings</BlockTitle>
+      <Block title={{ Icon: HiAdjustmentsHorizontal, text: "Settings" }}>
         <div>
           <div>SIMULATION STEPS PER FRAME</div>
           <ChangeSimulationSpeed />
@@ -54,8 +52,7 @@ export const Sidebar: FC<SidebarProps> = ({ data, chartData, isOpen }) => {
           <ChangeControlMode />
         </div>
       </Block>
-      <Block>
-        <BlockTitle Icon={HiSun}>Energy</BlockTitle>
+      <Block title={{ Icon: HiSun, text: "Energy" }}>
         <Entries
           entries={[
             ["World", data.worldEnergy],
@@ -63,8 +60,7 @@ export const Sidebar: FC<SidebarProps> = ({ data, chartData, isOpen }) => {
           ]}
         />
       </Block>
-      <Block>
-        <BlockTitle Icon={HiSquaresPlus}>Entities</BlockTitle>
+      <Block title={{ Icon: HiSquaresPlus, text: "Entities" }}>
         <Entries entries={data.worldEntries} />
         <div
           style={{
@@ -104,9 +100,8 @@ export const Sidebar: FC<SidebarProps> = ({ data, chartData, isOpen }) => {
           </div>
         </div>
       </Block>
-      <Block>
-        <BlockTitle Icon={HiFingerPrint}>Selected</BlockTitle>
-        <SelectedItem />
+      <Block title={{ Icon: HiFingerPrint, text: "Selected" }}>
+        <SelectedEntity />
       </Block>
     </div>
   );

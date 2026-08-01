@@ -1,6 +1,6 @@
 import { attackForward, inspectForward, COLOR_ATTACK, COLOR_MOVE_FORWARD, COLOR_PHOTOSYNTHESIS, COLOR_PUSH, getGeneHandler, moveForward, absorbLight, displaceForward, reproduce } from "simulation/creature/genes";
 import type { FC } from "react";
-import { Hexagon } from "ui/hexagon";
+import { Hexagon } from "shared/ui/hexagon";
 import { useWorkerEvent } from "app/hooks/use-worker-event";
 import { base4toInt, chunk } from "shared/utils";
 
@@ -45,6 +45,7 @@ const Program: FC<ProgramProps> = ({ program, pointer }) => {
                   justifyContent: "space-around",
                   fontWeight: "bold"
                 }}
+                title={handler.name}
               >
                 {symbols.map((x, i) => {
                   return (
@@ -61,7 +62,7 @@ const Program: FC<ProgramProps> = ({ program, pointer }) => {
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const SelectedItemCreature: FC<{ item: any }> = ({ item }) => {
+export const WorldEntityCreature: FC<{ item: any }> = ({ item }) => {
   const program = item.program as number[];
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -82,7 +83,7 @@ export const SelectedItemCreature: FC<{ item: any }> = ({ item }) => {
   );
 };
 
-export const SelectedItem: FC = () => {
+export const SelectedEntity: FC = () => {
   const selectedItem = useWorkerEvent("selectedItemUpdate");
 
   if (!selectedItem) return (
@@ -91,7 +92,7 @@ export const SelectedItem: FC = () => {
     </div>
   )
 
-  const [r, g, b, a] = selectedItem.color;
+  const [r, g, b] = selectedItem.color;
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -99,7 +100,7 @@ export const SelectedItem: FC = () => {
         <Hexagon size={8} color={`rgba(${r}, ${g}, ${b}`} strokeColor="white" strokeWidth={0.5} />
         <h3 style={{ margin: 0 }}>{selectedItem.type.toUpperCase()}</h3>
       </div>
-      {selectedItem.type === "Creature" && <SelectedItemCreature item={selectedItem} />}
+      {selectedItem.type === "Creature" && <WorldEntityCreature item={selectedItem} />}
       {/* <pre style={{ margin: 0 }}>
         {JSON.stringify(selectedItem, null, 2)}
       </pre> */}
