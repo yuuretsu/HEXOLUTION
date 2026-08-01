@@ -157,8 +157,8 @@ export const App: FC = () => {
           </BlockTitle>
           <Entries
             entries={[
-              ["world", data.worldEnergy],
-              ["entities", data.itemsEnergy],
+              ["World", data.worldEnergy],
+              ["Entities", data.itemsEnergy],
             ]}
           />
         </Block>
@@ -219,7 +219,7 @@ const Entries: FC<{ entries: [string, number][] }> = ({ entries }) => {
         {entries.map(([name, count]) => {
           return (
             <tr key={name}>
-              <th style={{ minWidth: 150 }}>{name.replace(/([A-Z])/g, ' $1').toUpperCase()}</th>
+              <th style={{ minWidth: 150 }}>{name}</th>
               <td style={{ minWidth: 100 }}>{new Intl.NumberFormat("en-US").format(count)}</td>
               <td style={{ minWidth: 64 }}>{(count / all * 100).toFixed(1)}%</td>
             </tr>
