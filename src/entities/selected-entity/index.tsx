@@ -45,6 +45,7 @@ const Program: FC<ProgramProps> = ({ program, pointer }) => {
                   justifyContent: "space-around",
                   fontWeight: "bold"
                 }}
+                title={handler.name}
               >
                 {symbols.map((x, i) => {
                   return (
