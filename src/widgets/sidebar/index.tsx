@@ -8,13 +8,13 @@ import {
 import { ChangeControlMode } from "features/change-control-mode";
 import { ChangeSimulationSpeed } from "features/change-simulation-speed";
 import { ChangeViewMode } from "features/change-view-mode";
-import { SelectedItem } from "components/selected-item";
 import { Chart } from "shared/ui/chart";
 import styles from "./sidebar.module.css";
 import type { ChartData } from "app/hooks/use-world-data";
 import type { WorldData } from "shared/worker-protocol";
 import { Block } from "shared/ui/block";
 import { Entries } from "shared/ui/entries";
+import { SelectedEntity } from "entities/selected-entity";
 
 type SidebarProps = {
   data: WorldData;
@@ -101,7 +101,7 @@ export const Sidebar: FC<SidebarProps> = ({ data, chartData, isOpen }) => {
         </div>
       </Block>
       <Block title={{ Icon: HiFingerPrint, text: "Selected" }}>
-        <SelectedItem />
+        <SelectedEntity />
       </Block>
     </div>
   );
