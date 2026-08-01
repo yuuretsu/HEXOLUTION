@@ -1,5 +1,6 @@
 import type { FC, PropsWithChildren, ReactNode } from "react";
 import type { IconType } from "react-icons";
+import clsx from "clsx";
 import { BlockTitle } from "./block-title";
 import styles from "./block.module.css";
 
@@ -11,7 +12,7 @@ export type BlockProps = PropsWithChildren<{
 }>;
 
 export const Block: FC<BlockProps> = ({ title, children }) => (
-  <div className={`blur-bg ${styles.block}`}>
+  <div className={clsx("blur-bg", styles.block)}>
     {title && <BlockTitle Icon={title.Icon}>{title.text}</BlockTitle>}
     {children}
   </div>

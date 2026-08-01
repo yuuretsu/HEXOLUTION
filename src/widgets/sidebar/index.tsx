@@ -1,4 +1,5 @@
 import type { FC } from "react";
+import clsx from "clsx";
 import {
   HiAdjustmentsHorizontal,
   HiFingerPrint,
@@ -32,11 +33,9 @@ export const Sidebar: FC<SidebarProps> = ({ data, chartData, isOpen }) => {
 
   return (
     <div
-      className={styles.sidebar}
-      style={{
-        transform: isOpen ? "" : "translate(calc(362px + 16px), 0)",
-        transitionDuration: "0.3s",
-      }}
+      className={clsx(styles.sidebar, {
+        [styles.sidebarHidden]: !isOpen,
+      })}
     >
       <Block title={{ Icon: HiAdjustmentsHorizontal, text: "Settings" }}>
         <div>
@@ -62,14 +61,7 @@ export const Sidebar: FC<SidebarProps> = ({ data, chartData, isOpen }) => {
       </Block>
       <Block title={{ Icon: HiSquaresPlus, text: "Entities" }}>
         <Entries entries={data.worldEntries} />
-        <div
-          style={{
-            marginBottom: 0,
-            borderRadius: 8,
-            overflow: "hidden",
-            backgroundColor: "rgba(255, 255, 255, 0.1)",
-          }}
-        >
+        <div className={styles.chartWrapper}>
           <Chart
             height={128}
             series={[
@@ -86,17 +78,11 @@ export const Sidebar: FC<SidebarProps> = ({ data, chartData, isOpen }) => {
             ]}
           />
         </div>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
+        <div className={styles.worldAgeRow}>
           <div>world age</div>
-          <div style={{ fontVariantNumeric: "tabular-nums" }}>
+          <div className={styles.worldAgeValue}>
             {fullAge}
-            <span style={{ opacity: 0.5 }}>.{fractionalPart}</span>
+            <span className={styles.worldAgeFraction}>.{fractionalPart}</span>
           </div>
         </div>
       </Block>

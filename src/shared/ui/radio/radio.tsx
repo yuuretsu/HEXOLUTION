@@ -1,4 +1,6 @@
 import type { FC, PropsWithChildren } from "react";
+import clsx from "clsx";
+import styles from "./radio.module.css";
 
 export type RadioItemProps = PropsWithChildren & {
   isActive?: boolean;
@@ -8,15 +10,10 @@ export type RadioItemProps = PropsWithChildren & {
 const RadioItem: FC<RadioItemProps> = ({ isActive, onClick, children }) => {
   return (
     <label
-      style={{
-        padding: "0px 4px",
-        backgroundColor: isActive ? "rgba(150, 255, 150, 0.5)" : "rgba(255, 255, 255, 0.25)",
-        borderRadius: 4,
-        cursor: "pointer"
-      }}
+      className={clsx(styles.item, isActive ? styles.itemActive : styles.itemInactive)}
       onClick={onClick}
     >
-      <input type="radio" name="" id="" style={{ all: "unset" }} />
+      <input type="radio" name="" id="" className={styles.input} />
       <span>{children}</span>
     </label>
   );
@@ -30,7 +27,7 @@ export type RadioProps<T = string> = {
 
 export const Radio = <T,>({ options, value, onChange }: RadioProps<T>) => {
   return (
-    <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+    <div className={styles.wrapper}>
       {options.map((option, i) => (
         <RadioItem key={i} isActive={option.value === value} onClick={() => onChange(option.value)}>
           {option.text}

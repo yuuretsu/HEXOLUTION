@@ -1,0 +1,11 @@
+.name {
+  min-width: 150px;
+}
+
+.count {
+  min-width: 100px;
+}
+
+.percent {
+  min-width: 64px;
+}

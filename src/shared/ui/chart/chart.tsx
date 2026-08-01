@@ -1,4 +1,5 @@
 import { memo, useMemo } from "react";
+import styles from "./chart.module.css";
 
 type DataPoint = [number, number];
 
@@ -88,7 +89,7 @@ const ChartLine = memo(({ data, color, width, height, minX, scaleX, scaleY, maxP
   return (
     <g>
       <polyline
-        style={{ filter: "blur(8px) saturate(4)" }}
+        className={styles.blurLine}
         fill="none"
         stroke={color}
         strokeWidth="4"
@@ -137,10 +138,10 @@ export const Chart = ({
   if (!scene) return null;
 
   return (
-    <div style={{ position: "relative" }}>
+    <div className={styles.wrapper}>
       <svg
         viewBox={`0 0 ${width} ${height}`}
-        style={{ display: "block" }}
+        className={styles.svg}
         width="100%"
       >
         {series.map((s) => (
@@ -157,30 +158,13 @@ export const Chart = ({
           />
         ))}
       </svg>
-      <div
-        style={{
-          position: "absolute",
-          bottom: 4,
-          left: 4,
-          display: "flex",
-          gap: 8,
-          textTransform: "uppercase",
-          fontSize: 16 * 0.75
-        }}
-      >
+      <div className={styles.legend}>
         {series.map((s) => (
           <div
             key={s.label}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 4,
-              backgroundColor: "rgba(255, 255, 255, 0.2)",
-              borderRadius: 4,
-              padding: "0 0.25rem",
-            }}
+            className={styles.legendItem}
           >
-            <div style={{ width: 2, height: 8, backgroundColor: s.color }} />
+            <div className={styles.legendSwatch} style={{ backgroundColor: s.color }} />
             {s.label}
           </div>
         ))}

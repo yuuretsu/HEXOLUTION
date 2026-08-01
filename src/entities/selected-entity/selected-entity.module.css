@@ -1,0 +1,54 @@
+.programGrid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.programCell {
+  text-align: center;
+  display: flex;
+  justify-content: space-around;
+  font-weight: bold;
+}
+
+.creatureInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.infoTable {
+  width: 100%;
+}
+
+.colorationRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  margin-left: auto;
+}
+
+.colorationSwatch {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+}
+
+.emptyHint {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-style: italic;
+}
+
+.selectedHeader {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.selectedTitle {
+  margin: 0;
+}

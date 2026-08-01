@@ -4,6 +4,14 @@
   gap: 8px;
 }
 
+.gradientSvg {
+  position: absolute;
+}
+
+.icon {
+  fill: url(#block-title-gradient);
+}
+
 .title {
   font-family: "BBH Bartle", sans-serif;
   margin: 0;
