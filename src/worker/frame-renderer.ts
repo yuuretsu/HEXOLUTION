@@ -7,6 +7,7 @@ const getColor = (item: WorldItem, mode: ViewMode) => {
     case "normal": return item.getColor();
     case "energy": return item.getEnergyColor();
     case "genome-hash": return item.getGenomeHashColor();
+    case "coloration": return item.getColoration();
     default: return [255, 0, 255, 255];
   }
 };

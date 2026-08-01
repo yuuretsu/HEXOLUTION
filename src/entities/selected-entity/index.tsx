@@ -76,6 +76,17 @@ export const WorldEntityCreature: FC<{ item: any }> = ({ item }) => {
             <th>AGE</th>
             <td>{item.age}</td>
           </tr>
+          <tr>
+            <th>COLORATION</th>
+            <td>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, width: "fit-content", marginLeft: "auto" }}>
+                <span style={{ display: "inline-block", width: 12, height: 12, borderRadius: 2, backgroundColor: `rgba(${item.coloration[0]}, ${item.coloration[1]}, ${item.coloration[2]}, ${item.coloration[3] / 255})` }} />
+                <span style={{}}>
+                  {item.coloration[0]}, {item.coloration[1]}, {item.coloration[2]}
+                </span>
+              </div>
+            </td>
+          </tr>
         </tbody>
       </table>
       <Program program={program} pointer={item.pointer} />

@@ -1,7 +1,7 @@
 import { Dichotomy } from "simulation/dichotomy";
 import { getRandomBase4, Tape } from "simulation/tape";
 import type { Rgba } from "shared/types";
-import { createRandom, hslaToRgba, lerpRgb } from "shared/utils";
+import { createRandom, hslaToRgba, lerpRgb, randomLightColor, mutateColor } from "shared/utils";
 import { sendEnergy, WorldItemDynamic, type World } from "simulation/world";
 import { getGeneHandler } from "./genes";
 import { MAX_CELL_ENERGY } from "shared/constants";
@@ -15,10 +15,11 @@ export class Creature extends WorldItemDynamic {
   age = 0;
   energy: number;
   readonly color: Rgba;
+  readonly coloration: Rgba;
   readonly autotrophOrHeterotroph: Dichotomy;
   genomeHashColor: Rgba;
 
-  constructor(energy: number, tape: Tape, autotrophOrHeterotroph: number, color: Rgba) {
+  constructor(energy: number, tape: Tape, autotrophOrHeterotroph: number, color: Rgba, coloration?: Rgba) {
     super()
     this.tape = tape;
     this.genomeHashColor = (() => {
@@ -29,6 +30,7 @@ export class Creature extends WorldItemDynamic {
     this.energy = energy;
     this.autotrophOrHeterotroph = new Dichotomy(autotrophOrHeterotroph)
     this.color = color
+    this.coloration = coloration ?? randomLightColor()
   }
 
   get direction() {
@@ -58,7 +60,8 @@ export class Creature extends WorldItemDynamic {
       if (Math.random() > 0.0001) continue;
       tapeData[i] = getRandomBase4();
     }
-    return new Creature(0, new Tape(new Uint8Array(tapeData)), this.autotrophOrHeterotroph.right, color);
+    const coloration = mutateColor(this.coloration, 10);
+    return new Creature(0, new Tape(new Uint8Array(tapeData)), this.autotrophOrHeterotroph.right, color, coloration);
   }
 
   process(world: World, x: number, y: number): void {
@@ -85,5 +88,9 @@ export class Creature extends WorldItemDynamic {
 
   getGenomeHashColor(): Rgba {
     return this.genomeHashColor;
+  }
+
+  getColoration(): Rgba {
+    return this.coloration;
   }
 }

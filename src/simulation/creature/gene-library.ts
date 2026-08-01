@@ -1,4 +1,5 @@
 import { lerp, lerpRgb } from "shared/utils";
+import type { Rgba } from "shared/types";
 import { sendEnergy, World } from "simulation/world";
 import type { WorldItem } from "simulation/world";
 import { Creature } from "./creature";
@@ -10,15 +11,17 @@ import { scanRay } from "./utils";
 
 type ScanCategory = "empty" | "friend" | "enemy" | "food" | "stone";
 
+const colorationDiff = (a: Rgba, b: Rgba): number => {
+  const dr = Math.abs(a[0] - b[0]);
+  const dg = Math.abs(a[1] - b[1]);
+  const db = Math.abs(a[2] - b[2]);
+  return (dr + dg + db) / (3 * 255);
+};
+
 const classifyTarget = (target: WorldItem | null, creature: Creature): ScanCategory => {
   if (!target) return "empty";
   if (target instanceof Creature) {
-    let diff = 0;
-    const maxLen = Math.max(creature.tape.data.length, target.tape.data.length);
-    for (let i = 0; i < maxLen; i++) {
-      if (creature.tape.data[i] !== target.tape.data[i]) diff++;
-    }
-    return diff / maxLen > 0.1 ? "enemy" : "friend";
+    return colorationDiff(creature.coloration, target.coloration) > 0.1 ? "enemy" : "friend";
   }
   if (target instanceof Food) return "food";
   if (target instanceof Stone) return "stone";
