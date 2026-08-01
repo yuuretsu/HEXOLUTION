@@ -1,0 +1,9 @@
+.block {
+  padding: 16px 24px;
+  border-radius: 16px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex-shrink: 0;
+}

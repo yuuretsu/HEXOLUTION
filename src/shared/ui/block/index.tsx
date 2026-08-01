@@ -1,6 +1,7 @@
 import type { FC, PropsWithChildren, ReactNode } from "react";
 import type { IconType } from "react-icons";
 import { BlockTitle } from "./block-title";
+import styles from "./block.module.css";
 
 export type BlockProps = PropsWithChildren<{
   title?: {
@@ -10,18 +11,7 @@ export type BlockProps = PropsWithChildren<{
 }>;
 
 export const Block: FC<BlockProps> = ({ title, children }) => (
-  <div
-    className="blur-bg"
-    style={{
-      padding: "16px 24px",
-      borderRadius: 16,
-      overflow: "hidden",
-      display: "flex",
-      flexDirection: "column",
-      gap: 16,
-      flexShrink: 0,
-    }}
-  >
+  <div className={`blur-bg ${styles.block}`}>
     {title && <BlockTitle Icon={title.Icon}>{title.text}</BlockTitle>}
     {children}
   </div>
