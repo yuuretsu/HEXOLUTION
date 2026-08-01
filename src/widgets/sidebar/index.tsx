@@ -6,7 +6,7 @@ import {
   HiSun,
 } from "react-icons/hi2";
 import { ChangeControlMode } from "features/change-control-mode";
-import { ChangeSimulationSpeed } from "components/change-simulation-speed";
+import { ChangeSimulationSpeed } from "features/change-simulation-speed";
 import { ChangeViewMode } from "components/change-view-mode";
 import { SelectedItem } from "components/selected-item";
 import { Chart } from "shared/ui/chart";
