@@ -1,4 +1,4 @@
-import { useSimulationSpeed } from "app/hooks/use-simulation-speed";
+import { useSimulationSpeed } from "shared/hooks/use-simulation-speed";
 import { HiPlay, HiPause } from "react-icons/hi2";
 import { IconButton } from "shared/ui/icon-button";
 

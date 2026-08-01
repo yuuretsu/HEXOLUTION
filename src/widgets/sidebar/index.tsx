@@ -10,7 +10,7 @@ import { ChangeSimulationSpeed } from "features/change-simulation-speed";
 import { ChangeViewMode } from "features/change-view-mode";
 import { Chart } from "shared/ui/chart";
 import styles from "./sidebar.module.css";
-import type { ChartData } from "app/hooks/use-world-data";
+import type { ChartData } from "shared/hooks/use-world-data";
 import type { WorldData } from "shared/worker-protocol";
 import { Block } from "shared/ui/block";
 import { Entries } from "shared/ui/entries";

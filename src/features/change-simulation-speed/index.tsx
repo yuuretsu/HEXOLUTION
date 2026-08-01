@@ -1,5 +1,5 @@
 import { type FC } from "react";
-import { useSimulationSpeed } from "app/hooks/use-simulation-speed";
+import { useSimulationSpeed } from "shared/hooks/use-simulation-speed";
 import { Radio } from "shared/ui/radio";
 export { TogglePlayPause } from "./toggle-play-pause";
 
