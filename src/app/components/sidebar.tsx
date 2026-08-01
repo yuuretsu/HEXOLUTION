@@ -35,8 +35,8 @@ export const Sidebar: FC<SidebarProps> = ({ data, chartData, isOpen }) => {
     <div
       className={styles.sidebar}
       style={{
-        transform: isOpen ? "" : "translate(70%, 80%) scale(0)",
-        transitionDuration: "0.5s",
+        transform: isOpen ? "" : "translate(calc(362px + 16px), 0)",
+        transitionDuration: "0.3s",
       }}
     >
       <Block>
