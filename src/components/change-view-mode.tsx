@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { workerApi } from "simulation-worker-api";
+import { workerApi } from "app/worker-client";
 import { Radio } from "ui/radio";
 
 export const ChangeViewMode = () => {

@@ -1,6 +1,6 @@
-import type { Rgba } from "types";
-import { shuffle } from "utils";
-import { GridMap, type IGrid } from "utils/grid";
+import type { Rgba } from "shared/types";
+import { shuffle } from "shared/utils";
+import { GridMap, type IGrid } from "shared/utils/grid";
 
 export abstract class WorldItemStatic {
   readonly CLASS_NAME: string = "WorldItemStatic";

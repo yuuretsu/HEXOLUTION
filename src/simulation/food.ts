@@ -1,7 +1,7 @@
-import type { Rgba } from "types";
-import { lerpRgb } from "utils";
-import { sendEnergy, WorldItemDynamic, type World } from "world";
-import { MAX_CELL_ENERGY } from "./constants";
+import type { Rgba } from "shared/types";
+import { lerpRgb } from "shared/utils";
+import { sendEnergy, WorldItemDynamic, type World } from "simulation/world";
+import { MAX_CELL_ENERGY } from "shared/constants";
 
 export class Food extends WorldItemDynamic {
   readonly CLASS_NAME = "Food";

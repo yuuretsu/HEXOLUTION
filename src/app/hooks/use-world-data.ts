@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { workerApi, type WorldData } from "simulation-worker-api";
+import { workerApi, type WorldData } from "app/worker-client";
 
 export type ChartData = {
   creatures: [number, number][];

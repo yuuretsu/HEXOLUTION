@@ -1,4 +1,4 @@
-import { base4toInt, choice } from "utils";
+import { base4toInt, choice } from "shared/utils";
 
 export type Base4 = 0 | 1 | 2 | 3;
 

@@ -1,4 +1,4 @@
-import type { Rgba } from "types";
+import type { Rgba } from "shared/types";
 
 export function shuffle(arr: unknown[]): void {
   for (let i = arr.length - 1; i > 0; i--) {

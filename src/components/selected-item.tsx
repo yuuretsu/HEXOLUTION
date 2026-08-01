@@ -1,8 +1,8 @@
-import { attackForward, inspectForward, COLOR_ATTACK, COLOR_MOVE_FORWARD, COLOR_PHOTOSYNTHESIS, COLOR_PUSH, getGeneHandler, moveForward, absorbLight, displaceForward, reproduce } from "creature/genes";
+import { attackForward, inspectForward, COLOR_ATTACK, COLOR_MOVE_FORWARD, COLOR_PHOTOSYNTHESIS, COLOR_PUSH, getGeneHandler, moveForward, absorbLight, displaceForward, reproduce } from "simulation/creature/genes";
 import type { FC } from "react";
 import { Hexagon } from "ui/hexagon";
-import { useWorkerEvent } from "use-worker-event";
-import { base4toInt, chunk } from "utils";
+import { useWorkerEvent } from "app/hooks/use-worker-event";
+import { base4toInt, chunk } from "shared/utils";
 
 type ProgramProps = {
   program: number[];
