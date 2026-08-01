@@ -47,6 +47,7 @@ let speedMultiplier = 1;
 let viewMode: ViewMode = "normal";
 let selectedItem: null | WorldItem = null;
 let age = 0;
+let loopTimer: ReturnType<typeof setTimeout> | null = null;
 
 const pixelBuffer = new Uint8ClampedArray(w * h * 4);
 const pixelView = new Uint32Array(pixelBuffer.buffer);
@@ -84,15 +85,49 @@ const renderToBuffer = () => {
   return { counter, itemsEnergy };
 };
 
+const emitSelectedItemUpdate = () => {
+  if (!selectedItem) {
+    server.emit("selectedItemUpdate", null);
+    return;
+  }
+
+  const commonData = { type: selectedItem.CLASS_NAME, color: selectedItem.getColor() };
+  if (selectedItem instanceof Creature) {
+    server.emit("selectedItemUpdate", {
+      ...commonData,
+      direction: selectedItem.direction,
+      program: [...selectedItem.tape.data],
+      pointer: selectedItem.tape.pointer,
+      age: selectedItem.age,
+      energy: selectedItem.energy,
+    });
+  } else {
+    server.emit("selectedItemUpdate", commonData);
+  }
+};
+
+const scheduleLoop = (delay = 10) => {
+  if (loopTimer !== null) return;
+  loopTimer = setTimeout(() => {
+    loopTimer = null;
+    loop();
+  }, delay);
+};
+
 const server = new WorkerServer<Api, ApiResults, ApiEvents>(self, {
   selectItem(...params) {
-    if (!params.length) return (selectedItem = null);
-    const [x, y] = params;
-    selectedItem = world.grid.get(Math.floor(x), Math.floor(y)) || null;
+    if (!params.length) {
+      selectedItem = null;
+    } else {
+      const [x, y] = params;
+      selectedItem = world.grid.get(Math.floor(x), Math.floor(y)) || null;
+    }
+    emitSelectedItemUpdate();
   },
   setSpeed(speed: number) {
     speedMultiplier = speed;
     server.emit("speedChanged", speed);
+    if (speed > 0) scheduleLoop(0);
   },
   getSpeed() { return speedMultiplier; },
   setViewMode(mode: ViewMode) { viewMode = mode; renderToBuffer(); },
@@ -106,6 +141,8 @@ const server = new WorkerServer<Api, ApiResults, ApiEvents>(self, {
 });
 
 const loop = () => {
+  if (speedMultiplier <= 0) return;
+
   const totalCells = w * h;
   const iterations = totalCells * speedMultiplier;
 
@@ -129,23 +166,9 @@ const loop = () => {
     worldEntries: counter.getMostCommon(5)
   });
 
-  if (selectedItem) {
-    const commonData = { type: selectedItem.CLASS_NAME, color: selectedItem.getColor() };
-    if (selectedItem instanceof Creature) {
-      server.emit("selectedItemUpdate", {
-        ...commonData,
-        direction: selectedItem.direction,
-        program: [...selectedItem.tape.data],
-        pointer: selectedItem.tape.pointer,
-        age: selectedItem.age,
-        energy: selectedItem.energy,
-      });
-    } else {
-      server.emit("selectedItemUpdate", commonData);
-    }
-  }
+  emitSelectedItemUpdate();
 
-  setTimeout(loop, 10);
+  scheduleLoop();
 };
 
 const init = async () => {

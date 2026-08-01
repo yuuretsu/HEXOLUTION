@@ -19,7 +19,12 @@ export class WorkerClient<
     this.eventHandlers.set(event, handlers);
 
     return () => {
-      this.eventHandlers.delete(event);
+      const currentHandlers = this.eventHandlers.get(event);
+      if (!currentHandlers) return;
+      const index = currentHandlers.indexOf(handler);
+      if (index === -1) return;
+      currentHandlers.splice(index, 1);
+      if (currentHandlers.length === 0) this.eventHandlers.delete(event);
     }
   }
 
