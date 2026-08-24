@@ -256,7 +256,6 @@ export const HexagonsGl = forwardRef<HexagonsGlHandle, HexagonsGlProps>(
         gl.deleteShader(fragmentShader);
         gl.deleteProgram(program);
         glRef.current = null;
-        gl.getExtension("WEBGL_lose_context")?.loseContext();
       };
     }, []);
 

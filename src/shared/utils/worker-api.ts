@@ -1,25 +1,3 @@
-const TRANSFER_MARKER = Symbol("workerTransfer");
-
-export type WithTransfer<T> = {
-  readonly [TRANSFER_MARKER]: true;
-  result: T;
-  transfer: Transferable[];
-};
-
-export const withTransfer = <T>(result: T, transfer: Transferable[]): WithTransfer<T> => ({
-  [TRANSFER_MARKER]: true,
-  result,
-  transfer,
-});
-
-const unwrapHandlerResult = (value: unknown): { result: unknown; transfer: Transferable[] } => {
-  if (value && typeof value === "object" && TRANSFER_MARKER in value) {
-    const wrapped = value as WithTransfer<unknown>;
-    return { result: wrapped.result, transfer: wrapped.transfer };
-  }
-  return { result: value, transfer: [] };
-};
-
 export class WorkerClient<
   Methods extends Record<string, unknown[]>,
   Results extends { [Method in keyof Methods]: unknown },
@@ -90,9 +68,7 @@ export class WorkerServer<
   constructor(
     worker: Window & typeof globalThis,
     handlers: {
-      [Method in keyof Methods]: (
-        ...params: Methods[Method]
-      ) => Results[Method] | WithTransfer<Results[Method]>;
+      [Method in keyof Methods]: (...params: Methods[Method]) => Results[Method];
     }
   ) {
     this.worker = worker;
@@ -103,10 +79,9 @@ export class WorkerServer<
       const result = handlers[method as keyof Methods](
         ...(params as Methods[keyof Methods])
       );
-      Promise.resolve(result).then((v) => {
-        const { result: payload, transfer } = unwrapHandlerResult(v);
-        this.worker.postMessage({ id, result: payload }, { transfer });
-      });
+      Promise.resolve(result).then((v) =>
+        this.worker.postMessage({ id, result: v })
+      );
     });
   }
 

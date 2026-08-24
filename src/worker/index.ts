@@ -1,4 +1,4 @@
-import { WorkerServer, withTransfer } from "shared/utils/worker-api";
+import { WorkerServer } from "shared/utils/worker-api";
 import type { WorkerApi, WorkerApiEvents, WorkerApiResults } from "shared/worker-protocol";
 import { Simulation } from "./simulation";
 
@@ -13,10 +13,7 @@ const server = new WorkerServer<WorkerApi, WorkerApiResults, WorkerApiEvents>(se
   setSpeed: (speed) => simulation.setSpeed(speed),
   getSpeed: () => simulation.getSpeed(),
   setViewMode: (mode) => simulation.setViewMode(mode),
-  getLatestFrame: () => {
-    const frame = simulation.getLatestFrame();
-    return frame ? withTransfer(frame, [frame.buffer]) : null;
-  },
+  getLatestFrame: () => simulation.getLatestFrame(),
   getObjectAt: (position) => simulation.getObjectAt(position),
   ackData: () => simulation.ackData(),
 });
