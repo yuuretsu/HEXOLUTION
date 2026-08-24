@@ -23,10 +23,11 @@ export class FrameRenderer {
     this.pixelView = new Uint32Array(this.pixelBuffer.buffer);
   }
 
-  render(viewMode: ViewMode) {
+  render(viewMode: ViewMode, selectedId = 0) {
     const entries = new Counter<string>();
     let creaturesEnergy = 0;
     let foodEnergy = 0;
+    let selectedItem: WorldItem | null = null;
     const { width, height } = this.world.grid;
 
     for (let y = 0; y < height; y++) {
@@ -38,6 +39,7 @@ export class FrameRenderer {
           this.pixelView[index] = 0;
           continue;
         }
+        if (selectedId !== 0 && item.id === selectedId) selectedItem = item;
         entries.add(item.CLASS_NAME);
         const color = getColor(item, viewMode);
         this.pixelView[index] = (255 << 24) | (color[2] << 16) | (color[1] << 8) | color[0];
@@ -47,7 +49,7 @@ export class FrameRenderer {
         }
       }
     }
-    return { entries, creaturesEnergy, foodEnergy };
+    return { entries, creaturesEnergy, foodEnergy, selectedItem };
   }
 
   getFrame() {

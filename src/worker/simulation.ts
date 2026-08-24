@@ -18,11 +18,12 @@ export class Simulation {
   private readonly renderer = new FrameRenderer(this.world);
   private speedMultiplier = 1;
   private viewMode: ViewMode = "normal";
-  private selectedItem: WorldItem | null = null;
+  private selectedId = 0;
   private age = 0;
   private loopTimer: ReturnType<typeof setTimeout> | null = null;
 
   private pendingData: WorldData | null = null;
+  private pendingSelectedItem: WorldItem | null = null;
   private dataDirty = false;
   private uiReadyForData = true;
   private backpressureEnabled = false;
@@ -37,8 +38,15 @@ export class Simulation {
   }
 
   selectItem(...params: [number, number] | []) {
-    this.selectedItem = params.length ? this.world.grid.get(Math.floor(params[0]), Math.floor(params[1])) ?? null : null;
-    this.emitSelectedItemUpdate();
+    if (!params.length) {
+      this.selectedId = 0;
+      this.pendingSelectedItem = null;
+    } else {
+      const item = this.world.grid.get(Math.floor(params[0]), Math.floor(params[1])) ?? null;
+      this.selectedId = item?.id ?? 0;
+      this.pendingSelectedItem = item;
+    }
+    this.events.onSelectedItemUpdate(serializeSelectedItem(this.pendingSelectedItem));
   }
 
   setSpeed(speed: number) {
@@ -82,7 +90,9 @@ export class Simulation {
   };
 
   private render() {
-    const { entries, creaturesEnergy, foodEnergy } = this.renderer.render(this.viewMode);
+    const { entries, creaturesEnergy, foodEnergy, selectedItem } = this.renderer.render(this.viewMode, this.selectedId);
+    if (!selectedItem) this.selectedId = 0;
+    this.pendingSelectedItem = selectedItem;
     this.pendingData = {
       worldEnergy: this.world.energy,
       creaturesEnergy,
@@ -103,11 +113,7 @@ export class Simulation {
     if (this.backpressureEnabled) this.uiReadyForData = false;
 
     this.events.onData(this.pendingData);
-    this.emitSelectedItemUpdate();
-  }
-
-  private emitSelectedItemUpdate() {
-    this.events.onSelectedItemUpdate(serializeSelectedItem(this.selectedItem));
+    this.events.onSelectedItemUpdate(serializeSelectedItem(this.pendingSelectedItem));
   }
 
   private scheduleLoop() {

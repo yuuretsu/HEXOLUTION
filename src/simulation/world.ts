@@ -4,9 +4,15 @@ import { shuffle } from "@/shared/utils";
 import { GridMap, type IGrid } from "@/shared/utils/grid";
 
 const staticAttackResult = { energy: 0 };
+let nextWorldItemId = 1;
 
 export abstract class WorldItemStatic {
   readonly CLASS_NAME: string = "WorldItemStatic";
+  id = nextWorldItemId++;
+
+  rebindId() {
+    this.id = nextWorldItemId++;
+  }
 
   getColor(): Rgba {
     return [255, 0, 255, 255];

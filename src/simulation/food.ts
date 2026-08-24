@@ -24,6 +24,7 @@ export class Food extends WorldItemDynamic {
   static acquire(energy: number): Food {
     const food = foodPool.acquire();
     food.energy = energy;
+    food.rebindId();
     return food;
   }
 

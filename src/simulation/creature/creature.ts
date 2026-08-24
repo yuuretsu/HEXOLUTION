@@ -93,6 +93,7 @@ export class Creature extends WorldItemDynamic {
       randomLightColorInto(this.coloration);
     }
     this.refreshGenomeHashColor();
+    this.rebindId();
   }
 
   release(): void {
@@ -157,6 +158,7 @@ export class Creature extends WorldItemDynamic {
     mutateColorInto(child.coloration, this.coloration, COLORATION_MUTATION_RATE);
     child.autotrophOrHeterotroph.right = this.autotrophOrHeterotroph.right;
     child.refreshGenomeHashColor();
+    child.rebindId();
     return child;
   }
 
