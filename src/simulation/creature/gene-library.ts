@@ -58,7 +58,8 @@ export const absorbLight: GeneHandler = (creature, world, _x, _y) => {
   lerpRgb(creature.color, COLOR_PHOTOSYNTHESIS, 0.01);
   sendEnergy(creature, world, 2)
   const max = world.grid.width * world.grid.height * 0.01;
-  const e = Math.round(Math.min(50, world.energy / max * 1) * creature.autotrophOrHeterotroph.left ** 2);
+  const scarcity = Math.min(1, world.energy / max) ** 2;
+  const e = Math.round(50 * scarcity * creature.autotrophOrHeterotroph.left ** 2);
   creature.autotrophOrHeterotroph.left = lerp(creature.autotrophOrHeterotroph.left, 1, 0.002);
   sendEnergy(world, creature, e)
   return { isFinished: true };
