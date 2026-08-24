@@ -20,7 +20,16 @@ export const useWorldData = () => {
   const [chartData, setChartData] = useState<ChartData>({ creatures: [], food: [] });
 
   useEffect(() => {
-    return workerApi.on("data", (nextData) => {
+    let active = true;
+
+    void workerApi.call("ackData", []);
+
+    const unsubscribe = workerApi.on("data", (nextData) => {
+      if (!active) {
+        void workerApi.call("ackData", []);
+        return;
+      }
+
       setData(nextData);
       const creatures: [number, number] = [
         nextData.worldAge,
@@ -34,7 +43,15 @@ export const useWorldData = () => {
         creatures: [...previousData.creatures, creatures].slice(-1000),
         food: [...previousData.food, food].slice(-1000),
       }));
+
+      void workerApi.call("ackData", []);
     });
+
+    return () => {
+      active = false;
+      unsubscribe();
+      void workerApi.call("ackData", []);
+    };
   }, []);
 
   return [data, chartData] as const;

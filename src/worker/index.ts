@@ -15,6 +15,7 @@ const server = new WorkerServer<WorkerApi, WorkerApiResults, WorkerApiEvents>(se
   setViewMode: (mode) => simulation.setViewMode(mode),
   getLatestFrame: () => simulation.getLatestFrame(),
   getObjectAt: (position) => simulation.getObjectAt(position),
+  ackData: () => simulation.ackData(),
 });
 
 simulation.init();
