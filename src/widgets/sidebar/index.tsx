@@ -55,7 +55,8 @@ export const Sidebar: FC<SidebarProps> = ({ data, chartData, isOpen }) => {
         <Entries
           entries={[
             ["World", data.worldEnergy],
-            ["Entities", data.itemsEnergy],
+            ["Creature", data.creaturesEnergy],
+            ["Food", data.foodEnergy],
           ]}
         />
       </Block>
