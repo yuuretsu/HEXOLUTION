@@ -60,22 +60,29 @@ export const roundToEven = (n: number) => {
   return Math.round(n / 2) * 2;
 }
 
-export const randomLightColor = (): Rgba => {
-  return [
-    50 + Math.floor(Math.random() * 206),
-    50 + Math.floor(Math.random() * 206),
-    50 + Math.floor(Math.random() * 206),
-    255,
-  ];
+export const randomLightColorInto = (out: Rgba): Rgba => {
+  out[0] = 50 + Math.floor(Math.random() * 206);
+  out[1] = 50 + Math.floor(Math.random() * 206);
+  out[2] = 50 + Math.floor(Math.random() * 206);
+  out[3] = 255;
+  return out;
 };
 
-export const mutateColor = (color: Rgba, rate: number): Rgba => {
+export const randomLightColor = (): Rgba => randomLightColorInto([0, 0, 0, 255]);
+
+export const mutateColorInto = (out: Rgba, color: Rgba, rate: number): Rgba => {
   const mutateChannel = (c: number) => {
     const delta = Math.round((Math.random() - 0.5) * 2 * rate);
     return Math.max(50, Math.min(255, c + delta));
   };
-  return [mutateChannel(color[0]), mutateChannel(color[1]), mutateChannel(color[2]), 255];
+  out[0] = mutateChannel(color[0]);
+  out[1] = mutateChannel(color[1]);
+  out[2] = mutateChannel(color[2]);
+  out[3] = 255;
+  return out;
 };
+
+export const mutateColor = (color: Rgba, rate: number): Rgba => mutateColorInto([0, 0, 0, 255], color, rate);
 
 export const hslaToRgba = (h: number, s: number, l: number, a: number): Rgba => {
   h /= 360;

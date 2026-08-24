@@ -1,5 +1,10 @@
 import type { IGrid } from "./types";
 
+const DX_ODD = [1, 1, 0, -1, 0, 1] as const;
+const DX_EVEN = [1, 0, -1, -1, -1, 0] as const;
+const DY = [0, 1, 1, 0, -1, -1] as const;
+const defaultCoords: [number, number] = [0, 0];
+
 export class GridMatrix<T> implements IGrid<T> {
   private readonly cells: (T | undefined)[][];
   readonly width: number;
@@ -56,17 +61,25 @@ export class GridMatrix<T> implements IGrid<T> {
     this.cells[by0][bx0] = tmp;
   }
 
-  getCoordsByNarrow(x: number, y: number, narrow: number, distance: number = 1): [number, number] {
+  getCoordsByNarrow(
+    x: number,
+    y: number,
+    narrow: number,
+    distance: number = 1,
+    out: [number, number] = defaultCoords,
+  ): [number, number] {
     let curX = x;
     let curY = y;
     const n = ((narrow % 6) + 6) % 6;
     for (let i = 0; i < distance; i++) {
       const isOdd = curY % 2 !== 0;
-      const dx = isOdd ? [1, 1, 0, -1, 0, 1][n] : [1, 0, -1, -1, -1, 0][n];
-      const dy = [0, 1, 1, 0, -1, -1][n];
+      const dx = isOdd ? DX_ODD[n] : DX_EVEN[n];
+      const dy = DY[n];
       curX = this.mapX(curX + dx);
       curY = this.mapY(curY + dy);
     }
-    return [curX, curY];
+    out[0] = curX;
+    out[1] = curY;
+    return out;
   }
 }

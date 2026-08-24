@@ -18,9 +18,9 @@ export class DebugCreature extends WorldItemDynamic {
   process(world: World, x: number, y: number): void {
     if (Math.random() > 0.999) this.direction += 1;
     const coordsFwd = world.grid.getCoordsByNarrow(x, y, this.direction);
-    const target = world.grid.get(...coordsFwd);
+    const target = world.grid.get(coordsFwd[0], coordsFwd[1]);
     if (target) return;
-    world.grid.swap(x, y, ...coordsFwd);
+    world.grid.swap(x, y, coordsFwd[0], coordsFwd[1]);
   }
 
   getColor(): Rgba {
