@@ -1,6 +1,7 @@
 import type { Rgba } from "@/shared/types";
 import { lerpRgb } from "@/shared/utils";
 import { ObjectPool } from "@/shared/utils/object-pool";
+import { EntityKind } from "@/simulation/entity-kind";
 import { sendEnergy, WorldItemDynamic, type World } from "@/simulation/world";
 import { MAX_CELL_ENERGY } from "@/shared/constants";
 
@@ -12,7 +13,7 @@ const ENERGY_COLOR_HOT: Rgba = [255, 255, 0, 255];
 const FOOD_COLOR_FULL: Rgba = [75, 75, 50, 255];
 
 export class Food extends WorldItemDynamic {
-  readonly CLASS_NAME = "Food";
+  readonly kind = EntityKind.Food;
 
   energy: number;
 

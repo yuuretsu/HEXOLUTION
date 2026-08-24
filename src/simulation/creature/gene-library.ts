@@ -1,10 +1,9 @@
 import { lerp, lerpRgb } from "@/shared/utils";
 import type { Rgba } from "@/shared/types";
+import { EntityKind } from "@/simulation/entity-kind";
 import { sendEnergy, World } from "@/simulation/world";
 import type { WorldItem } from "@/simulation/world";
 import { Creature } from "./creature";
-import { Food } from "@/simulation/food";
-import { Stone } from "@/simulation/stone";
 import { GENE_CONTINUE, GENE_FINISHED, type GeneHandler } from "./gene-types";
 import {
   ATTACK_ENERGY_COST,
@@ -46,12 +45,16 @@ const colorationDiff = (a: Rgba, b: Rgba): number => {
 
 const classifyTarget = (target: WorldItem | null, creature: Creature): ScanCategory => {
   if (!target) return "empty";
-  if (target instanceof Creature) {
-    return colorationDiff(creature.coloration, target.coloration) > FRIEND_COLORATION_THRESHOLD ? "enemy" : "friend";
+  switch (target.kind) {
+    case EntityKind.Creature:
+      return colorationDiff(creature.coloration, (target as Creature).coloration) > FRIEND_COLORATION_THRESHOLD
+        ? "enemy"
+        : "friend";
+    case EntityKind.Food:
+      return "food";
+    case EntityKind.Stone:
+      return "stone";
   }
-  if (target instanceof Food) return "food";
-  if (target instanceof Stone) return "stone";
-  return "stone";
 };
 
 export const moveForward: GeneHandler = (creature, world, x, y) => {

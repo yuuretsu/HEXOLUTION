@@ -1,9 +1,10 @@
+import { EntityKind } from "@/simulation/entity-kind";
 import type { Rgba } from "@/shared/types";
 import { clampCycle } from "@/shared/utils";
 import { World, WorldItemDynamic } from "@/simulation/world";
 
 export class DebugCreature extends WorldItemDynamic {
-  readonly CLASS_NAME = "DebugCreature";
+  readonly kind = EntityKind.Creature;
 
   _direction = ~~(Math.random() * 6);
 

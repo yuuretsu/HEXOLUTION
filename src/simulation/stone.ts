@@ -1,8 +1,9 @@
 import type { Rgba } from "@/shared/types";
+import { EntityKind } from "@/simulation/entity-kind";
 import { WorldItemStatic } from "@/simulation/world";
 
 export class Stone extends WorldItemStatic {
-  readonly CLASS_NAME = "Stone";
+  readonly kind = EntityKind.Stone;
 
   color: Rgba;
 

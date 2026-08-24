@@ -9,8 +9,9 @@ import {
   randomLightColorInto,
 } from "@/shared/utils";
 import { ObjectPool } from "@/shared/utils/object-pool";
+import { EntityKind } from "@/simulation/entity-kind";
 import { sendEnergy, WorldItemDynamic, type World } from "@/simulation/world";
-import { getGeneHandler } from "./genes";
+import { getGeneHandler } from "./gene-registry";
 import {
   AGE_ENERGY_COST_FACTOR,
   COLORATION_MUTATION_RATE,
@@ -30,7 +31,7 @@ const ENERGY_COLOR_HOT: Rgba = [255, 255, 0, 255];
 const energyColorScratch: Rgba = [0, 0, 100, 255];
 
 export class Creature extends WorldItemDynamic {
-  readonly CLASS_NAME = "Creature";
+  readonly kind = EntityKind.Creature;
 
   _direction: number = ~~(Math.random() * 6);
   readonly tape: Tape;
