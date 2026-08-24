@@ -6,7 +6,23 @@ import { Creature } from "./creature";
 import { Food } from "simulation/food";
 import { Stone } from "simulation/stone";
 import type { GeneHandler } from "./gene-types";
-import { COLOR_ATTACK, COLOR_MOVE_FORWARD, COLOR_PHOTOSYNTHESIS, COLOR_PUSH } from "./constants";
+import {
+  ATTACK_ENERGY_COST,
+  ATTACK_MAX_STRENGTH,
+  COLOR_ATTACK,
+  COLOR_MOVE_FORWARD,
+  COLOR_PHOTOSYNTHESIS,
+  COLOR_PUSH,
+  FRIEND_COLORATION_THRESHOLD,
+  MOVE_ENERGY_COST,
+  PHOTOSYNTHESIS_ABUNDANCE_RATIO,
+  PHOTOSYNTHESIS_ENERGY_COST,
+  PHOTOSYNTHESIS_MAX_YIELD,
+  PUSH_ENERGY_COST,
+  REPRODUCE_ENERGY_COST,
+  REPRODUCE_MIN_ENERGY,
+  SPECIALIZATION_LEARN_RATE,
+} from "./constants";
 import { scanRay } from "./utils";
 
 type ScanCategory = "empty" | "friend" | "enemy" | "food" | "stone";
@@ -21,7 +37,7 @@ const colorationDiff = (a: Rgba, b: Rgba): number => {
 const classifyTarget = (target: WorldItem | null, creature: Creature): ScanCategory => {
   if (!target) return "empty";
   if (target instanceof Creature) {
-    return colorationDiff(creature.coloration, target.coloration) > 0.1 ? "enemy" : "friend";
+    return colorationDiff(creature.coloration, target.coloration) > FRIEND_COLORATION_THRESHOLD ? "enemy" : "friend";
   }
   if (target instanceof Food) return "food";
   if (target instanceof Stone) return "stone";
@@ -30,7 +46,7 @@ const classifyTarget = (target: WorldItem | null, creature: Creature): ScanCateg
 
 export const moveForward: GeneHandler = (creature, world, x, y) => {
   lerpRgb(creature.color, COLOR_MOVE_FORWARD, 0.01);
-  sendEnergy(creature, world, 2);
+  sendEnergy(creature, world, MOVE_ENERGY_COST);
   const coordsFwd = world.grid.getCoordsByNarrow(x, y, creature.direction);
   if (world.grid.get(...coordsFwd)) return { isFinished: true };
   world.grid.swap(x, y, ...coordsFwd)
@@ -44,8 +60,8 @@ export const rotateRight: GeneHandler = (creature, _grid, _x, _y) => {
 
 export const reproduce: GeneHandler = (creature, world, x, y) => {
   const amount = creature.tape.readFloat();
-  sendEnergy(creature, world, 10);
-  if (creature.energy < 100) return { isFinished: true };
+  sendEnergy(creature, world, REPRODUCE_ENERGY_COST);
+  if (creature.energy < REPRODUCE_MIN_ENERGY) return { isFinished: true };
   const coordsFwd = world.grid.getCoordsByNarrow(x, y, creature.direction);
   if (world.grid.get(...coordsFwd)) return { isFinished: true };
   const child = creature.reproduce();
@@ -56,23 +72,22 @@ export const reproduce: GeneHandler = (creature, world, x, y) => {
 
 export const absorbLight: GeneHandler = (creature, world, _x, _y) => {
   lerpRgb(creature.color, COLOR_PHOTOSYNTHESIS, 0.01);
-  sendEnergy(creature, world, 2)
-  const max = world.grid.width * world.grid.height * 0.01;
-  const scarcity = Math.min(1, world.energy / max) ** 2;
-  const e = Math.round(50 * scarcity * creature.autotrophOrHeterotroph.left ** 2);
-  creature.autotrophOrHeterotroph.left = lerp(creature.autotrophOrHeterotroph.left, 1, 0.002);
+  sendEnergy(creature, world, PHOTOSYNTHESIS_ENERGY_COST)
+  const abundance = Math.min(1, world.energy / (world.totalEnergy * PHOTOSYNTHESIS_ABUNDANCE_RATIO)) ** 2;
+  const e = Math.round(PHOTOSYNTHESIS_MAX_YIELD * abundance * creature.autotrophOrHeterotroph.left ** 2);
+  creature.autotrophOrHeterotroph.left = lerp(creature.autotrophOrHeterotroph.left, 1, SPECIALIZATION_LEARN_RATE);
   sendEnergy(world, creature, e)
   return { isFinished: true };
 }
 
 export const attackForward: GeneHandler = (creature, world, x, y) => {
   lerpRgb(creature.color, COLOR_ATTACK, 0.02);
-  sendEnergy(creature, world, 10);
+  sendEnergy(creature, world, ATTACK_ENERGY_COST);
   const coordsFwd = world.grid.getCoordsByNarrow(x, y, creature.direction);
   const target = world.grid.get(...coordsFwd);
   if (!target) return { isFinished: true };
-  const strength = Math.round(200 * creature.autotrophOrHeterotroph.right ** 2);
-  creature.autotrophOrHeterotroph.right = lerp(creature.autotrophOrHeterotroph.right, 1, 0.002);
+  const strength = Math.round(ATTACK_MAX_STRENGTH * creature.autotrophOrHeterotroph.right ** 2);
+  creature.autotrophOrHeterotroph.right = lerp(creature.autotrophOrHeterotroph.right, 1, SPECIALIZATION_LEARN_RATE);
   const result = target.handleAttack(world, strength);
   sendEnergy(result, creature, result.energy);
   return { isFinished: true };
@@ -130,7 +145,7 @@ export const resetGenomePointer: GeneHandler = (creature, _world, _x, _y) => {
 
 export const displaceForward: GeneHandler = (creature, world, x, y) => {
   lerpRgb(creature.color, COLOR_PUSH, 0.01);
-  sendEnergy(creature, world, 10);
+  sendEnergy(creature, world, PUSH_ENERGY_COST);
   const coordsFwd = world.grid.getCoordsByNarrow(x, y, creature.direction);
   const objFwd = world.grid.get(...coordsFwd);
   if (!objFwd) return { isFinished: true };
