@@ -8,18 +8,22 @@ import {
   mutateColorInto,
   randomLightColorInto,
 } from "shared/utils";
+import { ObjectPool } from "shared/utils/object-pool";
 import { sendEnergy, WorldItemDynamic, type World } from "simulation/world";
 import { getGeneHandler } from "./genes";
 import {
   AGE_ENERGY_COST_FACTOR,
   COLORATION_MUTATION_RATE,
   GENES_PER_TICK,
+  GENOME_LENGTH,
   GENOME_MUTATION_RATE,
   MAX_CELL_ENERGY,
 } from "shared/constants";
 import { Food } from "simulation/food";
 
-const creaturePool: Creature[] = [];
+const creaturePool = new ObjectPool(
+  () => new Creature(0, new Tape(new Uint8Array(GENOME_LENGTH)), 0, [0, 0, 0, 255], [0, 0, 0, 255]),
+);
 const attackResult = { energy: 0 };
 const GRAY: Rgba = [100, 100, 100, 255];
 const ENERGY_COLOR_HOT: Rgba = [255, 255, 0, 255];
@@ -55,10 +59,9 @@ export class Creature extends WorldItemDynamic {
     color: Rgba,
     coloration?: Rgba,
   ): Creature {
-    const pooled = creaturePool.pop();
-    if (!pooled) return new Creature(energy, tape, autotrophOrHeterotroph, color, coloration);
-    pooled.reset(energy, tape.data, autotrophOrHeterotroph, color, coloration);
-    return pooled;
+    const creature = creaturePool.acquire();
+    creature.reset(energy, tape.data, autotrophOrHeterotroph, color, coloration);
+    return creature;
   }
 
   reset(
@@ -93,7 +96,7 @@ export class Creature extends WorldItemDynamic {
   }
 
   release(): void {
-    creaturePool.push(this);
+    creaturePool.release(this);
   }
 
   refreshGenomeHashColor(): void {
@@ -129,13 +132,7 @@ export class Creature extends WorldItemDynamic {
   }
 
   reproduce() {
-    const child = creaturePool.pop() ?? new Creature(
-      0,
-      new Tape(new Uint8Array(this.tape.data.length)),
-      0,
-      [0, 0, 0, 255],
-      [0, 0, 0, 255],
-    );
+    const child = creaturePool.acquire();
 
     const src = this.tape.data;
     let dst = child.tape.data;

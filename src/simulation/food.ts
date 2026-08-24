@@ -1,9 +1,10 @@
 import type { Rgba } from "shared/types";
 import { lerpRgb } from "shared/utils";
+import { ObjectPool } from "shared/utils/object-pool";
 import { sendEnergy, WorldItemDynamic, type World } from "simulation/world";
 import { MAX_CELL_ENERGY } from "shared/constants";
 
-const foodPool: Food[] = [];
+const foodPool = new ObjectPool(() => new Food(0));
 const attackResult = { energy: 0 };
 const colorScratch: Rgba = [25, 25, 50, 0];
 const energyColorScratch: Rgba = [0, 0, 100, 255];
@@ -21,16 +22,13 @@ export class Food extends WorldItemDynamic {
   }
 
   static acquire(energy: number): Food {
-    const pooled = foodPool.pop();
-    if (pooled) {
-      pooled.energy = energy;
-      return pooled;
-    }
-    return new Food(energy);
+    const food = foodPool.acquire();
+    food.energy = energy;
+    return food;
   }
 
   release(): void {
-    foodPool.push(this);
+    foodPool.release(this);
   }
 
   getColor(): Rgba {
