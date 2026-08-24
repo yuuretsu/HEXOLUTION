@@ -9,7 +9,8 @@ export type ChartData = {
 
 const initialWorldData: WorldData = {
   worldEnergy: 0,
-  itemsEnergy: 0,
+  creaturesEnergy: 0,
+  foodEnergy: 0,
   worldEntries: [],
   worldAge: 0,
   worldSize: { width: 0, height: 0 },

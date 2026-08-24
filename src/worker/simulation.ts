@@ -82,10 +82,11 @@ export class Simulation {
   };
 
   private render() {
-    const { entries, itemsEnergy } = this.renderer.render(this.viewMode);
+    const { entries, creaturesEnergy, foodEnergy } = this.renderer.render(this.viewMode);
     this.pendingData = {
       worldEnergy: this.world.energy,
-      itemsEnergy,
+      creaturesEnergy,
+      foodEnergy,
       worldAge: this.age,
       worldSize: { width: WORLD_WIDTH, height: WORLD_HEIGHT },
       worldEntries: entries.getMostCommon(5),

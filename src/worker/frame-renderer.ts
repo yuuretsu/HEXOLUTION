@@ -25,7 +25,8 @@ export class FrameRenderer {
 
   render(viewMode: ViewMode) {
     const entries = new Counter<string>();
-    let itemsEnergy = 0;
+    let creaturesEnergy = 0;
+    let foodEnergy = 0;
     const { width, height } = this.world.grid;
 
     for (let y = 0; y < height; y++) {
@@ -40,10 +41,13 @@ export class FrameRenderer {
         entries.add(item.CLASS_NAME);
         const color = getColor(item, viewMode);
         this.pixelView[index] = (255 << 24) | (color[2] << 16) | (color[1] << 8) | color[0];
-        if ("energy" in item && typeof item.energy === "number") itemsEnergy += item.energy;
+        if ("energy" in item && typeof item.energy === "number") {
+          if (item.CLASS_NAME === "Creature") creaturesEnergy += item.energy;
+          else if (item.CLASS_NAME === "Food") foodEnergy += item.energy;
+        }
       }
     }
-    return { entries, itemsEnergy };
+    return { entries, creaturesEnergy, foodEnergy };
   }
 
   getFrame() {
