@@ -177,9 +177,11 @@ export const HexagonsGl = forwardRef<HexagonsGlHandle, HexagonsGlProps>(
         return s;
       };
 
+      const vertexShader = createShader(gl.VERTEX_SHADER, vertexSource);
+      const fragmentShader = createShader(gl.FRAGMENT_SHADER, fragmentSource);
       const program = gl.createProgram()!;
-      gl.attachShader(program, createShader(gl.VERTEX_SHADER, vertexSource));
-      gl.attachShader(program, createShader(gl.FRAGMENT_SHADER, fragmentSource));
+      gl.attachShader(program, vertexShader);
+      gl.attachShader(program, fragmentShader);
       gl.linkProgram(program);
       gl.useProgram(program);
       gl.enable(gl.BLEND);
@@ -244,6 +246,17 @@ export const HexagonsGl = forwardRef<HexagonsGlHandle, HexagonsGlProps>(
       return () => {
         window.removeEventListener("resize", resize);
         resizeObserver.disconnect();
+        gl.bindBuffer(gl.ARRAY_BUFFER, null);
+        gl.bindTexture(gl.TEXTURE_2D, null);
+        if (vBuffer) gl.deleteBuffer(vBuffer);
+        gl.deleteTexture(texture);
+        gl.detachShader(program, vertexShader);
+        gl.detachShader(program, fragmentShader);
+        gl.deleteShader(vertexShader);
+        gl.deleteShader(fragmentShader);
+        gl.deleteProgram(program);
+        glRef.current = null;
+        gl.getExtension("WEBGL_lose_context")?.loseContext();
       };
     }, []);
 
