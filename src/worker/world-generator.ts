@@ -1,9 +1,16 @@
-import { GENOME_LENGTH, HEX_ASPECT } from "shared/constants";
+import {
+  CREATURE_SPAWN_ATTEMPTS,
+  CREATURE_SPAWN_PROGRESS_EVERY,
+  GENOME_LENGTH,
+  HEX_ASPECT,
+  INITIAL_CREATURE_ENERGY,
+  STONE_BLOB_COUNT,
+} from "shared/constants";
 import type { IGrid } from "shared/utils/grid";
 import { Creature } from "simulation/creature";
 import { Stone } from "simulation/stone";
 import { Tape } from "simulation/tape";
-import type { World, WorldItem } from "simulation/world";
+import { sendEnergy, type World, type WorldItem } from "simulation/world";
 
 export const fillCircle = <T>(grid: IGrid<T>, sx: number, sy: number, sr: number, value?: (x: number, y: number) => T | undefined) => {
   const { width, height } = grid;
@@ -23,7 +30,7 @@ export const fillCircle = <T>(grid: IGrid<T>, sx: number, sy: number, sr: number
 export const populateWorld = async (world: World, renderProgress: () => void) => {
   const { width, height } = world.grid;
 
-  for (let i = 0; i < 25; i++) {
+  for (let i = 0; i < STONE_BLOB_COUNT; i++) {
     const x = Math.floor(Math.random() * width);
     const y = Math.floor(Math.random() * height);
     const radius = Math.random() ** 20 * 50 + 50;
@@ -34,13 +41,15 @@ export const populateWorld = async (world: World, renderProgress: () => void) =>
     await new Promise((resolve) => setTimeout(resolve, 0));
   }
 
-  for (let i = 0; i < 100_000; i++) {
+  for (let i = 0; i < CREATURE_SPAWN_ATTEMPTS; i++) {
     const x = Math.floor(Math.random() * width);
     const y = Math.floor(Math.random() * height);
     if (!world.grid.get(x, y)) {
-      world.grid.set(x, y, new Creature(150, Tape.random(GENOME_LENGTH), Math.random(), [100, 200, 100, 255]));
+      const creature = new Creature(0, Tape.random(GENOME_LENGTH), Math.random(), [100, 200, 100, 255]);
+      sendEnergy(world, creature, INITIAL_CREATURE_ENERGY);
+      world.grid.set(x, y, creature);
     }
-    if (i % 10_000 === 0) {
+    if (i % CREATURE_SPAWN_PROGRESS_EVERY === 0) {
       renderProgress();
       await new Promise((resolve) => setTimeout(resolve, 0));
     }

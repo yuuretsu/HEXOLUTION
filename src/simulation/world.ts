@@ -1,3 +1,4 @@
+import { ENERGY_PER_CELL } from "shared/constants";
 import type { Rgba } from "shared/types";
 import { shuffle } from "shared/utils";
 import { GridMap, type IGrid } from "shared/utils/grid";
@@ -41,10 +42,12 @@ export const sendEnergy = (from: { energy: number }, to: { energy: number }, amo
 
 export class World {
   readonly grid: IGrid<WorldItem>;
-  energy: number = 100000;
+  readonly totalEnergy: number;
+  energy: number;
   constructor(width: number, height: number) {
     this.grid = new GridMap(width, height)
-    // this.energy = width * height * 0.01;
+    this.totalEnergy = width * height * ENERGY_PER_CELL;
+    this.energy = this.totalEnergy;
   }
 
   step() {

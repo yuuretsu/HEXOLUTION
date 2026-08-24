@@ -4,7 +4,13 @@ import type { Rgba } from "shared/types";
 import { createRandom, hslaToRgba, lerpRgb, randomLightColor, mutateColor } from "shared/utils";
 import { sendEnergy, WorldItemDynamic, type World } from "simulation/world";
 import { getGeneHandler } from "./genes";
-import { MAX_CELL_ENERGY } from "shared/constants";
+import {
+  AGE_ENERGY_COST_FACTOR,
+  COLORATION_MUTATION_RATE,
+  GENES_PER_TICK,
+  GENOME_MUTATION_RATE,
+  MAX_CELL_ENERGY,
+} from "shared/constants";
 import { Food } from "simulation/food";
 
 export class Creature extends WorldItemDynamic {
@@ -57,22 +63,22 @@ export class Creature extends WorldItemDynamic {
     const color = [...this.color] as Rgba;
     lerpRgb(color, [100, 100, 100, 255], 0.5);
     for (let i = 0; i < tapeData.length; i++) {
-      if (Math.random() > 0.0001) continue;
+      if (Math.random() > GENOME_MUTATION_RATE) continue;
       tapeData[i] = getRandomBase4();
     }
-    const coloration = mutateColor(this.coloration, 10);
+    const coloration = mutateColor(this.coloration, COLORATION_MUTATION_RATE);
     return new Creature(0, new Tape(new Uint8Array(tapeData)), this.autotrophOrHeterotroph.right, color, coloration);
   }
 
   process(world: World, x: number, y: number): void {
     if (this.energy <= 0 || this.energy >= MAX_CELL_ENERGY) return this.die(world, x, y);
 
-    for (let i = 0; i < 16; i++) {
+    for (let i = 0; i < GENES_PER_TICK; i++) {
       const handle = getGeneHandler(this.tape.readInt());
       const result = handle(this, world, x, y);
       if (result.isFinished) break;
     }
-    sendEnergy(this, world, Math.floor(this.age * 0.0005));
+    sendEnergy(this, world, Math.floor(this.age * AGE_ENERGY_COST_FACTOR));
     this.age += 1;
   }
 

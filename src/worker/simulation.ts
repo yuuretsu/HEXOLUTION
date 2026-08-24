@@ -1,14 +1,10 @@
-import { HEX_ASPECT } from "shared/constants";
+import { WORLD_HEIGHT, WORLD_WIDTH } from "shared/constants";
 import type { ViewMode } from "shared/types";
 import type { WorldData } from "shared/worker-protocol";
-import { roundToEven } from "shared/utils";
 import { World, WorldItemDynamic, type WorldItem } from "simulation/world";
 import { FrameRenderer } from "./frame-renderer";
 import { serializeSelectedItem } from "./selected-item";
 import { populateWorld } from "./world-generator";
-
-const worldWidth = 200;
-const worldHeight = roundToEven(worldWidth / HEX_ASPECT);
 
 type SimulationEvents = {
   onData: (data: WorldData) => void;
@@ -18,7 +14,7 @@ type SimulationEvents = {
 
 export class Simulation {
   private readonly events: SimulationEvents;
-  private readonly world = new World(worldWidth, worldHeight);
+  private readonly world = new World(WORLD_WIDTH, WORLD_HEIGHT);
   private readonly renderer = new FrameRenderer(this.world);
   private speedMultiplier = 1;
   private viewMode: ViewMode = "normal";
@@ -43,7 +39,7 @@ export class Simulation {
   setSpeed(speed: number) {
     this.speedMultiplier = speed;
     this.events.onSpeedChanged(speed);
-    if (speed > 0) this.scheduleLoop(0);
+    if (speed > 0) this.scheduleLoop();
   }
 
   getSpeed() { return this.speedMultiplier; }
@@ -77,15 +73,15 @@ export class Simulation {
 
   private render() {
     const { entries, itemsEnergy } = this.renderer.render(this.viewMode);
-    this.events.onData({ worldEnergy: this.world.energy, itemsEnergy, worldAge: this.age, worldSize: { width: worldWidth, height: worldHeight }, worldEntries: entries.getMostCommon(5) });
+    this.events.onData({ worldEnergy: this.world.energy, itemsEnergy, worldAge: this.age, worldSize: { width: WORLD_WIDTH, height: WORLD_HEIGHT }, worldEntries: entries.getMostCommon(5) });
   }
 
   private emitSelectedItemUpdate() {
     this.events.onSelectedItemUpdate(serializeSelectedItem(this.selectedItem));
   }
 
-  private scheduleLoop(delay = 10) {
+  private scheduleLoop() {
     if (this.loopTimer !== null) return;
-    this.loopTimer = setTimeout(() => { this.loopTimer = null; this.loop(); }, delay);
+    this.loopTimer = setTimeout(() => { this.loopTimer = null; this.loop(); }, 0);
   }
 }
