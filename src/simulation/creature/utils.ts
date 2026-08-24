@@ -1,4 +1,4 @@
-import type { World } from "simulation/world";
+import type { World } from "@/simulation/world";
 import type { Creature } from "./creature";
 
 const rayCoords: [number, number] = [0, 0];

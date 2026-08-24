@@ -6,16 +6,16 @@ import {
   HiSquaresPlus,
   HiSun,
 } from "react-icons/hi2";
-import { ChangeControlMode } from "features/change-control-mode";
-import { ChangeSimulationSpeed } from "features/change-simulation-speed";
-import { ChangeViewMode } from "features/change-view-mode";
-import { Chart } from "shared/ui/chart";
+import { ChangeControlMode } from "@/features/change-control-mode";
+import { ChangeSimulationSpeed } from "@/features/change-simulation-speed";
+import { ChangeViewMode } from "@/features/change-view-mode";
+import { Chart } from "@/shared/ui/chart";
 import styles from "./sidebar.module.css";
-import type { ChartData } from "shared/hooks/use-world-data";
-import type { WorldData } from "shared/worker-protocol";
-import { Block } from "shared/ui/block";
-import { Entries } from "shared/ui/entries";
-import { SelectedEntity } from "entities/selected-entity";
+import type { ChartData } from "@/shared/hooks/use-world-data";
+import type { WorldData } from "@/shared/worker-protocol";
+import { Block } from "@/shared/ui/block";
+import { Entries } from "@/shared/ui/entries";
+import { SelectedEntity } from "@/entities/selected-entity";
 
 type SidebarProps = {
   data: WorldData;

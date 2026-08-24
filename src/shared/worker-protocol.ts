@@ -1,4 +1,4 @@
-import type { Rgba, ViewMode } from "shared/types";
+import type { Rgba, ViewMode } from "@/shared/types";
 
 export type WorkerApi = {
   selectItem: [x: number, y: number] | [];

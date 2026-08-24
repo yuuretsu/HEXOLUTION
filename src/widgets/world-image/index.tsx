@@ -1,6 +1,6 @@
 import { useEffect, type FC } from "react";
-import { workerApi } from "shared/worker-client";
-import { HexagonsGl, useHexagonsApi } from "shared/ui/hexagons-gl";
+import { workerApi } from "@/shared/worker-client";
+import { HexagonsGl, useHexagonsApi } from "@/shared/ui/hexagons-gl";
 
 export type WorldImageProps = {
   onClickPixel?: (x: number, y: number) => void;

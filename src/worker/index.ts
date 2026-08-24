@@ -1,5 +1,5 @@
-import { WorkerServer } from "shared/utils/worker-api";
-import type { WorkerApi, WorkerApiEvents, WorkerApiResults } from "shared/worker-protocol";
+import { WorkerServer } from "@/shared/utils/worker-api";
+import type { WorkerApi, WorkerApiEvents, WorkerApiResults } from "@/shared/worker-protocol";
 import { Simulation } from "./simulation";
 
 const simulation = new Simulation({

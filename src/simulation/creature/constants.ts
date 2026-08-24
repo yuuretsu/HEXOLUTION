@@ -1,4 +1,4 @@
-import type { Rgba } from "shared/types";
+import type { Rgba } from "@/shared/types";
 
 export const COLOR_MOVE_FORWARD: Rgba = [0, 150, 255, 255];
 export const COLOR_PHOTOSYNTHESIS: Rgba = [0, 200, 0, 255];

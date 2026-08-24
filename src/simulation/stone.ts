@@ -1,5 +1,5 @@
-import type { Rgba } from "shared/types";
-import { WorldItemStatic } from "simulation/world";
+import type { Rgba } from "@/shared/types";
+import { WorldItemStatic } from "@/simulation/world";
 
 export class Stone extends WorldItemStatic {
   readonly CLASS_NAME = "Stone";

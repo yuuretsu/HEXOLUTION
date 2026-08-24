@@ -1,8 +1,8 @@
-import type { Rgba } from "shared/types";
-import { lerpRgb } from "shared/utils";
-import { ObjectPool } from "shared/utils/object-pool";
-import { sendEnergy, WorldItemDynamic, type World } from "simulation/world";
-import { MAX_CELL_ENERGY } from "shared/constants";
+import type { Rgba } from "@/shared/types";
+import { lerpRgb } from "@/shared/utils";
+import { ObjectPool } from "@/shared/utils/object-pool";
+import { sendEnergy, WorldItemDynamic, type World } from "@/simulation/world";
+import { MAX_CELL_ENERGY } from "@/shared/constants";
 
 const foodPool = new ObjectPool(() => new Food(0));
 const attackResult = { energy: 0 };

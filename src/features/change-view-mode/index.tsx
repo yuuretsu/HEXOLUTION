@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { workerApi } from "shared/worker-client";
-import { Radio } from "shared/ui/radio";
-import type { ViewMode } from "shared/types";
+import { workerApi } from "@/shared/worker-client";
+import { Radio } from "@/shared/ui/radio";
+import type { ViewMode } from "@/shared/types";
 
 export const ChangeViewMode = () => {
   const [viewMode, setViewMode] = useState<ViewMode>("normal");

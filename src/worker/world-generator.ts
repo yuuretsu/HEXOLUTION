@@ -5,12 +5,12 @@ import {
   HEX_ASPECT,
   INITIAL_CREATURE_ENERGY,
   STONE_BLOB_COUNT,
-} from "shared/constants";
-import type { IGrid } from "shared/utils/grid";
-import { Creature } from "simulation/creature";
-import { Stone } from "simulation/stone";
-import { Tape } from "simulation/tape";
-import { sendEnergy, type World, type WorldItem } from "simulation/world";
+} from "@/shared/constants";
+import type { IGrid } from "@/shared/utils/grid";
+import { Creature } from "@/simulation/creature";
+import { Stone } from "@/simulation/stone";
+import { Tape } from "@/simulation/tape";
+import { sendEnergy, type World, type WorldItem } from "@/simulation/world";
 
 export const fillCircle = <T>(grid: IGrid<T>, sx: number, sy: number, sr: number, value?: (x: number, y: number) => T | undefined) => {
   const { width, height } = grid;

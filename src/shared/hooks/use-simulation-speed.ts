@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { workerApi } from "shared/worker-client";
+import { workerApi } from "@/shared/worker-client";
 
 export const useSimulationSpeed = () => {
   const [speed, setSpeed] = useState(1);

@@ -1,6 +1,6 @@
-import type { ViewMode } from "shared/types";
-import { Counter } from "shared/utils/counter";
-import type { World, WorldItem } from "simulation/world";
+import type { ViewMode } from "@/shared/types";
+import { Counter } from "@/shared/utils/counter";
+import type { World, WorldItem } from "@/simulation/world";
 
 const getColor = (item: WorldItem, mode: ViewMode) => {
   switch (mode) {

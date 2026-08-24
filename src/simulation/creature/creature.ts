@@ -1,15 +1,15 @@
-import { Dichotomy } from "simulation/dichotomy";
-import { getRandomBase4, Tape } from "simulation/tape";
-import type { Rgba } from "shared/types";
+import { Dichotomy } from "@/simulation/dichotomy";
+import { getRandomBase4, Tape } from "@/simulation/tape";
+import type { Rgba } from "@/shared/types";
 import {
   createRandom,
   hslaToRgba,
   lerpRgb,
   mutateColorInto,
   randomLightColorInto,
-} from "shared/utils";
-import { ObjectPool } from "shared/utils/object-pool";
-import { sendEnergy, WorldItemDynamic, type World } from "simulation/world";
+} from "@/shared/utils";
+import { ObjectPool } from "@/shared/utils/object-pool";
+import { sendEnergy, WorldItemDynamic, type World } from "@/simulation/world";
 import { getGeneHandler } from "./genes";
 import {
   AGE_ENERGY_COST_FACTOR,
@@ -18,8 +18,8 @@ import {
   GENOME_LENGTH,
   GENOME_MUTATION_RATE,
   MAX_CELL_ENERGY,
-} from "shared/constants";
-import { Food } from "simulation/food";
+} from "@/shared/constants";
+import { Food } from "@/simulation/food";
 
 const creaturePool = new ObjectPool(
   () => new Creature(0, new Tape(new Uint8Array(GENOME_LENGTH)), 0, [0, 0, 0, 255], [0, 0, 0, 255]),

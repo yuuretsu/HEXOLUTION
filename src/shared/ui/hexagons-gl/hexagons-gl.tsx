@@ -7,7 +7,7 @@ import {
   useCallback,
 } from "react";
 import styles from "./styles.module.css";
-import { HEX_ASPECT } from "shared/constants";
+import { HEX_ASPECT } from "@/shared/constants";
 import vertexSource from "./vertex.glsl?raw";
 import fragmentSource from "./fragment.glsl?raw";
 

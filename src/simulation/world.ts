@@ -1,7 +1,7 @@
-import { ENERGY_PER_CELL } from "shared/constants";
-import type { Rgba } from "shared/types";
-import { shuffle } from "shared/utils";
-import { GridMap, type IGrid } from "shared/utils/grid";
+import { ENERGY_PER_CELL } from "@/shared/constants";
+import type { Rgba } from "@/shared/types";
+import { shuffle } from "@/shared/utils";
+import { GridMap, type IGrid } from "@/shared/utils/grid";
 
 const staticAttackResult = { energy: 0 };
 

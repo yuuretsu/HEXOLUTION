@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Radio } from "shared/ui/radio";
+import { Radio } from "@/shared/ui/radio";
 import styles from "./change-control-mode.module.css";
 
 export const ChangeControlMode: React.FC = () => {

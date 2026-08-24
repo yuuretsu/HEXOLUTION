@@ -1,6 +1,6 @@
 import { type FC } from "react";
-import { useSimulationSpeed } from "shared/hooks/use-simulation-speed";
-import { Radio } from "shared/ui/radio";
+import { useSimulationSpeed } from "@/shared/hooks/use-simulation-speed";
+import { Radio } from "@/shared/ui/radio";
 export { TogglePlayPause } from "./toggle-play-pause";
 
 export const ChangeSimulationSpeed: FC = () => {

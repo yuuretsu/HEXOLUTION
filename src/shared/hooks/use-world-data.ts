@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { workerApi } from "shared/worker-client";
-import type { WorldData } from "shared/worker-protocol";
+import { workerApi } from "@/shared/worker-client";
+import type { WorldData } from "@/shared/worker-protocol";
 
 export type ChartData = {
   creatures: [number, number][];

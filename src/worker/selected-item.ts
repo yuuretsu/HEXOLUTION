@@ -1,5 +1,5 @@
-import { Creature } from "simulation/creature";
-import type { WorldItem } from "simulation/world";
+import { Creature } from "@/simulation/creature";
+import type { WorldItem } from "@/simulation/world";
 
 export const serializeSelectedItem = (item: WorldItem | null) => {
   if (!item) return null;

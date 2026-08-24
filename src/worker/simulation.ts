@@ -1,7 +1,7 @@
-import { WORLD_HEIGHT, WORLD_WIDTH } from "shared/constants";
-import type { ViewMode } from "shared/types";
-import type { WorldData } from "shared/worker-protocol";
-import { World, WorldItemDynamic, type WorldItem } from "simulation/world";
+import { WORLD_HEIGHT, WORLD_WIDTH } from "@/shared/constants";
+import type { ViewMode } from "@/shared/types";
+import type { WorldData } from "@/shared/worker-protocol";
+import { World, WorldItemDynamic, type WorldItem } from "@/simulation/world";
 import { FrameRenderer } from "./frame-renderer";
 import { serializeSelectedItem } from "./selected-item";
 import { populateWorld } from "./world-generator";
