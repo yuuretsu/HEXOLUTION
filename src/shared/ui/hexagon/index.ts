@@ -1,1 +1,0 @@
-export { Hexagon, type HexagonProps } from "./hexagon";

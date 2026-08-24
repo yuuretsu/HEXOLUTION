@@ -1,6 +1,5 @@
 import { attackForward, inspectForward, COLOR_ATTACK, COLOR_MOVE_FORWARD, COLOR_PHOTOSYNTHESIS, COLOR_PUSH, getGeneHandler, moveForward, absorbLight, displaceForward, reproduce } from "simulation/creature/genes";
 import type { FC } from "react";
-import { Hexagon } from "shared/ui/hexagon";
 import { useWorkerEvent } from "shared/hooks/use-worker-event";
 import { base4toInt, chunk } from "shared/utils";
 import styles from "./selected-entity.module.css";
@@ -106,7 +105,10 @@ export const SelectedEntity: FC = () => {
   return (
     <div className={styles.creatureInfo}>
       <div className={styles.selectedHeader}>
-        <Hexagon size={8} color={`rgba(${r}, ${g}, ${b}`} strokeColor="white" strokeWidth={0.5} />
+        <div
+          className={styles.entitySwatch}
+          style={{ backgroundColor: `rgb(${r}, ${g}, ${b})` }}
+        />
         <h3 className={styles.selectedTitle}>{selectedItem.type.toUpperCase()}</h3>
       </div>
       {selectedItem.type === "Creature" && <WorldEntityCreature item={selectedItem} />}
