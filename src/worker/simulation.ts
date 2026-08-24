@@ -22,6 +22,11 @@ export class Simulation {
   private age = 0;
   private loopTimer: ReturnType<typeof setTimeout> | null = null;
 
+  private pendingData: WorldData | null = null;
+  private dataDirty = false;
+  private uiReadyForData = true;
+  private backpressureEnabled = false;
+
   constructor(events: SimulationEvents) {
     this.events = events;
   }
@@ -51,6 +56,12 @@ export class Simulation {
 
   getLatestFrame() { return this.renderer.getFrame(); }
 
+  ackData() {
+    this.backpressureEnabled = true;
+    this.uiReadyForData = true;
+    this.flushDataIfReady();
+  }
+
   getObjectAt({ x, y }: { x: number; y: number }) {
     const item = this.world.grid.get(Math.floor(x), Math.floor(y));
     return item ? { type: item.constructor.name, color: item.getColor() } : null;
@@ -67,13 +78,31 @@ export class Simulation {
       if (item instanceof WorldItemDynamic) item.process(this.world, x, y);
     }
     this.render();
-    this.emitSelectedItemUpdate();
     this.scheduleLoop();
   };
 
   private render() {
     const { entries, itemsEnergy } = this.renderer.render(this.viewMode);
-    this.events.onData({ worldEnergy: this.world.energy, itemsEnergy, worldAge: this.age, worldSize: { width: WORLD_WIDTH, height: WORLD_HEIGHT }, worldEntries: entries.getMostCommon(5) });
+    this.pendingData = {
+      worldEnergy: this.world.energy,
+      itemsEnergy,
+      worldAge: this.age,
+      worldSize: { width: WORLD_WIDTH, height: WORLD_HEIGHT },
+      worldEntries: entries.getMostCommon(5),
+    };
+    this.dataDirty = true;
+    this.flushDataIfReady();
+  }
+
+  private flushDataIfReady() {
+    if (!this.dataDirty || !this.pendingData) return;
+    if (this.backpressureEnabled && !this.uiReadyForData) return;
+
+    this.dataDirty = false;
+    if (this.backpressureEnabled) this.uiReadyForData = false;
+
+    this.events.onData(this.pendingData);
+    this.emitSelectedItemUpdate();
   }
 
   private emitSelectedItemUpdate() {
