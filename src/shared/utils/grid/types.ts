@@ -6,5 +6,11 @@ export interface IGrid<T> {
   swap(ax: number, ay: number, bx: number, by: number): void;
   keys(): Generator<[number, number]>;
   entries(): Generator<[number, number, T]>;
-  getCoordsByNarrow(x: number, y: number, narrow: number, distance?: number): [number, number];
+  getCoordsByNarrow(
+    x: number,
+    y: number,
+    narrow: number,
+    distance?: number,
+    out?: [number, number],
+  ): [number, number];
 }

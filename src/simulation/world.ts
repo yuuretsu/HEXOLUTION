@@ -3,6 +3,8 @@ import type { Rgba } from "shared/types";
 import { shuffle } from "shared/utils";
 import { GridMap, type IGrid } from "shared/utils/grid";
 
+const staticAttackResult = { energy: 0 };
+
 export abstract class WorldItemStatic {
   readonly CLASS_NAME: string = "WorldItemStatic";
 
@@ -22,8 +24,9 @@ export abstract class WorldItemStatic {
     return [100, 100, 100, 255];
   }
 
-  handleAttack(world: World, strength: number): { energy: number } {
-    return { energy: 0 };
+  handleAttack(_world: World, _strength: number): { energy: number } {
+    staticAttackResult.energy = 0;
+    return staticAttackResult;
   }
 }
 
