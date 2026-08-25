@@ -39,7 +39,7 @@ export type SelectedItemData = {
   type: string;
   color: Rgba;
   direction?: number;
-  program?: number[];
+  program?: number[] | Uint8Array;
   pointer?: number;
   age?: number;
   energy?: number;

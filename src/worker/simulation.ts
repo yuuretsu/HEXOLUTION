@@ -1,68 +1,73 @@
 import { WORLD_HEIGHT, WORLD_WIDTH } from "@/shared/constants";
 import type { ViewMode } from "@/shared/types";
-import type { WorldData } from "@/shared/worker-protocol";
-import { World, WorldItemDynamic, type WorldItem } from "@/simulation/world";
-import { FrameRenderer } from "./frame-renderer";
-import { serializeSelectedItem } from "./selected-item";
-import { populateWorld } from "./world-generator";
+import type { SelectedItemData, WorldData } from "@/shared/worker-protocol";
+import init, { Simulation as WasmSimulation } from "../../crates/hexolution-sim/pkg/hexolution_sim.js";
 
 type SimulationEvents = {
   onData: (data: WorldData) => void;
-  onSelectedItemUpdate: (item: ReturnType<typeof serializeSelectedItem>) => void;
+  onSelectedItemUpdate: (item: SelectedItemData | null) => void;
   onSpeedChanged: (speed: number) => void;
 };
 
 export class Simulation {
   private readonly events: SimulationEvents;
-  private readonly world = new World(WORLD_WIDTH, WORLD_HEIGHT);
-  private readonly renderer = new FrameRenderer(this.world);
-  private speedMultiplier = 1;
-  private viewMode: ViewMode = "normal";
-  private selectedId = 0;
-  private age = 0;
+  private wasm: WasmSimulation | null = null;
   private loopTimer: ReturnType<typeof setTimeout> | null = null;
-
-  private pendingData: WorldData | null = null;
-  private pendingSelectedItem: WorldItem | null = null;
   private dataDirty = false;
   private uiReadyForData = true;
   private backpressureEnabled = false;
+  private pendingData: WorldData | null = null;
+  private pendingSelected: SelectedItemData | null = null;
+  private speedMultiplier = 1;
 
   constructor(events: SimulationEvents) {
     this.events = events;
   }
 
   async init() {
-    await populateWorld(this.world, () => this.render());
+    await init();
+    this.wasm = new WasmSimulation(WORLD_WIDTH, WORLD_HEIGHT);
+    this.speedMultiplier = this.wasm.getSpeed();
+    this.flushFromWasm();
     this.loop();
   }
 
   selectItem(...params: [number, number] | []) {
+    if (!this.wasm) return;
     if (!params.length) {
-      this.selectedId = 0;
-      this.pendingSelectedItem = null;
+      this.wasm.selectItem(undefined, undefined);
     } else {
-      const item = this.world.grid.get(Math.floor(params[0]), Math.floor(params[1])) ?? null;
-      this.selectedId = item?.id ?? 0;
-      this.pendingSelectedItem = item;
+      this.wasm.selectItem(params[0], params[1]);
     }
-    this.events.onSelectedItemUpdate(serializeSelectedItem(this.pendingSelectedItem));
+    this.pendingSelected = this.wasm.getSelectedItem() as SelectedItemData | null;
+    this.events.onSelectedItemUpdate(this.pendingSelected);
   }
 
   setSpeed(speed: number) {
     this.speedMultiplier = speed;
+    this.wasm?.setSpeed(speed);
     this.events.onSpeedChanged(speed);
     if (speed > 0) this.scheduleLoop();
   }
 
-  getSpeed() { return this.speedMultiplier; }
-
-  setViewMode(mode: ViewMode) {
-    this.viewMode = mode;
-    this.render();
+  getSpeed() {
+    return this.wasm?.getSpeed() ?? this.speedMultiplier;
   }
 
-  getLatestFrame() { return this.renderer.getFrame(); }
+  setViewMode(mode: ViewMode) {
+    this.wasm?.setViewMode(mode);
+    this.flushFromWasm();
+  }
+
+  getLatestFrame() {
+    if (!this.wasm) return null;
+    const frame = this.wasm.getLatestFrame() as {
+      buffer: ArrayBuffer;
+      width: number;
+      height: number;
+    };
+    return frame;
+  }
 
   ackData() {
     this.backpressureEnabled = true;
@@ -71,36 +76,21 @@ export class Simulation {
   }
 
   getObjectAt({ x, y }: { x: number; y: number }) {
-    const item = this.world.grid.get(Math.floor(x), Math.floor(y));
-    return item ? { type: item.constructor.name, color: item.getColor() } : null;
+    if (!this.wasm) return null;
+    return this.wasm.getObjectAt(x, y) as { type: string; color: [number, number, number, number] } | null;
   }
 
   private loop = () => {
-    if (this.speedMultiplier <= 0) return;
-    const { width, height } = this.world.grid;
-    for (let i = 0; i < width * height * this.speedMultiplier; i++) {
-      const x = Math.floor(Math.random() * width);
-      const y = Math.floor(Math.random() * height);
-      this.age++;
-      const item = this.world.grid.get(x, y);
-      if (item instanceof WorldItemDynamic) item.process(this.world, x, y);
-    }
-    this.render();
+    if (!this.wasm || this.speedMultiplier <= 0) return;
+    this.wasm.tick();
+    this.flushFromWasm();
     this.scheduleLoop();
   };
 
-  private render() {
-    const { entries, creaturesEnergy, foodEnergy, selectedItem } = this.renderer.render(this.viewMode, this.selectedId);
-    if (!selectedItem) this.selectedId = 0;
-    this.pendingSelectedItem = selectedItem;
-    this.pendingData = {
-      worldEnergy: this.world.energy,
-      creaturesEnergy,
-      foodEnergy,
-      worldAge: this.age,
-      worldSize: { width: WORLD_WIDTH, height: WORLD_HEIGHT },
-      worldEntries: entries.getMostCommon(5),
-    };
+  private flushFromWasm() {
+    if (!this.wasm) return;
+    this.pendingData = this.wasm.getWorldData() as WorldData;
+    this.pendingSelected = this.wasm.getSelectedItem() as SelectedItemData | null;
     this.dataDirty = true;
     this.flushDataIfReady();
   }
@@ -113,11 +103,14 @@ export class Simulation {
     if (this.backpressureEnabled) this.uiReadyForData = false;
 
     this.events.onData(this.pendingData);
-    this.events.onSelectedItemUpdate(serializeSelectedItem(this.pendingSelectedItem));
+    this.events.onSelectedItemUpdate(this.pendingSelected);
   }
 
   private scheduleLoop() {
     if (this.loopTimer !== null) return;
-    this.loopTimer = setTimeout(() => { this.loopTimer = null; this.loop(); }, 0);
+    this.loopTimer = setTimeout(() => {
+      this.loopTimer = null;
+      this.loop();
+    }, 0);
   }
 }

@@ -15,6 +15,10 @@ build
 .env
 *.local
 
+# Rust / WASM
+target
+crates/hexolution-sim/pkg
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

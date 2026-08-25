@@ -1,12 +1,22 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react-swc'
 import checker from 'vite-plugin-checker'
+import wasm from 'vite-plugin-wasm'
 
 // https://vite.dev/config/
 export default defineConfig({
   base: "./",
   resolve: {
     tsconfigPaths: true,
+  },
+  server: {
+    fs: {
+      allow: ['.'],
+    },
+  },
+  worker: {
+    plugins: () => [wasm()],
+    format: 'es',
   },
   build: {
     rolldownOptions: {
@@ -24,6 +34,7 @@ export default defineConfig({
   },
   plugins: [
     react(),
+    wasm(),
     checker({
       typescript: true,
     }),

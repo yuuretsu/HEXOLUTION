@@ -5,9 +5,10 @@
   "type": "module",
   "main": "electron/main.cjs",
   "scripts": {
-    "dev": "vite",
-    "dev:host": "vite --host",
-    "build": "tsc -b && vite build",
+    "dev": "npm run build:wasm && vite",
+    "dev:host": "npm run build:wasm && vite --host",
+    "build:wasm": "wasm-pack build crates/hexolution-sim --target web --out-dir pkg --release",
+    "build": "npm run build:wasm && tsc -b && vite build",
     "dev:electron": "concurrently -k \"vite\" \"wait-on tcp:5173 && cross-env VITE_DEV_SERVER_URL=http://localhost:5173 electron .\"",
     "build:electron": "npm run build && electron-builder",
     "deploy": "npx tsx deploy.mts",
@@ -40,6 +41,7 @@
     "typescript-eslint": "^8.67.0",
     "vite": "^8.2.2",
     "vite-plugin-checker": "^0.14.5",
+    "vite-plugin-wasm": "^3.6.0",
     "wait-on": "^9.1.0"
   },
   "build": {

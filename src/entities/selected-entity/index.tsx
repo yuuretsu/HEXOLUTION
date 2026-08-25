@@ -1,7 +1,7 @@
-import { attackForward, inspectForward, COLOR_ATTACK, COLOR_MOVE_FORWARD, COLOR_PHOTOSYNTHESIS, COLOR_PUSH, getGeneHandler, moveForward, absorbLight, displaceForward, reproduce } from "@/simulation/creature/genes";
+import { geneInfoFromTriplet } from "@/shared/gene-ui";
 import type { FC } from "react";
 import { useWorkerEvent } from "@/shared/hooks/use-worker-event";
-import { base4toInt, chunk } from "@/shared/utils";
+import { chunk } from "@/shared/utils";
 import styles from "./selected-entity.module.css";
 
 type ProgramProps = {
@@ -9,27 +9,16 @@ type ProgramProps = {
   pointer: number;
 };
 
-const Program: FC<ProgramProps> = ({ program, pointer }) => {
+const Program: FC<ProgramProps> = ({ program }) => {
   const triplets = chunk(program, 3);
 
   return (
     <div>
       <div className={styles.programGrid}>
         {triplets.map((triplet, i) => {
-          const n = base4toInt(triplet[0], triplet[1], triplet[2]);
-
-          const handler = getGeneHandler(n);
-
+          const gene = geneInfoFromTriplet(triplet[0], triplet[1], triplet[2]);
           const symbols = triplet.map((x) => ["A", "T", "G", "C"][x]);
-
-          const color = {
-            [absorbLight.name]: COLOR_PHOTOSYNTHESIS,
-            [attackForward.name]: COLOR_ATTACK,
-            [reproduce.name]: [255, 255, 255, 255],
-            [moveForward.name]: COLOR_MOVE_FORWARD,
-            [displaceForward.name]: COLOR_PUSH,
-            [inspectForward.name]: [255, 255, 0, 255],
-          }[handler.name];
+          const color = gene.color;
 
           return (
             <div key={i}>
@@ -39,7 +28,7 @@ const Program: FC<ProgramProps> = ({ program, pointer }) => {
                   backgroundColor: color ? `rgba(${color[0]}, ${color[1]}, ${color[2]}, 0.3)` : "rgba(255, 255, 255, 0.1)",
                   color: color ? `rgba(${color[0]}, ${color[1]}, ${color[2]})` : "rgba(255, 255, 255, 0.1)",
                 }}
-                title={handler.name}
+                title={gene.name}
               >
                 {symbols.map((x, i) => {
                   return (
