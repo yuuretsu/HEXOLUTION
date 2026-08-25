@@ -1,63 +1,125 @@
-.programGrid {
-  display: grid;
-  grid-template-columns: repeat(8, 1fr);
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.programCell {
-  text-align: center;
-  display: flex;
-  justify-content: space-around;
-  font-weight: bold;
-}
-
-.creatureInfo {
+.root {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-}
-
-.infoTable {
-  width: 100%;
-}
-
-.colorationRow {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  width: fit-content;
-  margin-left: auto;
-}
-
-.colorationSwatch {
-  display: inline-block;
-  width: 12px;
-  height: 12px;
-  border-radius: 2px;
+  gap: 12px;
 }
 
 .emptyHint {
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.65);
   font-style: italic;
 }
 
-.selectedHeader {
+.header {
   display: flex;
-  gap: 6px;
+  gap: 8px;
   align-items: center;
 }
 
-.entitySwatch {
-  width: 16px;
-  height: 16px;
+.swatch {
+  width: 14px;
+  height: 14px;
   flex-shrink: 0;
-  box-sizing: border-box;
   border-radius: 50%;
-  border: 0.5px solid white;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35);
 }
 
-.selectedTitle {
+.headerText {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.title {
   margin: 0;
+  font-size: 1rem;
+  text-transform: capitalize;
+}
+
+.subtitle {
+  font-size: 0.7rem;
+  opacity: 0.55;
+}
+
+.details {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 12px;
+  margin: 0;
+}
+
+.stats > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 0.8rem;
+}
+
+.stats dt {
+  margin: 0;
+  opacity: 0.55;
+}
+
+.stats dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.geneBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.geneTitle {
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.55;
+}
+
+.growthList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.growthRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 0.8rem;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.growthDir {
+  opacity: 0.65;
+}
+
+.growthValue {
+  font-weight: 600;
+}
+
+.byteGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.byte {
+  text-align: center;
+  font-size: 0.65rem;
+  font-variant-numeric: tabular-nums;
+  padding: 3px 0;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.07);
 }

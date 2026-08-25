@@ -48,21 +48,9 @@ impl<T: Clone> Grid<T> {
     }
 
     #[inline]
-    pub fn get_mut(&mut self, x: i32, y: i32) -> &mut T {
-        let i = self.index(x, y);
-        &mut self.cells[i]
-    }
-
-    #[inline]
     pub fn set(&mut self, x: i32, y: i32, value: T) {
         let i = self.index(x, y);
         self.cells[i] = value;
-    }
-
-    pub fn swap(&mut self, ax: i32, ay: i32, bx: i32, by: i32) {
-        let ia = self.index(ax, ay);
-        let ib = self.index(bx, by);
-        self.cells.swap(ia, ib);
     }
 
     pub fn coords_by_narrow(&self, x: i32, y: i32, narrow: i32, distance: i32) -> (i32, i32) {
@@ -79,11 +67,4 @@ impl<T: Clone> Grid<T> {
         (cur_x, cur_y)
     }
 
-    pub fn cells(&self) -> &[T] {
-        &self.cells
-    }
-
-    pub fn cells_mut(&mut self) -> &mut [T] {
-        &mut self.cells
-    }
 }

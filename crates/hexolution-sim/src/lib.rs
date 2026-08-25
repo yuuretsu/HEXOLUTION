@@ -1,11 +1,25 @@
-mod cell;
+mod apex_program;
+mod behaviors;
+mod cell_types;
+mod clan_cell;
 mod color;
+mod commands_alone;
+mod commands_attached;
+mod conditions;
 mod config;
-mod genes;
+mod constants;
+mod directions;
+mod energy_network;
+mod genome_pool;
 mod grid;
+mod growth;
+mod lifecycle;
 mod rng;
+mod sensors;
 mod simulation;
-mod tape;
+mod soil;
+mod soil_actions;
+mod tissue;
 mod world;
 
 pub use simulation::Simulation;

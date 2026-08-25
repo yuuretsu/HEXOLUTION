@@ -16,11 +16,11 @@ export const ChangeViewMode = () => {
       value={viewMode}
       onChange={handleChange}
       options={[
-        { text: "Normal", value: "normal" },
-        { text: "Energy", value: "energy" },
-        { text: "Genome Hash", value: "genome-hash" },
-        { text: "Coloration", value: "coloration" },
+        { text: "Клетки", value: "normal" },
+        { text: "Органика", value: "organic" },
+        { text: "Энергия", value: "energy" },
+        { text: "Геном", value: "genome-hash" },
       ]}
     />
-  )
+  );
 };

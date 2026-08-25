@@ -1,4 +1,4 @@
-import type { Rgba, ViewMode } from "@/shared/types";
+import type { Rgba, ViewMode } from "./types";
 
 export type WorkerApi = {
   selectItem: [x: number, y: number] | [];
@@ -21,12 +21,15 @@ export type WorkerApiResults = {
 };
 
 export type WorldData = {
-  worldEnergy: number;
-  creaturesEnergy: number;
-  foodEnergy: number;
+  organicSoil: number;
+  energySoil: number;
+  organicPoison: number;
+  energyPoison: number;
+  mutations: number;
+  livingCells: number;
   worldAge: number;
   worldSize: { width: number; height: number };
-  worldEntries: [string, number][];
+  typeCounts: number[];
 };
 
 export type WorkerApiEvents = {
@@ -38,10 +41,16 @@ export type WorkerApiEvents = {
 export type SelectedItemData = {
   type: string;
   color: Rgba;
-  direction?: number;
-  program?: number[] | Uint8Array;
-  pointer?: number;
-  age?: number;
+  cellType?: number;
   energy?: number;
-  coloration?: Rgba;
+  age?: number;
+  level?: number;
+  activeGene?: number;
+  clanId?: number;
+  direction?: number;
+  parent?: number;
+  genomeIndex?: number;
+  geneBytes?: number[];
+  organicHere?: number;
+  energyHere?: number;
 };

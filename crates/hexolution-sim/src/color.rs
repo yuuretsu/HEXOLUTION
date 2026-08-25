@@ -1,9 +1,4 @@
 #[inline]
-pub fn lerp(a: f64, b: f64, t: f64) -> f64 {
-    a * (1.0 - t) + b * t
-}
-
-#[inline]
 pub fn lerp_f32(a: f32, b: f32, t: f32) -> f32 {
     a * (1.0 - t) + b * t
 }
@@ -13,33 +8,6 @@ pub fn lerp_rgba(a: &mut [f32; 4], b: &[f32; 4], t: f32) {
     a[0] = lerp_f32(a[0], b[0], t);
     a[1] = lerp_f32(a[1], b[1], t);
     a[2] = lerp_f32(a[2], b[2], t);
-}
-
-#[inline]
-pub fn base4_to_int(a: u8, b: u8, c: u8) -> u8 {
-    a * 16 + b * 4 + c
-}
-
-pub fn random_light_color(rng: &mut fastrand::Rng) -> [f32; 4] {
-    [
-        50.0 + crate::rng::random_floor(rng, 206) as f32,
-        50.0 + crate::rng::random_floor(rng, 206) as f32,
-        50.0 + crate::rng::random_floor(rng, 206) as f32,
-        255.0,
-    ]
-}
-
-pub fn mutate_color(color: &[f32; 4], rate: f64, rng: &mut fastrand::Rng) -> [f32; 4] {
-    let mut mutate_channel = |c: f32| {
-        let delta = ((crate::rng::random_f64(rng) - 0.5) * 2.0 * rate).round();
-        (c + delta as f32).clamp(50.0, 255.0)
-    };
-    [
-        mutate_channel(color[0]),
-        mutate_channel(color[1]),
-        mutate_channel(color[2]),
-        255.0,
-    ]
 }
 
 /// Matches the JS `createRandom` seeded by a string.
@@ -107,24 +75,32 @@ pub fn hsla_to_rgba(h: f64, s: f64, l: f64, a: f64) -> [u8; 4] {
     ]
 }
 
-/// Matches JS `color[i] << n` / ToInt32 truncation when packing pixels.
+/// JS `ToInt32` — used so out-of-range channel values wrap exactly like `color[i] << n`.
+#[inline]
+fn js_to_int32(v: f64) -> i32 {
+    if !v.is_finite() {
+        return 0;
+    }
+    let m = v.trunc().rem_euclid(4294967296.0);
+    if m >= 2147483648.0 {
+        (m - 4294967296.0) as i32
+    } else {
+        m as i32
+    }
+}
+
+/// Matches the JS pixel write `(255 << 24) | (b << 16) | (g << 8) | r`,
+/// including bit-level wrapping for channels outside 0..255.
 pub fn pack_rgba_u32(color: &[f32; 4]) -> u32 {
-    let r = (color[0] as i32) as u32 & 0xff;
-    let g = (color[1] as i32) as u32 & 0xff;
-    let b = (color[2] as i32) as u32 & 0xff;
-    (255 << 24) | (b << 16) | (g << 8) | r
+    let r = js_to_int32(color[0] as f64) as u32;
+    let g = js_to_int32(color[1] as f64) as u32;
+    let b = js_to_int32(color[2] as f64) as u32;
+    0xFF00_0000u32 | b.wrapping_shl(16) | g.wrapping_shl(8) | r
 }
 
 pub fn pack_rgba_u8(color: &[u8; 4]) -> u32 {
     let r = color[0] as u32;
     let g = color[1] as u32;
     let b = color[2] as u32;
-    (255 << 24) | (b << 16) | (g << 8) | r
-}
-
-pub fn coloration_diff(a: &[f32; 4], b: &[f32; 4]) -> f64 {
-    let dr = (a[0] - b[0]).abs() as f64;
-    let dg = (a[1] - b[1]).abs() as f64;
-    let db = (a[2] - b[2]).abs() as f64;
-    (dr + dg + db) / (3.0 * 255.0)
+    0xFF00_0000u32 | (b << 16) | (g << 8) | r
 }

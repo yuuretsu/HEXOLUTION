@@ -21,8 +21,8 @@ export const ChangeControlMode: React.FC = () => {
       <div className={styles.radioRow}>
         <Radio
           options={[
-            { text: "Mouse", value: "mouse" },
-            { text: "Touchpad", value: "touchpad" }
+            { text: "Мышь", value: "mouse" },
+            { text: "Тачпад", value: "touchpad" },
           ]}
           value={isTouchpadMode ? "touchpad" : "mouse"}
           onChange={handleChange}
@@ -30,9 +30,8 @@ export const ChangeControlMode: React.FC = () => {
       </div>
       <div className={styles.hint}>
         {isTouchpadMode
-          ? "Use two fingers to pan, pinch to zoom"
-          : "Left click + drag to pan, wheel to zoom"
-        }
+          ? "Два пальца — панорама, щипок — зум"
+          : "ЛКМ + drag — панорама, колесо — зум"}
       </div>
     </div>
   );

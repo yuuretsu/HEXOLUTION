@@ -1,24 +1,35 @@
 import { useEffect, useState } from "react";
 import { workerApi } from "@/shared/worker-client";
 import type { WorldData } from "@/shared/worker-protocol";
+import { CellType } from "@/simulation/clans/cell-types";
 
 export type ChartData = {
-  creatures: [number, number][];
-  food: [number, number][];
+  living: [number, number][];
+  leaf: [number, number][];
+  wood: [number, number][];
+  apex: [number, number][];
 };
 
 const initialWorldData: WorldData = {
-  worldEnergy: 0,
-  creaturesEnergy: 0,
-  foodEnergy: 0,
-  worldEntries: [],
+  organicSoil: 0,
+  energySoil: 0,
+  organicPoison: 0,
+  energyPoison: 0,
+  mutations: 0,
+  livingCells: 0,
+  typeCounts: [],
   worldAge: 0,
   worldSize: { width: 0, height: 0 },
 };
 
 export const useWorldData = () => {
   const [data, setData] = useState<WorldData>(initialWorldData);
-  const [chartData, setChartData] = useState<ChartData>({ creatures: [], food: [] });
+  const [chartData, setChartData] = useState<ChartData>({
+    living: [],
+    leaf: [],
+    wood: [],
+    apex: [],
+  });
 
   useEffect(() => {
     let active = true;
@@ -32,17 +43,13 @@ export const useWorldData = () => {
       }
 
       setData(nextData);
-      const creatures: [number, number] = [
-        nextData.worldAge,
-        nextData.worldEntries.find(([name]) => name === "Creature")?.[1] ?? 0,
-      ];
-      const food: [number, number] = [
-        nextData.worldAge,
-        nextData.worldEntries.find(([name]) => name === "Food")?.[1] ?? 0,
-      ];
+      const age = nextData.worldAge;
+      const counts = nextData.typeCounts ?? [];
       setChartData((previousData) => ({
-        creatures: [...previousData.creatures, creatures].slice(-1000),
-        food: [...previousData.food, food].slice(-1000),
+        living: [...previousData.living, [age, nextData.livingCells] as [number, number]].slice(-800),
+        apex: [...previousData.apex, [age, counts[CellType.Apex] ?? 0] as [number, number]].slice(-800),
+        leaf: [...previousData.leaf, [age, counts[CellType.Leaf] ?? 0] as [number, number]].slice(-800),
+        wood: [...previousData.wood, [age, counts[CellType.Wood] ?? 0] as [number, number]].slice(-800),
       }));
 
       void workerApi.call("ackData", []);
