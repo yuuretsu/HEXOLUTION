@@ -2,11 +2,13 @@ use crate::cell::{Cell, Creature, Food, Stone};
 use crate::config::Config;
 use crate::genes;
 use crate::grid::Grid;
-use crate::js_rng;
+use crate::rng;
 use crate::tape::Tape;
+use fastrand::Rng;
 
 pub struct World {
     pub config: Config,
+    pub rng: Rng,
     pub grid: Grid<Cell>,
     pub total_energy: i32,
     pub energy: i32,
@@ -23,6 +25,7 @@ impl World {
             total_energy,
             energy: total_energy,
             next_id: 1,
+            rng: rng::new_rng(),
             config,
         }
     }
@@ -55,22 +58,28 @@ impl World {
         self.grid.set(x, y, Cell::Creature(creature));
     }
 
-    pub fn send_energy_from_creature(&mut self, x: i32, y: i32, amount: i32) {
-        if let Cell::Creature(c) = self.grid.get_mut(x, y) {
-            Self::send_energy(&mut c.energy, &mut self.energy, amount);
-        }
-    }
-
-    pub fn send_energy_from_food(&mut self, x: i32, y: i32, amount: i32) {
-        if let Cell::Food(f) = self.grid.get_mut(x, y) {
-            Self::send_energy(&mut f.energy, &mut self.energy, amount);
-        }
+    /// Mutate a creature in place while also touching world energy (avoids take/put).
+    #[inline]
+    pub fn with_creature<R>(
+        &mut self,
+        x: i32,
+        y: i32,
+        f: impl FnOnce(&mut Creature, &mut i32) -> R,
+    ) -> Option<R> {
+        let mut energy = self.energy;
+        let result = match self.grid.get_mut(x, y) {
+            Cell::Creature(c) => Some(f(c, &mut energy)),
+            _ => None,
+        };
+        self.energy = energy;
+        result
     }
 
     pub fn handle_attack(&mut self, x: i32, y: i32, strength: i32) -> i32 {
-        match self.grid.get_mut(x, y) {
+        let mut energy = self.energy;
+        let stolen = match self.grid.get_mut(x, y) {
             Cell::Creature(c) => {
-                Self::send_energy(&mut c.energy, &mut self.energy, 1);
+                Self::send_energy(&mut c.energy, &mut energy, 1);
                 let mut stolen = 0;
                 Self::send_energy(&mut c.energy, &mut stolen, strength);
                 stolen
@@ -81,7 +90,9 @@ impl World {
                 stolen
             }
             _ => 0,
-        }
+        };
+        self.energy = energy;
+        stolen
     }
 
     pub fn process_at(&mut self, x: i32, y: i32) {
@@ -93,11 +104,17 @@ impl World {
     }
 
     fn process_food(&mut self, x: i32, y: i32) {
-        self.send_energy_from_food(x, y, 1);
-        if let Cell::Food(f) = self.grid.get(x, y) {
-            if f.energy <= 0 {
-                self.grid.set(x, y, Cell::Empty);
+        let mut energy = self.energy;
+        let clear = match self.grid.get_mut(x, y) {
+            Cell::Food(f) => {
+                Self::send_energy(&mut f.energy, &mut energy, 1);
+                f.energy <= 0
             }
+            _ => false,
+        };
+        self.energy = energy;
+        if clear {
+            self.grid.set(x, y, Cell::Empty);
         }
     }
 
@@ -106,13 +123,13 @@ impl World {
         let genes_per_tick = self.config.genes_per_tick;
         let age_factor = self.config.age_energy_cost_factor;
 
-        let energy = match self.grid.get(x, y) {
-            Cell::Creature(c) => c.energy,
+        match self.grid.get(x, y) {
+            Cell::Creature(c) if c.energy > 0 && c.energy < max_energy => {}
+            Cell::Creature(_) => {
+                self.die_creature(x, y);
+                return;
+            }
             _ => return,
-        };
-        if energy <= 0 || energy >= max_energy {
-            self.die_creature(x, y);
-            return;
         }
 
         for _ in 0..genes_per_tick {
@@ -123,26 +140,16 @@ impl World {
             let (finished, nx, ny) = genes::run_gene(gene, self, x, y);
             x = nx;
             y = ny;
-            if !matches!(self.grid.get(x, y), Cell::Creature(_)) {
-                return;
-            }
             if finished {
                 break;
             }
         }
 
-        if !matches!(self.grid.get(x, y), Cell::Creature(_)) {
-            return;
-        }
-
-        let age_cost = match self.grid.get(x, y) {
-            Cell::Creature(c) => (c.age as f64 * age_factor).floor() as i32,
-            _ => return,
-        };
-        self.send_energy_from_creature(x, y, age_cost);
-        if let Cell::Creature(c) = self.grid.get_mut(x, y) {
+        self.with_creature(x, y, |c, world_energy| {
+            let age_cost = (c.age as f64 * age_factor).floor() as i32;
+            Self::send_energy(&mut c.energy, world_energy, age_cost);
             c.age += 1;
-        }
+        });
     }
 
     pub fn die_creature(&mut self, x: i32, y: i32) {
@@ -167,11 +174,11 @@ impl World {
         let initial_energy = self.config.initial_creature_energy;
 
         for _ in 0..stone_blobs {
-            let x = js_rng::random_floor(width) as f64;
-            let y = js_rng::random_floor(height) as f64;
-            let radius = js_rng::random().powi(20) * 50.0 + 50.0;
+            let x = rng::random_floor(&mut self.rng, width) as f64;
+            let y = rng::random_floor(&mut self.rng, height) as f64;
+            let radius = rng::random_f64(&mut self.rng).powi(20) * 50.0 + 50.0;
             self.fill_circle(x, y, radius, true);
-            let angle = js_rng::random() * std::f64::consts::PI * 2.0;
+            let angle = rng::random_f64(&mut self.rng) * std::f64::consts::PI * 2.0;
             self.fill_circle(
                 x + radius * 0.2 * angle.cos(),
                 y + radius * 0.2 * angle.sin(),
@@ -181,12 +188,12 @@ impl World {
         }
 
         for _ in 0..spawn_attempts {
-            let x = js_rng::random_floor(width);
-            let y = js_rng::random_floor(height);
+            let x = rng::random_floor(&mut self.rng, width);
+            let y = rng::random_floor(&mut self.rng, height);
             if matches!(self.grid.get(x, y), Cell::Empty) {
                 let id = self.alloc_id();
-                let tape = Tape::random(genome_length);
-                let dichotomy = js_rng::random();
+                let tape = Tape::random(genome_length, &mut self.rng);
+                let dichotomy = rng::random_f64(&mut self.rng);
                 let mut creature = Creature::new(
                     id,
                     0,
@@ -194,6 +201,7 @@ impl World {
                     dichotomy,
                     [100.0, 200.0, 100.0, 255.0],
                     None,
+                    &mut self.rng,
                 );
                 Self::send_energy(&mut self.energy, &mut creature.energy, initial_energy);
                 self.grid.set(x, y, Cell::Creature(creature));
@@ -217,7 +225,7 @@ impl World {
                 let world_x = self.grid.map_x(sx.floor() as i32 + x);
                 if place_stone {
                     let id = self.alloc_id();
-                    let stone = Stone::new(id);
+                    let stone = Stone::new(id, &mut self.rng);
                     self.grid.set(world_x, world_y, Cell::Stone(stone));
                 } else {
                     self.grid.set(world_x, world_y, Cell::Empty);

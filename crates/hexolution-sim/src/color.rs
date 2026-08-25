@@ -20,18 +20,18 @@ pub fn base4_to_int(a: u8, b: u8, c: u8) -> u8 {
     a * 16 + b * 4 + c
 }
 
-pub fn random_light_color() -> [f32; 4] {
+pub fn random_light_color(rng: &mut fastrand::Rng) -> [f32; 4] {
     [
-        50.0 + crate::js_rng::random_floor(206) as f32,
-        50.0 + crate::js_rng::random_floor(206) as f32,
-        50.0 + crate::js_rng::random_floor(206) as f32,
+        50.0 + crate::rng::random_floor(rng, 206) as f32,
+        50.0 + crate::rng::random_floor(rng, 206) as f32,
+        50.0 + crate::rng::random_floor(rng, 206) as f32,
         255.0,
     ]
 }
 
-pub fn mutate_color(color: &[f32; 4], rate: f64) -> [f32; 4] {
-    let mutate_channel = |c: f32| {
-        let delta = ((crate::js_rng::random() - 0.5) * 2.0 * rate).round();
+pub fn mutate_color(color: &[f32; 4], rate: f64, rng: &mut fastrand::Rng) -> [f32; 4] {
+    let mut mutate_channel = |c: f32| {
+        let delta = ((crate::rng::random_f64(rng) - 0.5) * 2.0 * rate).round();
         (c + delta as f32).clamp(50.0, 255.0)
     };
     [

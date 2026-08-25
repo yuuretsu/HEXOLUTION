@@ -62,17 +62,18 @@ pub fn run_gene(index: u8, world: &mut World, x: i32, y: i32) -> (bool, i32, i32
 fn move_forward(world: &mut World, x: i32, y: i32) -> (bool, i32, i32) {
     let cost = world.config.move_energy_cost;
     let color = world.config.color_move_forward;
-    let Some(mut creature) = world.take_creature(x, y) else {
+    let Some(direction) = world.with_creature(x, y, |creature, world_energy| {
+        lerp_rgba(&mut creature.color, &color, 0.01);
+        World::send_energy(&mut creature.energy, world_energy, cost);
+        creature.direction
+    }) else {
         return (true, x, y);
     };
-    lerp_rgba(&mut creature.color, &color, 0.01);
-    World::send_energy(&mut creature.energy, &mut world.energy, cost);
-    let (tx, ty) = world.grid.coords_by_narrow(x, y, creature.direction, 1);
+    let (tx, ty) = world.grid.coords_by_narrow(x, y, direction, 1);
     if !matches!(world.grid.get(tx, ty), Cell::Empty) {
-        world.put_creature(x, y, creature);
         return (true, x, y);
     }
-    world.put_creature(tx, ty, creature);
+    world.grid.swap(x, y, tx, ty);
     (true, tx, ty)
 }
 
@@ -100,7 +101,7 @@ fn reproduce(world: &mut World, x: i32, y: i32) {
         return;
     }
     let child_id = world.alloc_id();
-    let mut child = parent.reproduce(child_id, &world.config);
+    let mut child = parent.reproduce(child_id, &world.config, &mut world.rng);
     let transfer = ((parent.energy as f64) * amount).round() as i32;
     World::send_energy(&mut parent.energy, &mut child.energy, transfer);
     world.put_creature(x, y, parent);
@@ -115,19 +116,17 @@ fn absorb_light(world: &mut World, x: i32, y: i32) {
     let color = world.config.color_photosynthesis;
     let total_energy = world.total_energy;
 
-    let Some(mut creature) = world.take_creature(x, y) else {
-        return;
-    };
-    lerp_rgba(&mut creature.color, &color, 0.01);
-    World::send_energy(&mut creature.energy, &mut world.energy, cost);
-    let left = creature.dichotomy_left();
-    let abundance = (world.energy as f64 / (total_energy as f64 * abundance_ratio))
-        .min(1.0)
-        .powi(2);
-    let e = (max_yield * abundance * left.powi(2)).round() as i32;
-    creature.set_dichotomy_left(lerp(left, 1.0, learn_rate));
-    World::send_energy(&mut world.energy, &mut creature.energy, e);
-    world.put_creature(x, y, creature);
+    world.with_creature(x, y, |creature, world_energy| {
+        lerp_rgba(&mut creature.color, &color, 0.01);
+        World::send_energy(&mut creature.energy, world_energy, cost);
+        let left = creature.dichotomy_left();
+        let abundance = (*world_energy as f64 / (total_energy as f64 * abundance_ratio))
+            .min(1.0)
+            .powi(2);
+        let e = (max_yield * abundance * left.powi(2)).round() as i32;
+        creature.set_dichotomy_left(lerp(left, 1.0, learn_rate));
+        World::send_energy(world_energy, &mut creature.energy, e);
+    });
 }
 
 fn attack_forward(world: &mut World, x: i32, y: i32) {
@@ -136,21 +135,31 @@ fn attack_forward(world: &mut World, x: i32, y: i32) {
     let learn_rate = world.config.specialization_learn_rate;
     let color = world.config.color_attack;
 
-    let Some(mut creature) = world.take_creature(x, y) else {
+    let Some(direction) = world.with_creature(x, y, |creature, world_energy| {
+        lerp_rgba(&mut creature.color, &color, 0.02);
+        World::send_energy(&mut creature.energy, world_energy, cost);
+        creature.direction
+    }) else {
         return;
     };
-    lerp_rgba(&mut creature.color, &color, 0.02);
-    World::send_energy(&mut creature.energy, &mut world.energy, cost);
-    let (tx, ty) = world.grid.coords_by_narrow(x, y, creature.direction, 1);
+
+    let (tx, ty) = world.grid.coords_by_narrow(x, y, direction, 1);
     if matches!(world.grid.get(tx, ty), Cell::Empty) {
-        world.put_creature(x, y, creature);
         return;
     }
-    let strength = (max_strength * creature.dichotomy.powi(2)).round() as i32;
-    creature.dichotomy = lerp(creature.dichotomy, 1.0, learn_rate);
+
+    let Some(strength) = world.with_creature(x, y, |creature, _| {
+        let strength = (max_strength * creature.dichotomy.powi(2)).round() as i32;
+        creature.dichotomy = lerp(creature.dichotomy, 1.0, learn_rate);
+        strength
+    }) else {
+        return;
+    };
+
     let stolen = world.handle_attack(tx, ty, strength);
-    creature.energy += stolen;
-    world.put_creature(x, y, creature);
+    if let Cell::Creature(creature) = world.grid.get_mut(x, y) {
+        creature.energy += stolen;
+    }
 }
 
 fn check_self_energy(world: &mut World, x: i32, y: i32) {
@@ -208,17 +217,17 @@ fn scan_forward(world: &mut World, x: i32, y: i32) {
         _ => return,
     };
 
-    let mut target = Cell::Empty;
+    let mut category = ScanCategory::Empty;
     for d in 1..=distance {
         let (cx, cy) = world.grid.coords_by_narrow(x, y, direction, d);
         let cell = world.grid.get(cx, cy);
         if !matches!(cell, Cell::Empty) {
-            target = cell.clone();
+            category = classify(cell, &coloration, threshold);
             break;
         }
     }
 
-    let jump = jump_for_scan(classify(&target, &coloration, threshold), jumps);
+    let jump = jump_for_scan(category, jumps);
     if let Cell::Creature(creature) = world.grid.get_mut(x, y) {
         creature.tape.jump(jump);
     }
@@ -241,8 +250,8 @@ fn inspect_forward(world: &mut World, x: i32, y: i32) {
     };
 
     let (cx, cy) = world.grid.coords_by_narrow(x, y, direction, 1);
-    let target = world.grid.get(cx, cy).clone();
-    let jump = jump_for_scan(classify(&target, &coloration, threshold), jumps);
+    let category = classify(world.grid.get(cx, cy), &coloration, threshold);
+    let jump = jump_for_scan(category, jumps);
     if let Cell::Creature(creature) = world.grid.get_mut(x, y) {
         creature.tape.jump(jump);
     }
@@ -257,14 +266,13 @@ fn reset_genome_pointer(world: &mut World, x: i32, y: i32) {
 fn displace_forward(world: &mut World, x: i32, y: i32) {
     let cost = world.config.push_energy_cost;
     let color = world.config.color_push;
-    let direction = match world.grid.get_mut(x, y) {
-        Cell::Creature(creature) => {
-            lerp_rgba(&mut creature.color, &color, 0.01);
-            creature.direction
-        }
-        _ => return,
+    let Some(direction) = world.with_creature(x, y, |creature, world_energy| {
+        lerp_rgba(&mut creature.color, &color, 0.01);
+        World::send_energy(&mut creature.energy, world_energy, cost);
+        creature.direction
+    }) else {
+        return;
     };
-    world.send_energy_from_creature(x, y, cost);
     let (fwd_x, fwd_y) = world.grid.coords_by_narrow(x, y, direction, 1);
     if matches!(world.grid.get(fwd_x, fwd_y), Cell::Empty) {
         return;

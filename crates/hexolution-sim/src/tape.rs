@@ -1,5 +1,6 @@
 use crate::color::base4_to_int;
-use crate::js_rng;
+use crate::rng;
+use fastrand::Rng;
 
 #[derive(Clone)]
 pub struct Tape {
@@ -8,10 +9,10 @@ pub struct Tape {
 }
 
 impl Tape {
-    pub fn random(length: usize) -> Self {
+    pub fn random(length: usize, rng: &mut Rng) -> Self {
         let mut data = vec![0u8; length];
         for slot in &mut data {
-            *slot = js_rng::random_base4();
+            *slot = rng::random_base4(rng);
         }
         Self { data, pointer: 0 }
     }

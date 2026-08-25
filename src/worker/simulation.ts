@@ -66,6 +66,7 @@ export class Simulation {
       width: number;
       height: number;
     };
+    this.flushFromWasm();
     return frame;
   }
 
@@ -83,7 +84,6 @@ export class Simulation {
   private loop = () => {
     if (!this.wasm || this.speedMultiplier <= 0) return;
     this.wasm.tick();
-    this.flushFromWasm();
     this.scheduleLoop();
   };
 

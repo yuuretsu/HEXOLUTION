@@ -1,7 +1,7 @@
 use crate::cell::Cell;
 use crate::color::{pack_rgba_u32, pack_rgba_u8};
 use crate::config::Config;
-use crate::js_rng;
+use crate::rng;
 use crate::world::World;
 use js_sys::{Object, Reflect, Uint8Array};
 use serde::Serialize;
@@ -148,7 +148,7 @@ impl Simulation {
         self.render_internal();
     }
 
-    /// Run one simulation frame (random cell sampling + render).
+    /// Run one simulation step (random cell sampling). Render is driven by getLatestFrame.
     pub fn tick(&mut self) {
         if self.speed_multiplier <= 0.0 {
             return;
@@ -158,17 +158,17 @@ impl Simulation {
         let iterations = (width as f64) * (height as f64) * self.speed_multiplier;
         let mut i = 0.0;
         while i < iterations {
-            let x = js_rng::random_floor(width);
-            let y = js_rng::random_floor(height);
+            let x = rng::random_floor(&mut self.world.rng, width);
+            let y = rng::random_floor(&mut self.world.rng, height);
             self.age += 1;
             self.world.process_at(x, y);
             i += 1.0;
         }
-        self.render_internal();
     }
 
     #[wasm_bindgen(js_name = getLatestFrame)]
-    pub fn get_latest_frame(&self) -> JsValue {
+    pub fn get_latest_frame(&mut self) -> JsValue {
+        self.render_internal();
         let buffer = Uint8Array::new_with_length(self.pixel_buffer.len() as u32);
         buffer.copy_from(&self.pixel_buffer);
         let obj = Object::new();

@@ -2,8 +2,9 @@ use crate::color::{
     create_random_state, hsla_to_rgba, lerp_rgba, mutate_color, next_random, random_light_color,
 };
 use crate::config::Config;
-use crate::js_rng;
+use crate::rng;
 use crate::tape::Tape;
+use fastrand::Rng;
 
 #[derive(Clone)]
 pub struct Creature {
@@ -27,11 +28,12 @@ impl Creature {
         dichotomy: f64,
         color: [f32; 4],
         coloration: Option<[f32; 4]>,
+        rng: &mut Rng,
     ) -> Self {
-        let coloration = coloration.unwrap_or_else(random_light_color);
+        let coloration = coloration.unwrap_or_else(|| random_light_color(rng));
         let mut c = Self {
             id,
-            direction: js_rng::random_floor(6),
+            direction: rng::random_floor(rng, 6),
             tape,
             age: 0,
             energy,
@@ -63,24 +65,24 @@ impl Creature {
         self.genome_hash_color = hsla_to_rgba(hue, 100.0, 50.0, 1.0);
     }
 
-    pub fn reproduce(&self, next_id: u32, cfg: &Config) -> Self {
+    pub fn reproduce(&self, next_id: u32, cfg: &Config, rng: &mut Rng) -> Self {
         let len = self.tape.data.len();
         let mut data = vec![0u8; len];
         for i in 0..len {
-            data[i] = if js_rng::random() > cfg.genome_mutation_rate {
+            data[i] = if rng::random_f64(rng) > cfg.genome_mutation_rate {
                 self.tape.data[i]
             } else {
-                js_rng::random_base4()
+                rng::random_base4(rng)
             };
         }
 
         let mut color = self.color;
         lerp_rgba(&mut color, &cfg.color_gray, 0.5);
-        let coloration = mutate_color(&self.coloration, cfg.coloration_mutation_rate);
+        let coloration = mutate_color(&self.coloration, cfg.coloration_mutation_rate, rng);
 
         let mut child = Self {
             id: next_id,
-            direction: js_rng::random_floor(6),
+            direction: rng::random_floor(rng, 6),
             tape: Tape::from_data(data),
             age: 0,
             energy: 0,
@@ -136,8 +138,8 @@ pub struct Stone {
 }
 
 impl Stone {
-    pub fn new(id: u32) -> Self {
-        let br = (js_rng::random().powi(5) * 20.0 + 50.0).floor();
+    pub fn new(id: u32, rng: &mut Rng) -> Self {
+        let br = (rng::random_f64(rng).powi(5) * 20.0 + 50.0).floor();
         Self {
             id,
             color: [br as f32, br as f32, br as f32, 255.0],

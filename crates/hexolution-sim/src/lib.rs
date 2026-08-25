@@ -3,7 +3,7 @@ mod color;
 mod config;
 mod genes;
 mod grid;
-mod js_rng;
+mod rng;
 mod simulation;
 mod tape;
 mod world;
