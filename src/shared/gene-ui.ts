@@ -1,16 +1,17 @@
 import type { Rgba } from "@/shared/types";
 import { base4toInt } from "@/shared/utils";
+import {
+  COLOR_ATTACK,
+  COLOR_MOVE_FORWARD,
+  COLOR_PHOTOSYNTHESIS,
+  COLOR_PUSH,
+} from "@/shared/constants";
 
 /** Gene metadata for UI — order matches the Rust gene dispatch table. */
 export type GeneInfo = {
   name: string;
   color?: Rgba;
 };
-
-export const COLOR_MOVE_FORWARD: Rgba = [0, 150, 255, 255];
-export const COLOR_PHOTOSYNTHESIS: Rgba = [0, 200, 0, 255];
-export const COLOR_ATTACK: Rgba = [255, 0, 0, 255];
-export const COLOR_PUSH: Rgba = [0, 0, 255, 255];
 
 export const GENES: GeneInfo[] = [
   { name: "moveForward", color: COLOR_MOVE_FORWARD },

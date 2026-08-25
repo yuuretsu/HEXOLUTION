@@ -1,6 +1,6 @@
 use crate::cell::Cell;
 use crate::color::{pack_rgba_u32, pack_rgba_u8};
-use crate::constants::{WORLD_HEIGHT, WORLD_WIDTH};
+use crate::config::Config;
 use crate::js_rng;
 use crate::world::World;
 use js_sys::{Object, Reflect, Uint8Array};
@@ -89,10 +89,19 @@ pub struct Simulation {
 #[wasm_bindgen]
 impl Simulation {
     #[wasm_bindgen(constructor)]
-    pub fn new(width: i32, height: i32) -> Result<Simulation, JsValue> {
-        let width = if width > 0 { width } else { WORLD_WIDTH };
-        let height = if height > 0 { height } else { WORLD_HEIGHT };
-        let mut world = World::new(width, height);
+    pub fn new(config: JsValue) -> Result<Simulation, JsValue> {
+        let config: Config = serde_wasm_bindgen::from_value(config)
+            .map_err(|e| JsValue::from_str(&format!("invalid sim config: {e}")))?;
+        if config.world_width <= 0 || config.world_height <= 0 {
+            return Err(JsValue::from_str("worldWidth/worldHeight must be positive"));
+        }
+        if config.genome_length == 0 {
+            return Err(JsValue::from_str("genomeLength must be positive"));
+        }
+
+        let width = config.world_width;
+        let height = config.world_height;
+        let mut world = World::new(config);
         world.populate();
         let pixel_len = (width * height * 4) as usize;
         let mut sim = Simulation {
@@ -197,7 +206,7 @@ impl Simulation {
         }
         serde_wasm_bindgen::to_value(&ObjectAtDto {
             item_type: item.class_name().to_string(),
-            color: item.color(),
+            color: item.color(&self.world.config),
         })
         .unwrap_or(JsValue::NULL)
     }
@@ -217,6 +226,7 @@ impl Simulation {
     fn render_internal(&mut self) {
         let width = self.world.grid.width as usize;
         let height = self.world.grid.height as usize;
+        let cfg = self.world.config.clone();
         let mut empty = 0u32;
         let mut stone = 0u32;
         let mut food = 0u32;
@@ -238,7 +248,7 @@ impl Simulation {
                 }
 
                 if self.selected_id != 0 && item.id() == self.selected_id {
-                    selected = Some(serialize_selected(item));
+                    selected = Some(serialize_selected(item, &cfg));
                 }
 
                 match item {
@@ -255,8 +265,8 @@ impl Simulation {
                 }
 
                 let packed = match self.view_mode {
-                    ViewMode::Normal => pack_rgba_u32(&item.color()),
-                    ViewMode::Energy => pack_rgba_u32(&item.energy_color()),
+                    ViewMode::Normal => pack_rgba_u32(&item.color(&cfg)),
+                    ViewMode::Energy => pack_rgba_u32(&item.energy_color(&cfg)),
                     ViewMode::GenomeHash => pack_rgba_u8(&item.genome_hash_color()),
                     ViewMode::Coloration => pack_rgba_u32(&item.coloration()),
                 };
@@ -304,10 +314,11 @@ impl Simulation {
             self.latest_selected = JsValue::NULL;
             return;
         }
+        let cfg = self.world.config.clone();
         for cell in self.world.grid.cells() {
             if cell.id() == self.selected_id {
-                self.latest_selected =
-                    serde_wasm_bindgen::to_value(&serialize_selected(cell)).unwrap_or(JsValue::NULL);
+                self.latest_selected = serde_wasm_bindgen::to_value(&serialize_selected(cell, &cfg))
+                    .unwrap_or(JsValue::NULL);
                 return;
             }
         }
@@ -316,13 +327,13 @@ impl Simulation {
     }
 }
 
-fn serialize_selected(item: &Cell) -> SelectedItemDto {
+fn serialize_selected(item: &Cell, cfg: &Config) -> SelectedItemDto {
     match item {
         Cell::Creature(c) => SelectedItemDto {
             item_type: "Creature".to_string(),
             color: c.color,
             direction: Some(c.direction),
-            program: Some(c.tape.data.to_vec()),
+            program: Some(c.tape.data.clone()),
             pointer: Some(c.tape.pointer),
             age: Some(c.age),
             energy: Some(c.energy),
@@ -330,7 +341,7 @@ fn serialize_selected(item: &Cell) -> SelectedItemDto {
         },
         other => SelectedItemDto {
             item_type: other.class_name().to_string(),
-            color: other.color(),
+            color: other.color(cfg),
             direction: None,
             program: None,
             pointer: None,

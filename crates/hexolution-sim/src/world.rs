@@ -1,11 +1,12 @@
 use crate::cell::{Cell, Creature, Food, Stone};
-use crate::constants::*;
+use crate::config::Config;
 use crate::genes;
 use crate::grid::Grid;
 use crate::js_rng;
 use crate::tape::Tape;
 
 pub struct World {
+    pub config: Config,
     pub grid: Grid<Cell>,
     pub total_energy: i32,
     pub energy: i32,
@@ -13,13 +14,16 @@ pub struct World {
 }
 
 impl World {
-    pub fn new(width: i32, height: i32) -> Self {
-        let total_energy = width * height * ENERGY_PER_CELL;
+    pub fn new(config: Config) -> Self {
+        let width = config.world_width;
+        let height = config.world_height;
+        let total_energy = width * height * config.energy_per_cell;
         Self {
             grid: Grid::new(width, height, Cell::Empty),
             total_energy,
             energy: total_energy,
             next_id: 1,
+            config,
         }
     }
 
@@ -98,16 +102,20 @@ impl World {
     }
 
     fn process_creature(&mut self, mut x: i32, mut y: i32) {
+        let max_energy = self.config.max_cell_energy;
+        let genes_per_tick = self.config.genes_per_tick;
+        let age_factor = self.config.age_energy_cost_factor;
+
         let energy = match self.grid.get(x, y) {
             Cell::Creature(c) => c.energy,
             _ => return,
         };
-        if energy <= 0 || energy >= MAX_CELL_ENERGY {
+        if energy <= 0 || energy >= max_energy {
             self.die_creature(x, y);
             return;
         }
 
-        for _ in 0..GENES_PER_TICK {
+        for _ in 0..genes_per_tick {
             let gene = match self.grid.get_mut(x, y) {
                 Cell::Creature(c) => c.tape.read_int(),
                 _ => return,
@@ -128,7 +136,7 @@ impl World {
         }
 
         let age_cost = match self.grid.get(x, y) {
-            Cell::Creature(c) => (c.age as f64 * AGE_ENERGY_COST_FACTOR).floor() as i32,
+            Cell::Creature(c) => (c.age as f64 * age_factor).floor() as i32,
             _ => return,
         };
         self.send_energy_from_creature(x, y, age_cost);
@@ -153,8 +161,12 @@ impl World {
     pub fn populate(&mut self) {
         let width = self.grid.width;
         let height = self.grid.height;
+        let stone_blobs = self.config.stone_blob_count;
+        let spawn_attempts = self.config.creature_spawn_attempts;
+        let genome_length = self.config.genome_length;
+        let initial_energy = self.config.initial_creature_energy;
 
-        for _ in 0..STONE_BLOB_COUNT {
+        for _ in 0..stone_blobs {
             let x = js_rng::random_floor(width) as f64;
             let y = js_rng::random_floor(height) as f64;
             let radius = js_rng::random().powi(20) * 50.0 + 50.0;
@@ -168,12 +180,12 @@ impl World {
             );
         }
 
-        for _ in 0..CREATURE_SPAWN_ATTEMPTS {
+        for _ in 0..spawn_attempts {
             let x = js_rng::random_floor(width);
             let y = js_rng::random_floor(height);
             if matches!(self.grid.get(x, y), Cell::Empty) {
                 let id = self.alloc_id();
-                let tape = Tape::random();
+                let tape = Tape::random(genome_length);
                 let dichotomy = js_rng::random();
                 let mut creature = Creature::new(
                     id,
@@ -183,23 +195,19 @@ impl World {
                     [100.0, 200.0, 100.0, 255.0],
                     None,
                 );
-                Self::send_energy(
-                    &mut self.energy,
-                    &mut creature.energy,
-                    INITIAL_CREATURE_ENERGY,
-                );
+                Self::send_energy(&mut self.energy, &mut creature.energy, initial_energy);
                 self.grid.set(x, y, Cell::Creature(creature));
             }
         }
     }
 
     fn fill_circle(&mut self, sx: f64, sy: f64, sr: f64, place_stone: bool) {
+        let hex_aspect = self.config.hex_aspect;
         let radius_squared = sr * sr;
-        let radius_ceil_y = (sr / HEX_ASPECT).floor() as i32;
+        let radius_ceil_y = (sr / hex_aspect).floor() as i32;
 
         for y in -radius_ceil_y..=radius_ceil_y {
-            let inner = radius_squared - (y as f64 * HEX_ASPECT).powi(2);
-            // JS: Math.sqrt(negative) => NaN => loop does not run
+            let inner = radius_squared - (y as f64 * hex_aspect).powi(2);
             if inner < 0.0 || inner.is_nan() {
                 continue;
             }

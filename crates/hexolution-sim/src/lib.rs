@@ -1,6 +1,6 @@
 mod cell;
 mod color;
-mod constants;
+mod config;
 mod genes;
 mod grid;
 mod js_rng;

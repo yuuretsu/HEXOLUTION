@@ -1,4 +1,4 @@
-import { WORLD_HEIGHT, WORLD_WIDTH } from "@/shared/constants";
+import { SIM_CONFIG } from "@/shared/constants";
 import type { ViewMode } from "@/shared/types";
 import type { SelectedItemData, WorldData } from "@/shared/worker-protocol";
 import init, { Simulation as WasmSimulation } from "../../crates/hexolution-sim/pkg/hexolution_sim.js";
@@ -26,7 +26,7 @@ export class Simulation {
 
   async init() {
     await init();
-    this.wasm = new WasmSimulation(WORLD_WIDTH, WORLD_HEIGHT);
+    this.wasm = new WasmSimulation({ ...SIM_CONFIG });
     this.speedMultiplier = this.wasm.getSpeed();
     this.flushFromWasm();
     this.loop();

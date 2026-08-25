@@ -1,23 +1,22 @@
-use crate::constants::GENOME_LENGTH;
 use crate::color::base4_to_int;
 use crate::js_rng;
 
 #[derive(Clone)]
 pub struct Tape {
-    pub data: [u8; GENOME_LENGTH],
+    pub data: Vec<u8>,
     pub pointer: usize,
 }
 
 impl Tape {
-    pub fn random() -> Self {
-        let mut data = [0u8; GENOME_LENGTH];
+    pub fn random(length: usize) -> Self {
+        let mut data = vec![0u8; length];
         for slot in &mut data {
             *slot = js_rng::random_base4();
         }
         Self { data, pointer: 0 }
     }
 
-    pub fn from_data(data: [u8; GENOME_LENGTH]) -> Self {
+    pub fn from_data(data: Vec<u8>) -> Self {
         Self { data, pointer: 0 }
     }
 

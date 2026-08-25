@@ -1,7 +1,7 @@
-use crate::color::{create_random_state, hsla_to_rgba, lerp_rgba, mutate_color, next_random, random_light_color};
-use crate::constants::{
-    COLORATION_MUTATION_RATE, GENOME_LENGTH, GENOME_MUTATION_RATE, GRAY, MAX_CELL_ENERGY,
+use crate::color::{
+    create_random_state, hsla_to_rgba, lerp_rgba, mutate_color, next_random, random_light_color,
 };
+use crate::config::Config;
 use crate::js_rng;
 use crate::tape::Tape;
 
@@ -63,10 +63,11 @@ impl Creature {
         self.genome_hash_color = hsla_to_rgba(hue, 100.0, 50.0, 1.0);
     }
 
-    pub fn reproduce(&self, next_id: u32) -> Self {
-        let mut data = [0u8; GENOME_LENGTH];
-        for i in 0..GENOME_LENGTH {
-            data[i] = if js_rng::random() > GENOME_MUTATION_RATE {
+    pub fn reproduce(&self, next_id: u32, cfg: &Config) -> Self {
+        let len = self.tape.data.len();
+        let mut data = vec![0u8; len];
+        for i in 0..len {
+            data[i] = if js_rng::random() > cfg.genome_mutation_rate {
                 self.tape.data[i]
             } else {
                 js_rng::random_base4()
@@ -74,8 +75,8 @@ impl Creature {
         }
 
         let mut color = self.color;
-        lerp_rgba(&mut color, &GRAY, 0.5);
-        let coloration = mutate_color(&self.coloration, COLORATION_MUTATION_RATE);
+        lerp_rgba(&mut color, &cfg.color_gray, 0.5);
+        let coloration = mutate_color(&self.coloration, cfg.coloration_mutation_rate);
 
         let mut child = Self {
             id: next_id,
@@ -92,12 +93,12 @@ impl Creature {
         child
     }
 
-    pub fn energy_color(&self) -> [f32; 4] {
+    pub fn energy_color(&self, cfg: &Config) -> [f32; 4] {
         let mut c = [0.0, 0.0, 100.0, 255.0];
         lerp_rgba(
             &mut c,
-            &crate::constants::ENERGY_COLOR_HOT,
-            self.energy as f32 / MAX_CELL_ENERGY as f32,
+            &cfg.color_energy_hot,
+            self.energy as f32 / cfg.max_cell_energy as f32,
         );
         c
     }
@@ -110,19 +111,19 @@ pub struct Food {
 }
 
 impl Food {
-    pub fn color(&self) -> [f32; 4] {
+    pub fn color(&self, cfg: &Config) -> [f32; 4] {
         let mut c = [25.0, 25.0, 50.0, 0.0];
-        let t = (self.energy as f32 / MAX_CELL_ENERGY as f32).powi(2);
-        lerp_rgba(&mut c, &crate::constants::FOOD_COLOR_FULL, t);
+        let t = (self.energy as f32 / cfg.max_cell_energy as f32).powi(2);
+        lerp_rgba(&mut c, &cfg.color_food_full, t);
         c
     }
 
-    pub fn energy_color(&self) -> [f32; 4] {
+    pub fn energy_color(&self, cfg: &Config) -> [f32; 4] {
         let mut c = [0.0, 0.0, 100.0, 255.0];
         lerp_rgba(
             &mut c,
-            &crate::constants::ENERGY_COLOR_HOT,
-            self.energy as f32 / MAX_CELL_ENERGY as f32,
+            &cfg.color_energy_hot,
+            self.energy as f32 / cfg.max_cell_energy as f32,
         );
         c
     }
@@ -171,21 +172,21 @@ impl Cell {
         }
     }
 
-    pub fn color(&self) -> [f32; 4] {
+    pub fn color(&self, cfg: &Config) -> [f32; 4] {
         match self {
             Cell::Empty => [0.0, 0.0, 0.0, 0.0],
             Cell::Stone(s) => s.color,
-            Cell::Food(f) => f.color(),
+            Cell::Food(f) => f.color(cfg),
             Cell::Creature(c) => c.color,
         }
     }
 
-    pub fn energy_color(&self) -> [f32; 4] {
+    pub fn energy_color(&self, cfg: &Config) -> [f32; 4] {
         match self {
             Cell::Empty => [0.0, 0.0, 0.0, 0.0],
             Cell::Stone(_) => [100.0, 100.0, 100.0, 255.0],
-            Cell::Food(f) => f.energy_color(),
-            Cell::Creature(c) => c.energy_color(),
+            Cell::Food(f) => f.energy_color(cfg),
+            Cell::Creature(c) => c.energy_color(cfg),
         }
     }
 
