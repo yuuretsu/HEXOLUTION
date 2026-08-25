@@ -38,6 +38,8 @@ export const HexagonsGl = forwardRef<HexagonsGlHandle, HexagonsGlProps>(
     } | null>(null);
 
     const camera = useRef({ x: 0, y: 0, scale: 10 });
+    const getDpr = () => window.devicePixelRatio || 1;
+    const getDeviceScale = () => camera.current.scale * getDpr();
     const dragInfo = useRef({
       isDragging: false,
       hasMoved: false,
@@ -82,7 +84,7 @@ export const HexagonsGl = forwardRef<HexagonsGlHandle, HexagonsGlProps>(
       const dpr = window.devicePixelRatio || 1;
       const x = (clientX - rect.left) * dpr;
       const y = (clientY - rect.top) * dpr;
-      const size = camera.current.scale / 1.7320508;
+      const size = getDeviceScale() / 1.7320508;
       const pixelX = x - camera.current.x;
       const pixelY = y - camera.current.y;
       const q = (1.7320508 / 3.0 * pixelX - 1.0 / 3.0 * pixelY) / size;
@@ -144,8 +146,9 @@ export const HexagonsGl = forwardRef<HexagonsGlHandle, HexagonsGlProps>(
       if (!canvas || !container || w <= 0) return;
       const dpr = window.devicePixelRatio || 1;
       const rect = container.getBoundingClientRect();
-      const worldPixelWidth = w * camera.current.scale;
-      const worldPixelHeight = h * camera.current.scale * HEX_ASPECT;
+      const deviceScale = getDeviceScale();
+      const worldPixelWidth = w * deviceScale;
+      const worldPixelHeight = h * deviceScale * HEX_ASPECT;
       camera.current.x = (rect.width * dpr) / 2 - worldPixelWidth / 2;
       camera.current.y = (rect.height * dpr) / 2 - worldPixelHeight / 2;
       isInitialized.current = true;
@@ -271,7 +274,7 @@ export const HexagonsGl = forwardRef<HexagonsGlHandle, HexagonsGlProps>(
           gl.uniform2f(uniforms.uResolution, canvas.width, canvas.height);
           gl.uniform2f(uniforms.uWorldSize, width, height);
           gl.uniform2f(uniforms.uOffset, camera.current.x, camera.current.y);
-          gl.uniform1f(uniforms.uScale, camera.current.scale);
+          gl.uniform1f(uniforms.uScale, getDeviceScale());
           gl.uniform1i(uniforms.uWrap, wrapRef.current ? 1 : 0);
           gl.drawArrays(gl.TRIANGLES, 0, 6);
         }
