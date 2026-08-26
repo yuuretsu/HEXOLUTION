@@ -62,11 +62,11 @@ pub fn run_gene(index: u8, world: &mut World, x: i32, y: i32) -> (bool, i32, i32
 fn move_forward(world: &mut World, x: i32, y: i32) -> (bool, i32, i32) {
     let cost = world.config.move_energy_cost;
     let color = world.config.color_move_forward;
-    let Some(direction) = world.with_creature(x, y, |creature, world_energy| {
+    let direction = if let Cell::Creature(creature) = world.grid.get_mut(x, y) {
         lerp_rgba(&mut creature.color, &color, 0.01);
-        World::send_energy(&mut creature.energy, world_energy, cost);
+        World::send_energy(&mut creature.energy, &mut world.energy, cost);
         creature.direction
-    }) else {
+    } else {
         return (true, x, y);
     };
     let (tx, ty) = world.grid.coords_by_narrow(x, y, direction, 1);
@@ -116,17 +116,17 @@ fn absorb_light(world: &mut World, x: i32, y: i32) {
     let color = world.config.color_photosynthesis;
     let total_energy = world.total_energy;
 
-    world.with_creature(x, y, |creature, world_energy| {
+    if let Cell::Creature(creature) = world.grid.get_mut(x, y) {
         lerp_rgba(&mut creature.color, &color, 0.01);
-        World::send_energy(&mut creature.energy, world_energy, cost);
+        World::send_energy(&mut creature.energy, &mut world.energy, cost);
         let left = creature.dichotomy_left();
-        let abundance = (*world_energy as f64 / (total_energy as f64 * abundance_ratio))
+        let abundance = (world.energy as f64 / (total_energy as f64 * abundance_ratio))
             .min(1.0)
             .powi(2);
         let e = (max_yield * abundance * left.powi(2)).round() as i32;
         creature.set_dichotomy_left(lerp(left, 1.0, learn_rate));
-        World::send_energy(world_energy, &mut creature.energy, e);
-    });
+        World::send_energy(&mut world.energy, &mut creature.energy, e);
+    }
 }
 
 fn attack_forward(world: &mut World, x: i32, y: i32) {
@@ -135,11 +135,11 @@ fn attack_forward(world: &mut World, x: i32, y: i32) {
     let learn_rate = world.config.specialization_learn_rate;
     let color = world.config.color_attack;
 
-    let Some(direction) = world.with_creature(x, y, |creature, world_energy| {
+    let direction = if let Cell::Creature(creature) = world.grid.get_mut(x, y) {
         lerp_rgba(&mut creature.color, &color, 0.02);
-        World::send_energy(&mut creature.energy, world_energy, cost);
+        World::send_energy(&mut creature.energy, &mut world.energy, cost);
         creature.direction
-    }) else {
+    } else {
         return;
     };
 
@@ -148,11 +148,11 @@ fn attack_forward(world: &mut World, x: i32, y: i32) {
         return;
     }
 
-    let Some(strength) = world.with_creature(x, y, |creature, _| {
+    let strength = if let Cell::Creature(creature) = world.grid.get_mut(x, y) {
         let strength = (max_strength * creature.dichotomy.powi(2)).round() as i32;
         creature.dichotomy = lerp(creature.dichotomy, 1.0, learn_rate);
         strength
-    }) else {
+    } else {
         return;
     };
 
@@ -266,11 +266,11 @@ fn reset_genome_pointer(world: &mut World, x: i32, y: i32) {
 fn displace_forward(world: &mut World, x: i32, y: i32) {
     let cost = world.config.push_energy_cost;
     let color = world.config.color_push;
-    let Some(direction) = world.with_creature(x, y, |creature, world_energy| {
+    let direction = if let Cell::Creature(creature) = world.grid.get_mut(x, y) {
         lerp_rgba(&mut creature.color, &color, 0.01);
-        World::send_energy(&mut creature.energy, world_energy, cost);
+        World::send_energy(&mut creature.energy, &mut world.energy, cost);
         creature.direction
-    }) else {
+    } else {
         return;
     };
     let (fwd_x, fwd_y) = world.grid.coords_by_narrow(x, y, direction, 1);

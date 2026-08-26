@@ -58,28 +58,10 @@ impl World {
         self.grid.set(x, y, Cell::Creature(creature));
     }
 
-    /// Mutate a creature in place while also touching world energy (avoids take/put).
-    #[inline]
-    pub fn with_creature<R>(
-        &mut self,
-        x: i32,
-        y: i32,
-        f: impl FnOnce(&mut Creature, &mut i32) -> R,
-    ) -> Option<R> {
-        let mut energy = self.energy;
-        let result = match self.grid.get_mut(x, y) {
-            Cell::Creature(c) => Some(f(c, &mut energy)),
-            _ => None,
-        };
-        self.energy = energy;
-        result
-    }
-
     pub fn handle_attack(&mut self, x: i32, y: i32, strength: i32) -> i32 {
-        let mut energy = self.energy;
-        let stolen = match self.grid.get_mut(x, y) {
+        match self.grid.get_mut(x, y) {
             Cell::Creature(c) => {
-                Self::send_energy(&mut c.energy, &mut energy, 1);
+                Self::send_energy(&mut c.energy, &mut self.energy, 1);
                 let mut stolen = 0;
                 Self::send_energy(&mut c.energy, &mut stolen, strength);
                 stolen
@@ -90,9 +72,7 @@ impl World {
                 stolen
             }
             _ => 0,
-        };
-        self.energy = energy;
-        stolen
+        }
     }
 
     pub fn process_at(&mut self, x: i32, y: i32) {
@@ -104,15 +84,13 @@ impl World {
     }
 
     fn process_food(&mut self, x: i32, y: i32) {
-        let mut energy = self.energy;
         let clear = match self.grid.get_mut(x, y) {
             Cell::Food(f) => {
-                Self::send_energy(&mut f.energy, &mut energy, 1);
+                Self::send_energy(&mut f.energy, &mut self.energy, 1);
                 f.energy <= 0
             }
             _ => false,
         };
-        self.energy = energy;
         if clear {
             self.grid.set(x, y, Cell::Empty);
         }
@@ -145,11 +123,11 @@ impl World {
             }
         }
 
-        self.with_creature(x, y, |c, world_energy| {
+        if let Cell::Creature(c) = self.grid.get_mut(x, y) {
             let age_cost = (c.age as f64 * age_factor).floor() as i32;
-            Self::send_energy(&mut c.energy, world_energy, age_cost);
+            Self::send_energy(&mut c.energy, &mut self.energy, age_cost);
             c.age += 1;
-        });
+        }
     }
 
     pub fn die_creature(&mut self, x: i32, y: i32) {
