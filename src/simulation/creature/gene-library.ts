@@ -100,6 +100,10 @@ export const attackForward: GeneHandler = (creature, world, x, y) => {
   creature.autotrophOrHeterotroph.right = lerp(creature.autotrophOrHeterotroph.right, 1, SPECIALIZATION_LEARN_RATE);
   const result = target.handleAttack(world, strength);
   sendEnergy(result, creature, result.energy);
+  if (target instanceof Food && target.energy <= 0) {
+    world.grid.set(coordsA[0], coordsA[1], undefined);
+    target.release();
+  }
   return GENE_FINISHED;
 };
 
@@ -107,7 +111,7 @@ export const checkSelfEnergy: GeneHandler = (creature, _world, _x, _y) => {
   const treshold = creature.tape.readFloat();
   const jumpA = creature.tape.readInt();
   const jumpB = creature.tape.readInt();
-  if (creature.energy * 100 < treshold) {
+  if (creature.energy / 100 < treshold) {
     creature.tape.jump(jumpA);
     return GENE_CONTINUE;
   }
