@@ -30,10 +30,16 @@ export const HexagonsGl = forwardRef<HexagonsGlHandle, HexagonsGlProps>(
     const isInitialized = useRef(false);
     const savedBodyCursor = useRef<string | null>(null);
     const savedBodyPriority = useRef<string>("");
+    const lastFrameRef = useRef<{ buffer: Uint8Array; width: number; height: number } | null>(null);
+    const inputSource = useRef<"mouse" | "touch" | null>(null);
 
     const glRef = useRef<{
       gl: WebGLRenderingContext;
       texture: WebGLTexture;
+      program: WebGLProgram;
+      vertexShader: WebGLShader;
+      fragmentShader: WebGLShader;
+      vBuffer: WebGLBuffer | null;
       uniforms: Record<string, WebGLUniformLocation>;
     } | null>(null);
 
@@ -41,6 +47,7 @@ export const HexagonsGl = forwardRef<HexagonsGlHandle, HexagonsGlProps>(
     const dragInfo = useRef({
       isDragging: false,
       hasMoved: false,
+      wasPinching: false,
       lastX: 0,
       lastY: 0,
       lastDist: 0,
@@ -52,15 +59,22 @@ export const HexagonsGl = forwardRef<HexagonsGlHandle, HexagonsGlProps>(
       wrapRef.current = isWrap;
     }, [isWrap]);
 
-    const stopDragging = useCallback(() => {
-      dragInfo.current.isDragging = false;
-      dragInfo.current.lastDist = 0;
+    const restoreBodyCursor = useCallback(() => {
       if (savedBodyCursor.current !== null) {
         document.body.style.setProperty("cursor", savedBodyCursor.current, savedBodyPriority.current);
         savedBodyCursor.current = null;
         savedBodyPriority.current = "";
       }
     }, []);
+
+    const stopDragging = useCallback(() => {
+      dragInfo.current.isDragging = false;
+      dragInfo.current.hasMoved = false;
+      dragInfo.current.wasPinching = false;
+      dragInfo.current.lastDist = 0;
+      inputSource.current = null;
+      restoreBodyCursor();
+    }, [restoreBodyCursor]);
 
     const cubeRound = (fracX: number, fracY: number, fracZ: number) => {
       let rx = Math.floor(fracX + 0.5);
@@ -103,7 +117,7 @@ export const HexagonsGl = forwardRef<HexagonsGlHandle, HexagonsGlProps>(
 
     useEffect(() => {
       const handleWindowMouseMove = (e: MouseEvent) => {
-        if (!dragInfo.current.isDragging) return;
+        if (inputSource.current !== "mouse" || !dragInfo.current.isDragging) return;
         const dx = e.clientX - dragInfo.current.lastX;
         const dy = e.clientY - dragInfo.current.lastY;
 
@@ -124,17 +138,25 @@ export const HexagonsGl = forwardRef<HexagonsGlHandle, HexagonsGlProps>(
       };
 
       const handleWindowMouseUp = (e: MouseEvent) => {
-        if (dragInfo.current.isDragging) {
-          if (!dragInfo.current.hasMoved) handleCanvasClick(e.clientX, e.clientY);
-          stopDragging();
-        }
+        if (inputSource.current !== "mouse" || !dragInfo.current.isDragging) return;
+        if (!dragInfo.current.hasMoved) handleCanvasClick(e.clientX, e.clientY);
+        stopDragging();
+      };
+
+      const handleWindowBlur = () => {
+        stopDragging();
       };
 
       window.addEventListener("mousemove", handleWindowMouseMove);
       window.addEventListener("mouseup", handleWindowMouseUp);
+      window.addEventListener("pointercancel", handleWindowBlur);
+      window.addEventListener("blur", handleWindowBlur);
       return () => {
         window.removeEventListener("mousemove", handleWindowMouseMove);
         window.removeEventListener("mouseup", handleWindowMouseUp);
+        window.removeEventListener("pointercancel", handleWindowBlur);
+        window.removeEventListener("blur", handleWindowBlur);
+        stopDragging();
       };
     }, [handleCanvasClick, stopDragging]);
 
@@ -151,15 +173,20 @@ export const HexagonsGl = forwardRef<HexagonsGlHandle, HexagonsGlProps>(
       isInitialized.current = true;
     };
 
+    const uploadFrame = (buffer: Uint8Array, w: number, h: number) => {
+      const state = glRef.current;
+      if (!state || state.gl.isContextLost()) return;
+      const { gl, texture } = state;
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, w, h, 0, gl.RGBA, gl.UNSIGNED_BYTE, buffer);
+    };
+
     useImperativeHandle(ref, () => ({
       updateBuffer: (buffer, w, h) => {
-        const state = glRef.current;
-        if (!state) return;
+        lastFrameRef.current = { buffer, width: w, height: h };
         const needsCentering = !isInitialized.current && w > 0;
         worldSize.current = { width: w, height: h };
-        const { gl, texture } = state;
-        gl.bindTexture(gl.TEXTURE_2D, texture);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, w, h, 0, gl.RGBA, gl.UNSIGNED_BYTE, buffer);
+        uploadFrame(buffer, w, h);
         if (needsCentering) centerCamera(w, h);
       },
     }));
@@ -167,55 +194,83 @@ export const HexagonsGl = forwardRef<HexagonsGlHandle, HexagonsGlProps>(
     useLayoutEffect(() => {
       const canvas = canvasRef.current;
       if (!canvas) return;
-      const gl = canvas.getContext("webgl", { antialias: true, alpha: true, premultipliedAlpha: false });
-      if (!gl) return;
 
-      const createShader = (type: number, source: string) => {
+      const createShader = (gl: WebGLRenderingContext, type: number, source: string) => {
         const s = gl.createShader(type)!;
         gl.shaderSource(s, source);
         gl.compileShader(s);
         return s;
       };
 
-      const vertexShader = createShader(gl.VERTEX_SHADER, vertexSource);
-      const fragmentShader = createShader(gl.FRAGMENT_SHADER, fragmentSource);
-      const program = gl.createProgram()!;
-      gl.attachShader(program, vertexShader);
-      gl.attachShader(program, fragmentShader);
-      gl.linkProgram(program);
-      gl.useProgram(program);
-      gl.enable(gl.BLEND);
-      gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+      const initGl = () => {
+        const gl = canvas.getContext("webgl", { antialias: true, alpha: true, premultipliedAlpha: false });
+        if (!gl || gl.isContextLost()) return;
 
-      const vertices = new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]);
-      const vBuffer = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
-      gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+        const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexSource);
+        const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentSource);
+        const program = gl.createProgram()!;
+        gl.attachShader(program, vertexShader);
+        gl.attachShader(program, fragmentShader);
+        gl.linkProgram(program);
+        gl.useProgram(program);
+        gl.enable(gl.BLEND);
+        gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
-      const posAttrib = gl.getAttribLocation(program, "position");
-      gl.enableVertexAttribArray(posAttrib);
-      gl.vertexAttribPointer(posAttrib, 2, gl.FLOAT, false, 0, 0);
+        const vertices = new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]);
+        const vBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
 
-      const texture = gl.createTexture()!;
-      gl.bindTexture(gl.TEXTURE_2D, texture);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        const posAttrib = gl.getAttribLocation(program, "position");
+        gl.enableVertexAttribArray(posAttrib);
+        gl.vertexAttribPointer(posAttrib, 2, gl.FLOAT, false, 0, 0);
 
-      glRef.current = {
-        gl,
-        texture,
-        uniforms: {
-          uResolution: gl.getUniformLocation(program, "uResolution")!,
-          uWorldSize: gl.getUniformLocation(program, "uWorldSize")!,
-          uOffset: gl.getUniformLocation(program, "uOffset")!,
-          uScale: gl.getUniformLocation(program, "uScale")!,
-          uWrap: gl.getUniformLocation(program, "uWrap")!,
-        },
+        const texture = gl.createTexture()!;
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+
+        glRef.current = {
+          gl,
+          texture,
+          program,
+          vertexShader,
+          fragmentShader,
+          vBuffer,
+          uniforms: {
+            uResolution: gl.getUniformLocation(program, "uResolution")!,
+            uWorldSize: gl.getUniformLocation(program, "uWorldSize")!,
+            uOffset: gl.getUniformLocation(program, "uOffset")!,
+            uScale: gl.getUniformLocation(program, "uScale")!,
+            uWrap: gl.getUniformLocation(program, "uWrap")!,
+          },
+        };
+
+        const last = lastFrameRef.current;
+        if (last) uploadFrame(last.buffer, last.width, last.height);
+      };
+
+      const disposeGl = () => {
+        const state = glRef.current;
+        glRef.current = null;
+        if (!state || state.gl.isContextLost()) return;
+        const { gl, texture, program, vertexShader, fragmentShader, vBuffer } = state;
+        gl.bindBuffer(gl.ARRAY_BUFFER, null);
+        gl.bindTexture(gl.TEXTURE_2D, null);
+        if (vBuffer) gl.deleteBuffer(vBuffer);
+        gl.deleteTexture(texture);
+        gl.detachShader(program, vertexShader);
+        gl.detachShader(program, fragmentShader);
+        gl.deleteShader(vertexShader);
+        gl.deleteShader(fragmentShader);
+        gl.deleteProgram(program);
       };
 
       const resize = () => {
+        const state = glRef.current;
+        if (!state || state.gl.isContextLost()) return;
         const dpr = window.devicePixelRatio || 1;
         const rect = containerRef.current?.getBoundingClientRect();
         if (rect) {
@@ -231,9 +286,21 @@ export const HexagonsGl = forwardRef<HexagonsGlHandle, HexagonsGlProps>(
 
           canvas.width = newWidth;
           canvas.height = newHeight;
-          gl.viewport(0, 0, canvas.width, canvas.height);
+          state.gl.viewport(0, 0, canvas.width, canvas.height);
         }
       };
+
+      const handleContextLost = (e: Event) => {
+        e.preventDefault();
+        glRef.current = null;
+      };
+
+      const handleContextRestored = () => {
+        initGl();
+        resize();
+      };
+
+      initGl();
 
       const resizeObserver = new ResizeObserver(() => resize());
       if (containerRef.current) {
@@ -241,29 +308,25 @@ export const HexagonsGl = forwardRef<HexagonsGlHandle, HexagonsGlProps>(
       }
 
       window.addEventListener("resize", resize);
+      canvas.addEventListener("webglcontextlost", handleContextLost);
+      canvas.addEventListener("webglcontextrestored", handleContextRestored);
       resize();
 
       return () => {
         window.removeEventListener("resize", resize);
+        canvas.removeEventListener("webglcontextlost", handleContextLost);
+        canvas.removeEventListener("webglcontextrestored", handleContextRestored);
         resizeObserver.disconnect();
-        gl.bindBuffer(gl.ARRAY_BUFFER, null);
-        gl.bindTexture(gl.TEXTURE_2D, null);
-        if (vBuffer) gl.deleteBuffer(vBuffer);
-        gl.deleteTexture(texture);
-        gl.detachShader(program, vertexShader);
-        gl.detachShader(program, fragmentShader);
-        gl.deleteShader(vertexShader);
-        gl.deleteShader(fragmentShader);
-        gl.deleteProgram(program);
-        glRef.current = null;
+        disposeGl();
       };
     }, []);
 
     useEffect(() => {
       let frameId: number;
       const render = () => {
-        if (glRef.current && canvasRef.current) {
-          const { gl, uniforms } = glRef.current;
+        const state = glRef.current;
+        if (state && canvasRef.current && !state.gl.isContextLost()) {
+          const { gl, uniforms } = state;
           const canvas = canvasRef.current;
           const { width, height } = worldSize.current;
           gl.clearColor(0, 0, 0, 0);
@@ -325,24 +388,34 @@ export const HexagonsGl = forwardRef<HexagonsGlHandle, HexagonsGlProps>(
         return;
       }
 
+      inputSource.current = "mouse";
       dragInfo.current.isDragging = true;
       dragInfo.current.hasMoved = false;
+      dragInfo.current.wasPinching = false;
       dragInfo.current.lastX = e.clientX;
       dragInfo.current.lastY = e.clientY;
     };
 
+    const beginPinch = (t1: React.Touch, t2: React.Touch) => {
+      const dx = t1.clientX - t2.clientX;
+      const dy = t1.clientY - t2.clientY;
+      dragInfo.current.wasPinching = true;
+      dragInfo.current.hasMoved = true;
+      dragInfo.current.lastDist = Math.sqrt(dx * dx + dy * dy);
+      dragInfo.current.lastMidX = (t1.clientX + t2.clientX) / 2;
+      dragInfo.current.lastMidY = (t1.clientY + t2.clientY) / 2;
+    };
+
     const handleTouchStart = (e: React.TouchEvent) => {
+      inputSource.current = "touch";
       if (e.touches.length === 1) {
         dragInfo.current.isDragging = true;
         dragInfo.current.hasMoved = false;
+        dragInfo.current.wasPinching = false;
         dragInfo.current.lastX = e.touches[0].clientX;
         dragInfo.current.lastY = e.touches[0].clientY;
-      } else if (e.touches.length === 2) {
-        const t1 = e.touches[0], t2 = e.touches[1];
-        const dx = t1.clientX - t2.clientX, dy = t1.clientY - t2.clientY;
-        dragInfo.current.lastDist = Math.sqrt(dx * dx + dy * dy);
-        dragInfo.current.lastMidX = (t1.clientX + t2.clientX) / 2;
-        dragInfo.current.lastMidY = (t1.clientY + t2.clientY) / 2;
+      } else if (e.touches.length >= 2) {
+        beginPinch(e.touches[0], e.touches[1]);
         e.preventDefault();
       }
     };
@@ -359,7 +432,7 @@ export const HexagonsGl = forwardRef<HexagonsGlHandle, HexagonsGlProps>(
         camera.current.y += dy * dpr;
         dragInfo.current.lastX = e.touches[0].clientX;
         dragInfo.current.lastY = e.touches[0].clientY;
-      } else if (e.touches.length === 2) {
+      } else if (e.touches.length >= 2) {
         const t1 = e.touches[0], t2 = e.touches[1];
         const dx = t1.clientX - t2.clientX, dy = t1.clientY - t2.clientY;
         const dist = Math.sqrt(dx * dx + dy * dy);
@@ -367,16 +440,42 @@ export const HexagonsGl = forwardRef<HexagonsGlHandle, HexagonsGlProps>(
         camera.current.x += (midX - dragInfo.current.lastMidX) * dpr;
         camera.current.y += (midY - dragInfo.current.lastMidY) * dpr;
         if (dragInfo.current.lastDist > 0) updateZoom((midX - rect.left) * dpr, (midY - rect.top) * dpr, dist / dragInfo.current.lastDist);
+        dragInfo.current.wasPinching = true;
+        dragInfo.current.hasMoved = true;
         dragInfo.current.lastDist = dist;
         dragInfo.current.lastMidX = midX;
         dragInfo.current.lastMidY = midY;
+        e.preventDefault();
       }
     };
 
     const handleTouchEnd = (e: React.TouchEvent) => {
-      if (dragInfo.current.isDragging && !dragInfo.current.hasMoved && e.changedTouches.length > 0) {
+      if (e.touches.length >= 2) {
+        beginPinch(e.touches[0], e.touches[1]);
+        return;
+      }
+
+      if (e.touches.length === 1) {
+        dragInfo.current.isDragging = true;
+        dragInfo.current.hasMoved = true;
+        dragInfo.current.lastDist = 0;
+        dragInfo.current.lastX = e.touches[0].clientX;
+        dragInfo.current.lastY = e.touches[0].clientY;
+        return;
+      }
+
+      if (
+        dragInfo.current.isDragging
+        && !dragInfo.current.hasMoved
+        && !dragInfo.current.wasPinching
+        && e.changedTouches.length > 0
+      ) {
         handleCanvasClick(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
       }
+      stopDragging();
+    };
+
+    const handleTouchCancel = () => {
       stopDragging();
     };
 
@@ -389,6 +488,7 @@ export const HexagonsGl = forwardRef<HexagonsGlHandle, HexagonsGlProps>(
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
+          onTouchCancel={handleTouchCancel}
           className={styles.canvas}
         />
       </div>
