@@ -11,6 +11,7 @@
   flex-direction: column;
   gap: 16px;
   transition-duration: 0.3s;
+  touch-action: pan-y;
 }
 
 .sidebarHidden {
