@@ -1,11 +1,12 @@
+import { HEX_ASPECT } from "@/shared/hex-math";
+
+export { HEX_ASPECT, SQRT3 } from "@/shared/hex-math";
+
 /** Starting simulation speed. Paused in dev so the world can be inspected before ticks. */
 export const INITIAL_SIMULATION_SPEED = import.meta.env.DEV ? 0 : 1;
 
 /** Creature genome length in base units. */
 export const GENOME_LENGTH = 32 * 3;
-
-/** Hex cell height-to-width aspect ratio. */
-export const HEX_ASPECT = 0.866;
 
 /** World width in cells. */
 export const WORLD_WIDTH = 128;

@@ -7,7 +7,7 @@ import {
   useCallback,
 } from "react";
 import styles from "./styles.module.css";
-import { HEX_ASPECT } from "@/shared/constants";
+import { HEX_ASPECT, SQRT3 } from "@/shared/constants";
 import vertexSource from "./vertex.glsl?raw";
 import fragmentSource from "./fragment.glsl?raw";
 
@@ -86,10 +86,10 @@ export const HexagonsGl = forwardRef<HexagonsGlHandle, HexagonsGlProps>(
       const dpr = window.devicePixelRatio || 1;
       const x = (clientX - rect.left) * dpr;
       const y = (clientY - rect.top) * dpr;
-      const size = getDeviceScale() / 1.7320508;
+      const size = getDeviceScale() / SQRT3;
       const pixelX = x - camera.current.x;
       const pixelY = y - camera.current.y;
-      const q = (1.7320508 / 3.0 * pixelX - 1.0 / 3.0 * pixelY) / size;
+      const q = (SQRT3 / 3.0 * pixelX - 1.0 / 3.0 * pixelY) / size;
       const r = (2.0 / 3.0 * pixelY) / size;
       const rounded = cubeRound(q, -q - r, r);
       const col = rounded.x + (rounded.z - (Math.abs(rounded.z) % 2)) / 2;
