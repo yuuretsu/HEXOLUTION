@@ -11,10 +11,12 @@ import fragmentSource from "./fragment.glsl?raw";
 import {
   createHexagonsGl,
   disposeHexagonsGl,
+} from "./gl-create";
+import {
   drawHexagonsFrame,
   resizeHexagonsCanvas,
   uploadWorldTexture,
-} from "./gl-setup";
+} from "./gl-frame";
 import type { HexagonsGlHandle } from "./types";
 import type { HexagonsViewport } from "./use-hexagons-viewport";
 

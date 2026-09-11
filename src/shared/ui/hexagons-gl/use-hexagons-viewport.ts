@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useRef } from "react";
 import { HEX_ASPECT } from "@/shared/constants";
 import { getDpr } from "./hex-pick";
-import { updateCameraZoom, type CameraState } from "./gl-setup";
-
-export type WorldSize = { width: number; height: number };
+import { updateCameraZoom } from "./camera";
+import type { CameraState, WorldSize } from "./types";
 
 export const useHexagonsViewport = (isWrap: boolean) => {
   const camera = useRef<CameraState>({ x: 0, y: 0, scale: 10 });
