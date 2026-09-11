@@ -42,7 +42,7 @@ const Program: FC<ProgramProps> = ({ program, pointer }) => {
                 }}
                 title={handler.name}
               >
-                <Stack dir="row" gap={0} justify="around">
+                <Stack dir="row" justify="around">
                   {symbols.map((x, i) => (
                     <div key={i}>{x}</div>
                   ))}

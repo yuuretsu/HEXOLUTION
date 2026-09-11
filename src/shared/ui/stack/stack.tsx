@@ -14,7 +14,7 @@ export type StackJustify =
 
 export type StackProps = PropsWithChildren<{
   dir: "row" | "column";
-  gap: number;
+  gap?: number;
   align?: StackAlign;
   justify?: StackJustify;
   isWrap?: boolean;
@@ -22,7 +22,7 @@ export type StackProps = PropsWithChildren<{
 
 export const Stack: FC<StackProps> = ({
   dir,
-  gap,
+  gap = 0,
   align,
   justify,
   isWrap,

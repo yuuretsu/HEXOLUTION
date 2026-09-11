@@ -81,7 +81,7 @@ export const Sidebar: FC<SidebarProps> = ({ data, chartData, isOpen }) => {
               ]}
             />
           </div>
-          <Stack dir="row" gap={0} align="center" justify="between">
+          <Stack dir="row" align="center" justify="between">
             <div>world age</div>
             <div className={styles.worldAgeValue}>
               {fullAge}
