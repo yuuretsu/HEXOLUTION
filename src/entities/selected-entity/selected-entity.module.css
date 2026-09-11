@@ -6,8 +6,18 @@
 }
 
 .programCell {
+  --program-activity-height: 2px;
   text-align: center;
   font-weight: bold;
+  display: flex;
+  flex-direction: column;
+  padding-top: var(--program-activity-height);
+}
+
+.programCellActivity {
+  height: var(--program-activity-height);
+  width: 100%;
+  flex-shrink: 0;
 }
 
 .infoTable {

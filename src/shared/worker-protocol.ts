@@ -45,4 +45,6 @@ export type SelectedItemData = {
   generation?: number;
   energy?: number;
   coloration?: Rgba;
+  activeGeneIndices?: number[];
+  lastGeneIndex?: number;
 };

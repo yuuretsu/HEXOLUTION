@@ -36,6 +36,8 @@ export class Creature extends WorldItemDynamic {
   readonly tape: Tape;
   age = 0;
   generation = 0;
+  lastGeneIndex = -1;
+  readonly activeGeneIndices: number[] = [];
   energy: number;
   readonly color: Rgba;
   readonly coloration: Rgba;
@@ -80,6 +82,8 @@ export class Creature extends WorldItemDynamic {
     this.energy = energy;
     this.age = 0;
     this.generation = 0;
+    this.lastGeneIndex = -1;
+    this.activeGeneIndices.length = 0;
     this._direction = ~~(Math.random() * 6);
     this.autotrophOrHeterotroph.right = autotrophOrHeterotroph;
     this.color[0] = color[0];
@@ -150,6 +154,8 @@ export class Creature extends WorldItemDynamic {
     child.energy = 0;
     child.age = 0;
     child.generation = this.generation + 1;
+    child.lastGeneIndex = -1;
+    child.activeGeneIndices.length = 0;
     child._direction = ~~(Math.random() * 6);
 
     child.color[0] = this.color[0];
@@ -168,8 +174,14 @@ export class Creature extends WorldItemDynamic {
   process(world: World, x: number, y: number): void {
     if (this.energy <= 0 || this.energy >= MAX_CELL_ENERGY) return this.die(world, x, y);
 
+    this.activeGeneIndices.length = 0;
+    this.lastGeneIndex = -1;
+
     for (let i = 0; i < GENES_PER_TICK; i++) {
+      const geneIndex = Math.floor(this.tape.pointer / 3);
       const handle = getGeneHandler(this.tape.readInt());
+      this.activeGeneIndices.push(geneIndex);
+      this.lastGeneIndex = geneIndex;
       const result = handle(this, world, x, y);
       if (result.isFinished) break;
     }

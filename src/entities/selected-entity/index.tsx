@@ -8,11 +8,13 @@ import styles from "./selected-entity.module.css";
 
 type ProgramProps = {
   program: number[];
-  pointer: number;
+  activeGeneIndices?: number[];
+  lastGeneIndex?: number;
 };
 
-const Program: FC<ProgramProps> = ({ program, pointer }) => {
+const Program: FC<ProgramProps> = ({ program, activeGeneIndices = [], lastGeneIndex = -1 }) => {
   const triplets = chunk(program, 3);
+  const activeSet = new Set(activeGeneIndices);
 
   return (
     <div>
@@ -33,12 +35,21 @@ const Program: FC<ProgramProps> = ({ program, pointer }) => {
             [inspectForward.name]: [255, 255, 0, 255],
           }[handler.name];
 
+          const backgroundColor = color
+            ? `rgba(${color[0]}, ${color[1]}, ${color[2]}, 0.3)`
+            : "rgba(255, 255, 255, 0.1)";
+          const activityColor = i === lastGeneIndex
+            ? "#ffffff"
+            : activeSet.has(i)
+              ? "#888888"
+              : undefined;
+
           return (
             <div key={i}>
               <div
                 className={styles.programCell}
                 style={{
-                  backgroundColor: color ? `rgba(${color[0]}, ${color[1]}, ${color[2]}, 0.3)` : "rgba(255, 255, 255, 0.1)",
+                  backgroundColor,
                   color: color ? `rgba(${color[0]}, ${color[1]}, ${color[2]})` : "rgba(255, 255, 255, 0.1)",
                 }}
                 title={handler.name}
@@ -48,6 +59,10 @@ const Program: FC<ProgramProps> = ({ program, pointer }) => {
                     <Text key={i}>{x}</Text>
                   ))}
                 </Stack>
+                <div
+                  className={styles.programCellActivity}
+                  style={activityColor ? { backgroundColor: activityColor } : undefined}
+                />
               </div>
             </div>
           );
@@ -94,7 +109,11 @@ export const WorldEntityCreature: FC<{ item: any }> = ({ item }) => {
           </tr>
         </tbody>
       </table>
-      <Program program={program} pointer={item.pointer} />
+      <Program
+        program={program}
+        activeGeneIndices={item.activeGeneIndices}
+        lastGeneIndex={item.lastGeneIndex}
+      />
     </Stack>
   );
 };
