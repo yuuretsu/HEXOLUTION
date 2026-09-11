@@ -1,15 +1,15 @@
 import { useState, useEffect, useCallback } from "react";
+import { INITIAL_SIMULATION_SPEED } from "@/shared/constants";
 import { workerApi } from "@/shared/worker-client";
 
 export const useSimulationSpeed = () => {
-  const [speed, setSpeed] = useState(1);
-  const [isPlaying, setIsPlaying] = useState(true);
+  const [speed, setSpeed] = useState(INITIAL_SIMULATION_SPEED);
   const [lastActiveSpeed, setLastActiveSpeed] = useState(1);
+  const isPlaying = speed > 0;
 
   useEffect(() => {
     workerApi.call("getSpeed", []).then(currentSpeed => {
       setSpeed(currentSpeed);
-      setIsPlaying(currentSpeed > 0);
       if (currentSpeed > 0) {
         setLastActiveSpeed(currentSpeed);
       }
@@ -19,7 +19,6 @@ export const useSimulationSpeed = () => {
   useEffect(() => {
     const unsubscribe = workerApi.on("speedChanged", (newSpeed) => {
       setSpeed(newSpeed);
-      setIsPlaying(newSpeed > 0);
       if (newSpeed > 0) {
         setLastActiveSpeed(newSpeed);
       }
@@ -29,7 +28,6 @@ export const useSimulationSpeed = () => {
 
   const setSpeedAndNotify = useCallback((newSpeed: number) => {
     setSpeed(newSpeed);
-    setIsPlaying(newSpeed > 0);
     if (newSpeed > 0) {
       setLastActiveSpeed(newSpeed);
     }
@@ -37,17 +35,15 @@ export const useSimulationSpeed = () => {
   }, []);
 
   const togglePlayPause = useCallback(() => {
-    if (isPlaying) {
+    if (speed > 0) {
       workerApi.call("setSpeed", [0]);
       setSpeed(0);
-      setIsPlaying(false);
     } else {
       const speedToRestore = lastActiveSpeed > 0 ? lastActiveSpeed : 1;
       workerApi.call("setSpeed", [speedToRestore]);
       setSpeed(speedToRestore);
-      setIsPlaying(true);
     }
-  }, [isPlaying, lastActiveSpeed]);
+  }, [speed, lastActiveSpeed]);
 
   return {
     speed,

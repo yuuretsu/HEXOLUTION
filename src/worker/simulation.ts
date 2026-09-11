@@ -1,4 +1,4 @@
-import { WORLD_HEIGHT, WORLD_WIDTH } from "@/shared/constants";
+import { INITIAL_SIMULATION_SPEED, WORLD_HEIGHT, WORLD_WIDTH } from "@/shared/constants";
 import type { ViewMode } from "@/shared/types";
 import type { WorldData } from "@/shared/worker-protocol";
 import { World, WorldItemDynamic, type WorldItem } from "@/simulation/world";
@@ -16,7 +16,7 @@ export class Simulation {
   private readonly events: SimulationEvents;
   private readonly world = new World(WORLD_WIDTH, WORLD_HEIGHT);
   private readonly renderer = new FrameRenderer(this.world);
-  private speedMultiplier = 1;
+  private speedMultiplier = INITIAL_SIMULATION_SPEED;
   private viewMode: ViewMode = "normal";
   private selectedId = 0;
   private age = 0;
@@ -34,6 +34,7 @@ export class Simulation {
 
   async init() {
     await populateWorld(this.world, () => this.render());
+    this.render();
     this.loop();
   }
 

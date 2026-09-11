@@ -1,3 +1,6 @@
+/** Starting simulation speed. Paused in dev so the world can be inspected before ticks. */
+export const INITIAL_SIMULATION_SPEED = import.meta.env.DEV ? 0 : 1;
+
 /** Creature genome length in base units. */
 export const GENOME_LENGTH = 32 * 3;
 
