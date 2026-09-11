@@ -38,8 +38,10 @@ export const HexagonsGl = forwardRef<HexagonsGlHandle, HexagonsGlProps>(
     } | null>(null);
 
     const camera = useRef({ x: 0, y: 0, scale: 10 });
-    const getDpr = () => window.devicePixelRatio || 1;
-    const getDeviceScale = () => camera.current.scale * getDpr();
+    const getDeviceScale = useCallback(
+      () => camera.current.scale * (window.devicePixelRatio || 1),
+      []
+    );
     const dragInfo = useRef({
       isDragging: false,
       hasMoved: false,
@@ -101,7 +103,7 @@ export const HexagonsGl = forwardRef<HexagonsGlHandle, HexagonsGlProps>(
         const wrappedRow = ((row % height) + height) % height;
         onClickPixel(Math.floor(wrappedCol), Math.floor(wrappedRow));
       }
-    }, [onClickPixel]);
+    }, [onClickPixel, getDeviceScale]);
 
     useEffect(() => {
       const handleWindowMouseMove = (e: MouseEvent) => {
@@ -282,7 +284,7 @@ export const HexagonsGl = forwardRef<HexagonsGlHandle, HexagonsGlProps>(
       };
       render();
       return () => cancelAnimationFrame(frameId);
-    }, []);
+    }, [getDeviceScale]);
 
     const updateZoom = (centerX: number, centerY: number, factor: number) => {
       const oldScale = camera.current.scale;
