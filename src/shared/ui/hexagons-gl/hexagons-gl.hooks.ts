@@ -1,8 +1,5 @@
 import { useRef, useCallback } from "react";
-
-export interface HexagonsGlHandle {
-  updateBuffer: (buffer: Uint8Array, width: number, height: number) => void;
-}
+import type { HexagonsGlHandle } from "./types";
 
 export const useHexagonsApi = () => {
   const apiRef = useRef<HexagonsGlHandle>(null);

@@ -1,2 +1,3 @@
-export { HexagonsGl, type HexagonsGlHandle, type HexagonsGlProps } from "./hexagons-gl";
+export { HexagonsGl } from "./hexagons-gl";
+export type { HexagonsGlHandle, HexagonsGlProps } from "./types";
 export { useHexagonsApi } from "./hexagons-gl.hooks";
