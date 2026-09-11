@@ -6,6 +6,7 @@ export type WorkerApi = {
   setSpeed: [speed: number];
   getSpeed: [];
   getLatestFrame: [];
+  returnFrame: [buffer: ArrayBuffer];
   getObjectAt: [{ x: number, y: number }];
   ackData: [];
 };
@@ -16,6 +17,7 @@ export type WorkerApiResults = {
   setSpeed: void;
   getSpeed: number;
   getLatestFrame: { buffer: ArrayBuffer; width: number; height: number } | null;
+  returnFrame: void;
   getObjectAt: { type: string; color: Rgba } | null;
   ackData: void;
 };

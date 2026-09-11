@@ -13,15 +13,22 @@ const getColor = (item: WorldItem, mode: ViewMode) => {
   }
 };
 
+const POOL_LIMIT = 2;
+
 export class FrameRenderer {
   private readonly world: World;
-  private readonly pixelBuffer: Uint8ClampedArray;
-  private readonly pixelView: Uint32Array;
+  private readonly byteLength: number;
+  private readonly freeBuffers: ArrayBuffer[] = [];
+  private activeBuffer: ArrayBuffer;
+  private pixelView: Uint32Array;
+  private hasUnreadFrame = false;
 
   constructor(world: World) {
     this.world = world;
-    this.pixelBuffer = new Uint8ClampedArray(world.grid.width * world.grid.height * 4);
-    this.pixelView = new Uint32Array(this.pixelBuffer.buffer);
+    this.byteLength = world.grid.width * world.grid.height * 4;
+    this.activeBuffer = new ArrayBuffer(this.byteLength);
+    this.freeBuffers.push(new ArrayBuffer(this.byteLength));
+    this.pixelView = new Uint32Array(this.activeBuffer);
   }
 
   render(viewMode: ViewMode, selectedId = 0) {
@@ -50,10 +57,25 @@ export class FrameRenderer {
         }
       }
     }
+    this.hasUnreadFrame = true;
     return { entries, creaturesEnergy, organicEnergy, selectedItem };
   }
 
   getFrame() {
-    return { buffer: new Uint8ClampedArray(this.pixelBuffer).buffer, width: this.world.grid.width, height: this.world.grid.height };
+    if (!this.hasUnreadFrame) return null;
+
+    this.hasUnreadFrame = false;
+    const buffer = this.activeBuffer;
+    const next = this.freeBuffers.pop() ?? new ArrayBuffer(this.byteLength);
+    this.activeBuffer = next;
+    this.pixelView = new Uint32Array(next);
+
+    return { buffer, width: this.world.grid.width, height: this.world.grid.height };
+  }
+
+  returnFrame(buffer: ArrayBuffer) {
+    if (buffer.byteLength !== this.byteLength) return;
+    if (this.freeBuffers.length >= POOL_LIMIT) return;
+    this.freeBuffers.push(buffer);
   }
 }

@@ -1,5 +1,29 @@
 const trust = <T,>(_value: unknown): _value is T => true;
 
+const TRANSFER_RESULT: unique symbol = Symbol("worker.transferResult");
+
+export type TransferResult<T> = {
+  readonly [TRANSFER_RESULT]: true;
+  readonly result: T;
+  readonly transfer: Transferable[];
+};
+
+export const withTransfer = <T>(
+  result: T,
+  transfer: Transferable[]
+): TransferResult<T> => ({
+  [TRANSFER_RESULT]: true,
+  result,
+  transfer,
+});
+
+const isTransferResult = (value: unknown): value is TransferResult<unknown> => {
+  if (typeof value !== "object" || value === null || !(TRANSFER_RESULT in value)) {
+    return false;
+  }
+  return value[TRANSFER_RESULT] === true;
+};
+
 export class WorkerClient<
   Methods extends Record<string, unknown[]>,
   Results extends { [Method in keyof Methods]: unknown },
@@ -73,6 +97,8 @@ type ClientRequest<Methods extends Record<string, unknown[]>> = {
   };
 }[keyof Methods];
 
+type HandlerReturn<T> = T | TransferResult<T> | Promise<T | TransferResult<T>>;
+
 export class WorkerServer<
   Methods extends Record<string, unknown[]>,
   Results extends { [Method in keyof Methods]: unknown },
@@ -83,7 +109,9 @@ export class WorkerServer<
   constructor(
     worker: Window & typeof globalThis,
     handlers: {
-      [Method in keyof Methods]: (...params: Methods[Method]) => Results[Method];
+      [Method in keyof Methods]: (
+        ...params: Methods[Method]
+      ) => HandlerReturn<Results[Method]>;
     }
   ) {
     this.worker = worker;
@@ -95,9 +123,13 @@ export class WorkerServer<
 
         const { id, method, params } = message;
         const result = handlers[method](...params);
-        Promise.resolve(result).then((v) =>
-          this.worker.postMessage({ id, result: v })
-        );
+        Promise.resolve(result).then((v) => {
+          if (isTransferResult(v)) {
+            this.worker.postMessage({ id, result: v.result }, { transfer: v.transfer });
+            return;
+          }
+          this.worker.postMessage({ id, result: v });
+        });
       },
     );
   }

@@ -65,6 +65,8 @@ export class Simulation {
 
   getLatestFrame() { return this.renderer.getFrame(); }
 
+  returnFrame(buffer: ArrayBuffer) { this.renderer.returnFrame(buffer); }
+
   ackData() {
     this.isBackpressureEnabled = true;
     this.isUiReadyForData = true;
