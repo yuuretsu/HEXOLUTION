@@ -25,6 +25,7 @@ export default defineConfig([
     },
     rules: {
       'func-style': ['error', 'expression'],
+      complexity: ['error', 10],
       '@typescript-eslint/consistent-type-imports': ['error', {
         prefer: 'type-imports',
         fixStyle: 'separate-type-imports',

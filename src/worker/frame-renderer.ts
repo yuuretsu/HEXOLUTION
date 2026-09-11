@@ -13,6 +13,19 @@ const getColor = (item: WorldItem, mode: ViewMode) => {
   }
 };
 
+const packRgba = (color: readonly number[]) =>
+  (255 << 24) | (color[2] << 16) | (color[1] << 8) | color[0];
+
+const accumulateEnergy = (
+  item: WorldItem,
+  energy: { creatures: number; organic: number },
+) => {
+  if (!("energy" in item) || typeof item.energy !== "number") return;
+
+  if (item.CLASS_NAME === "Creature") energy.creatures += item.energy;
+  else if (item.CLASS_NAME === "Organic") energy.organic += item.energy;
+};
+
 const POOL_LIMIT = 2;
 
 export class FrameRenderer {
@@ -33,8 +46,7 @@ export class FrameRenderer {
 
   render(viewMode: ViewMode, selectedId = 0) {
     const entries = new Counter<string>();
-    let creaturesEnergy = 0;
-    let organicEnergy = 0;
+    const energy = { creatures: 0, organic: 0 };
     let selectedItem: WorldItem | null = null;
     const { width, height } = this.world.grid;
 
@@ -42,23 +54,28 @@ export class FrameRenderer {
       for (let x = 0; x < width; x++) {
         const item = this.world.grid.get(x, y);
         const index = y * width + x;
+
         if (!item) {
           entries.add("Empty");
           this.pixelView[index] = 0;
           continue;
         }
+
         if (selectedId !== 0 && item.id === selectedId) selectedItem = item;
+
         entries.add(item.CLASS_NAME);
-        const color = getColor(item, viewMode);
-        this.pixelView[index] = (255 << 24) | (color[2] << 16) | (color[1] << 8) | color[0];
-        if ("energy" in item && typeof item.energy === "number") {
-          if (item.CLASS_NAME === "Creature") creaturesEnergy += item.energy;
-          else if (item.CLASS_NAME === "Organic") organicEnergy += item.energy;
-        }
+        this.pixelView[index] = packRgba(getColor(item, viewMode));
+        accumulateEnergy(item, energy);
       }
     }
+
     this.hasUnreadFrame = true;
-    return { entries, creaturesEnergy, organicEnergy, selectedItem };
+    return {
+      entries,
+      creaturesEnergy: energy.creatures,
+      organicEnergy: energy.organic,
+      selectedItem,
+    };
   }
 
   getFrame() {

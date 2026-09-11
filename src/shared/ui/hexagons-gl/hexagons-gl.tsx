@@ -21,6 +21,41 @@ export type HexagonsGlProps = {
   isTouchpadMode?: boolean;
 }
 
+const getDpr = () => window.devicePixelRatio || 1;
+
+const getZoomFactor = (deltaY: number) => (deltaY > 0 ? 0.95 : 1.05);
+
+const cubeRound = (fracX: number, fracY: number, fracZ: number) => {
+  let rx = Math.floor(fracX + 0.5);
+  let ry = Math.floor(fracY + 0.5);
+  let rz = Math.floor(fracZ + 0.5);
+  const dx = Math.abs(rx - fracX);
+  const dy = Math.abs(ry - fracY);
+  const dz = Math.abs(rz - fracZ);
+  if (dx > dy && dx > dz) rx = -ry - rz;
+  else if (dy > dz) ry = -rx - rz;
+  else rz = -rx - ry;
+  return { x: rx, y: ry, z: rz };
+};
+
+const resolveClickCell = (
+  col: number,
+  row: number,
+  width: number,
+  height: number,
+  isWrapEnabled: boolean,
+): { col: number; row: number } | null => {
+  if (isWrapEnabled) {
+    return {
+      col: Math.floor(((col % width) + width) % width),
+      row: Math.floor(((row % height) + height) % height),
+    };
+  }
+
+  if (col < 0 || col >= width || row < 0 || row >= height) return null;
+  return { col: Math.floor(col), row: Math.floor(row) };
+};
+
 export const HexagonsGl = forwardRef<HexagonsGlHandle, HexagonsGlProps>(
   ({ onClickPixel, isWrap = true, isTouchpadMode = false }, ref) => {
     const containerRef = useRef<HTMLDivElement>(null);
@@ -39,7 +74,7 @@ export const HexagonsGl = forwardRef<HexagonsGlHandle, HexagonsGlProps>(
 
     const camera = useRef({ x: 0, y: 0, scale: 10 });
     const getDeviceScale = useCallback(
-      () => camera.current.scale * (window.devicePixelRatio || 1),
+      () => camera.current.scale * getDpr(),
       []
     );
     const dragInfo = useRef({
@@ -66,43 +101,22 @@ export const HexagonsGl = forwardRef<HexagonsGlHandle, HexagonsGlProps>(
       }
     }, []);
 
-    const cubeRound = (fracX: number, fracY: number, fracZ: number) => {
-      let rx = Math.floor(fracX + 0.5);
-      let ry = Math.floor(fracY + 0.5);
-      let rz = Math.floor(fracZ + 0.5);
-      const dx = Math.abs(rx - fracX);
-      const dy = Math.abs(ry - fracY);
-      const dz = Math.abs(rz - fracZ);
-      if (dx > dy && dx > dz) rx = -ry - rz;
-      else if (dy > dz) ry = -rx - rz;
-      else rz = -rx - ry;
-      return { x: rx, y: ry, z: rz };
-    };
-
     const handleCanvasClick = useCallback((clientX: number, clientY: number) => {
       const { width, height } = worldSize.current;
       if (!onClickPixel || !canvasRef.current || width <= 0) return;
+
       const rect = canvasRef.current.getBoundingClientRect();
-      const dpr = window.devicePixelRatio || 1;
-      const x = (clientX - rect.left) * dpr;
-      const y = (clientY - rect.top) * dpr;
+      const dpr = getDpr();
       const size = getDeviceScale() / SQRT3;
-      const pixelX = x - camera.current.x;
-      const pixelY = y - camera.current.y;
+      const pixelX = (clientX - rect.left) * dpr - camera.current.x;
+      const pixelY = (clientY - rect.top) * dpr - camera.current.y;
       const q = (SQRT3 / 3.0 * pixelX - 1.0 / 3.0 * pixelY) / size;
       const r = (2.0 / 3.0 * pixelY) / size;
       const rounded = cubeRound(q, -q - r, r);
       const col = rounded.x + (rounded.z - (Math.abs(rounded.z) % 2)) / 2;
-      const row = rounded.z;
+      const cell = resolveClickCell(col, rounded.z, width, height, wrapRef.current);
 
-      if (!wrapRef.current) {
-        if (col < 0 || col >= width || row < 0 || row >= height) return;
-        onClickPixel(Math.floor(col), Math.floor(row));
-      } else {
-        const wrappedCol = ((col % width) + width) % width;
-        const wrappedRow = ((row % height) + height) % height;
-        onClickPixel(Math.floor(wrappedCol), Math.floor(wrappedRow));
-      }
+      if (cell) onClickPixel(cell.col, cell.row);
     }, [onClickPixel, getDeviceScale]);
 
     useEffect(() => {
@@ -120,7 +134,7 @@ export const HexagonsGl = forwardRef<HexagonsGlHandle, HexagonsGlProps>(
           document.body.style.setProperty("cursor", "grabbing", "important");
         }
 
-        const dpr = window.devicePixelRatio || 1;
+        const dpr = getDpr();
         camera.current.x += dx * dpr;
         camera.current.y += dy * dpr;
         dragInfo.current.lastX = e.clientX;
@@ -146,7 +160,7 @@ export const HexagonsGl = forwardRef<HexagonsGlHandle, HexagonsGlProps>(
       const canvas = canvasRef.current;
       const container = containerRef.current;
       if (!canvas || !container || w <= 0) return;
-      const dpr = window.devicePixelRatio || 1;
+      const dpr = getDpr();
       const rect = container.getBoundingClientRect();
       const deviceScale = getDeviceScale();
       const worldPixelWidth = w * deviceScale;
@@ -221,7 +235,7 @@ export const HexagonsGl = forwardRef<HexagonsGlHandle, HexagonsGlProps>(
       };
 
       const resize = () => {
-        const dpr = window.devicePixelRatio || 1;
+        const dpr = getDpr();
         const rect = containerRef.current?.getBoundingClientRect();
         if (rect) {
           const newWidth = rect.width * dpr;
@@ -297,7 +311,15 @@ export const HexagonsGl = forwardRef<HexagonsGlHandle, HexagonsGlProps>(
     const handleWheel = (e: React.WheelEvent) => {
       const rect = canvasRef.current?.getBoundingClientRect();
       if (!rect) return;
-      const dpr = window.devicePixelRatio || 1;
+
+      const dpr = getDpr();
+      const zoomAtCursor = (factor: number) => {
+        updateZoom(
+          (e.clientX - rect.left) * dpr,
+          (e.clientY - rect.top) * dpr,
+          factor,
+        );
+      };
 
       if (isTouchpadMode && !e.ctrlKey) {
         camera.current.x -= e.deltaX * dpr;
@@ -306,19 +328,13 @@ export const HexagonsGl = forwardRef<HexagonsGlHandle, HexagonsGlProps>(
       }
 
       if (e.ctrlKey) {
-        const zoomFactor = e.deltaY > 0 ? 0.95 : 1.05;
-        updateZoom(
-          (e.clientX - rect.left) * dpr,
-          (e.clientY - rect.top) * dpr,
-          zoomFactor
-        );
-      } else if (!isTouchpadMode) {
+        zoomAtCursor(getZoomFactor(e.deltaY));
+        return;
+      }
+
+      if (!isTouchpadMode) {
         e.preventDefault();
-        updateZoom(
-          (e.clientX - rect.left) * dpr,
-          (e.clientY - rect.top) * dpr,
-          e.deltaY > 0 ? 0.95 : 1.05
-        );
+        zoomAtCursor(getZoomFactor(e.deltaY));
       }
     };
 
@@ -352,29 +368,49 @@ export const HexagonsGl = forwardRef<HexagonsGlHandle, HexagonsGlProps>(
       }
     };
 
+    const panFromTouch = (touch: React.Touch, dpr: number) => {
+      const dx = touch.clientX - dragInfo.current.lastX;
+      const dy = touch.clientY - dragInfo.current.lastY;
+      if (Math.abs(dx) > 2 || Math.abs(dy) > 2) dragInfo.current.hasMoved = true;
+      camera.current.x += dx * dpr;
+      camera.current.y += dy * dpr;
+      dragInfo.current.lastX = touch.clientX;
+      dragInfo.current.lastY = touch.clientY;
+    };
+
+    const pinchFromTouches = (
+      t1: React.Touch,
+      t2: React.Touch,
+      dpr: number,
+      rect: DOMRect,
+    ) => {
+      const dx = t1.clientX - t2.clientX;
+      const dy = t1.clientY - t2.clientY;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      const midX = (t1.clientX + t2.clientX) / 2;
+      const midY = (t1.clientY + t2.clientY) / 2;
+      camera.current.x += (midX - dragInfo.current.lastMidX) * dpr;
+      camera.current.y += (midY - dragInfo.current.lastMidY) * dpr;
+      if (dragInfo.current.lastDist > 0) {
+        updateZoom((midX - rect.left) * dpr, (midY - rect.top) * dpr, dist / dragInfo.current.lastDist);
+      }
+      dragInfo.current.lastDist = dist;
+      dragInfo.current.lastMidX = midX;
+      dragInfo.current.lastMidY = midY;
+    };
+
     const handleTouchMove = (e: React.TouchEvent) => {
-      const dpr = window.devicePixelRatio || 1;
       const rect = canvasRef.current?.getBoundingClientRect();
       if (!rect) return;
+
+      const dpr = getDpr();
       if (e.touches.length === 1 && dragInfo.current.isDragging) {
-        const dx = e.touches[0].clientX - dragInfo.current.lastX;
-        const dy = e.touches[0].clientY - dragInfo.current.lastY;
-        if (Math.abs(dx) > 2 || Math.abs(dy) > 2) dragInfo.current.hasMoved = true;
-        camera.current.x += dx * dpr;
-        camera.current.y += dy * dpr;
-        dragInfo.current.lastX = e.touches[0].clientX;
-        dragInfo.current.lastY = e.touches[0].clientY;
-      } else if (e.touches.length === 2) {
-        const t1 = e.touches[0], t2 = e.touches[1];
-        const dx = t1.clientX - t2.clientX, dy = t1.clientY - t2.clientY;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        const midX = (t1.clientX + t2.clientX) / 2, midY = (t1.clientY + t2.clientY) / 2;
-        camera.current.x += (midX - dragInfo.current.lastMidX) * dpr;
-        camera.current.y += (midY - dragInfo.current.lastMidY) * dpr;
-        if (dragInfo.current.lastDist > 0) updateZoom((midX - rect.left) * dpr, (midY - rect.top) * dpr, dist / dragInfo.current.lastDist);
-        dragInfo.current.lastDist = dist;
-        dragInfo.current.lastMidX = midX;
-        dragInfo.current.lastMidY = midY;
+        panFromTouch(e.touches[0], dpr);
+        return;
+      }
+
+      if (e.touches.length === 2) {
+        pinchFromTouches(e.touches[0], e.touches[1], dpr, rect);
       }
     };
 
