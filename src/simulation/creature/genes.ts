@@ -2,6 +2,7 @@ import * as GeneLibrary from "./gene-library";
 import type { GeneHandler } from "./gene-types";
 
 export * from "./constants";
+export * from "./gene-colors";
 export * from "./gene-library";
 export type { GeneHandler, GeneHandlerResult } from "./gene-types";
 

@@ -8,6 +8,7 @@ const getColor = (item: WorldItem, mode: ViewMode) => {
     case "energy": return item.getEnergyColor();
     case "genome-hash": return item.getGenomeHashColor();
     case "coloration": return item.getColoration();
+    case "last-action": return item.getLastActionColor();
     default: return [255, 0, 255, 255];
   }
 };

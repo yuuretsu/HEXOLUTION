@@ -6,7 +6,7 @@ export const serializeSelectedItem = (item: WorldItem | null) => {
 
   const commonData = { type: item.CLASS_NAME, color: item.getColor() };
   if (item instanceof Creature) {
-    return { ...commonData, direction: item.direction, program: [...item.tape.data], pointer: item.tape.pointer, age: item.age, generation: item.generation, energy: item.energy, coloration: item.getColoration(), activeGeneIndices: [...item.activeGeneIndices], lastGeneIndex: item.lastGeneIndex };
+    return { ...commonData, direction: item.direction, program: [...item.tape.data], pointer: item.tape.pointer, age: item.age, generation: item.generation, energy: item.energy, coloration: item.getColoration(), activeGeneIndices: [...item.activeGeneIndices] };
   }
   return commonData;
 };

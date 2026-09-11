@@ -1,4 +1,4 @@
-import { attackForward, inspectForward, COLOR_ATTACK, COLOR_MOVE_FORWARD, COLOR_PHOTOSYNTHESIS, COLOR_PUSH, getGeneHandler, moveForward, absorbLight, displaceForward, reproduce } from "@/simulation/creature/genes";
+import { getGeneColor, getGeneHandler } from "@/simulation/creature/genes";
 import type { FC } from "react";
 import { useWorkerEvent } from "@/shared/hooks/use-worker-event";
 import { Stack } from "@/shared/ui/stack";
@@ -9,35 +9,22 @@ import styles from "./selected-entity.module.css";
 type ProgramProps = {
   program: number[];
   activeGeneIndices?: number[];
-  lastGeneIndex?: number;
 };
 
-const Program: FC<ProgramProps> = ({ program, activeGeneIndices = [], lastGeneIndex = -1 }) => {
+const Program: FC<ProgramProps> = ({ program, activeGeneIndices = [] }) => {
   const triplets = chunk(program, 3);
   const activeSet = new Set(activeGeneIndices);
+  const lastGeneIndex = activeGeneIndices.at(-1);
 
   return (
     <div>
       <div className={styles.programGrid}>
         {triplets.map((triplet, i) => {
           const n = base4toInt(triplet[0], triplet[1], triplet[2]);
-
           const handler = getGeneHandler(n);
-
+          const geneColor = getGeneColor(handler);
           const symbols = triplet.map((x) => ["A", "T", "G", "C"][x]);
-
-          const color = {
-            [absorbLight.name]: COLOR_PHOTOSYNTHESIS,
-            [attackForward.name]: COLOR_ATTACK,
-            [reproduce.name]: [255, 255, 255, 255],
-            [moveForward.name]: COLOR_MOVE_FORWARD,
-            [displaceForward.name]: COLOR_PUSH,
-            [inspectForward.name]: [255, 255, 0, 255],
-          }[handler.name];
-
-          const backgroundColor = color
-            ? `rgba(${color[0]}, ${color[1]}, ${color[2]}, 0.3)`
-            : "rgba(255, 255, 255, 0.1)";
+          const backgroundColor = `rgba(${geneColor[0]}, ${geneColor[1]}, ${geneColor[2]}, 0.3)`;
           const activityColor = i === lastGeneIndex
             ? "#ffffff"
             : activeSet.has(i)
@@ -50,7 +37,7 @@ const Program: FC<ProgramProps> = ({ program, activeGeneIndices = [], lastGeneIn
                 className={styles.programCell}
                 style={{
                   backgroundColor,
-                  color: color ? `rgba(${color[0]}, ${color[1]}, ${color[2]})` : "rgba(255, 255, 255, 0.1)",
+                  color: `rgba(${geneColor[0]}, ${geneColor[1]}, ${geneColor[2]})`,
                 }}
                 title={handler.name}
               >
@@ -112,7 +99,6 @@ export const WorldEntityCreature: FC<{ item: any }> = ({ item }) => {
       <Program
         program={program}
         activeGeneIndices={item.activeGeneIndices}
-        lastGeneIndex={item.lastGeneIndex}
       />
     </Stack>
   );

@@ -20,6 +20,7 @@ export const ChangeViewMode = () => {
         { text: "Energy", value: "energy" },
         { text: "Genome Hash", value: "genome-hash" },
         { text: "Coloration", value: "coloration" },
+        { text: "Last Action", value: "last-action" },
       ]}
     />
   )

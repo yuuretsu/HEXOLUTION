@@ -7,10 +7,11 @@ import {
   lerpRgb,
   mutateColorInto,
   randomLightColorInto,
+  base4toInt,
 } from "@/shared/utils";
 import { ObjectPool } from "@/shared/utils/object-pool";
 import { sendEnergy, WorldItemDynamic, type World } from "@/simulation/world";
-import { getGeneHandler } from "./genes";
+import { DEFAULT_GENE_COLOR, getGeneColor, getGeneHandler } from "./genes";
 import {
   AGE_ENERGY_COST_FACTOR,
   COLORATION_MUTATION_RATE,
@@ -36,7 +37,6 @@ export class Creature extends WorldItemDynamic {
   readonly tape: Tape;
   age = 0;
   generation = 0;
-  lastGeneIndex = -1;
   readonly activeGeneIndices: number[] = [];
   energy: number;
   readonly color: Rgba;
@@ -82,7 +82,6 @@ export class Creature extends WorldItemDynamic {
     this.energy = energy;
     this.age = 0;
     this.generation = 0;
-    this.lastGeneIndex = -1;
     this.activeGeneIndices.length = 0;
     this._direction = ~~(Math.random() * 6);
     this.autotrophOrHeterotroph.right = autotrophOrHeterotroph;
@@ -154,7 +153,6 @@ export class Creature extends WorldItemDynamic {
     child.energy = 0;
     child.age = 0;
     child.generation = this.generation + 1;
-    child.lastGeneIndex = -1;
     child.activeGeneIndices.length = 0;
     child._direction = ~~(Math.random() * 6);
 
@@ -175,13 +173,11 @@ export class Creature extends WorldItemDynamic {
     if (this.energy <= 0 || this.energy >= MAX_CELL_ENERGY) return this.die(world, x, y);
 
     this.activeGeneIndices.length = 0;
-    this.lastGeneIndex = -1;
 
     for (let i = 0; i < GENES_PER_TICK; i++) {
       const geneIndex = Math.floor(this.tape.pointer / 3);
       const handle = getGeneHandler(this.tape.readInt());
       this.activeGeneIndices.push(geneIndex);
-      this.lastGeneIndex = geneIndex;
       const result = handle(this, world, x, y);
       if (result.isFinished) break;
     }
@@ -208,5 +204,17 @@ export class Creature extends WorldItemDynamic {
 
   getColoration(): Rgba {
     return this.coloration;
+  }
+
+  getLastActionColor(): Rgba {
+    const geneIndex = this.activeGeneIndices.at(-1);
+    if (geneIndex === undefined) return DEFAULT_GENE_COLOR;
+    const offset = geneIndex * 3;
+    const n = base4toInt(
+      this.tape.data[offset],
+      this.tape.data[offset + 1],
+      this.tape.data[offset + 2],
+    );
+    return getGeneColor(getGeneHandler(n));
   }
 }

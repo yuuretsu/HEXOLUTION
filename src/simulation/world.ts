@@ -30,6 +30,10 @@ export abstract class WorldItemStatic {
     return [100, 100, 100, 255];
   }
 
+  getLastActionColor(): Rgba {
+    return [100, 100, 100, 255];
+  }
+
   handleAttack(_world: World, _strength: number): { energy: number } {
     staticAttackResult.energy = 0;
     return staticAttackResult;

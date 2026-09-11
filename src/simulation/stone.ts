@@ -27,4 +27,8 @@ export class Stone extends WorldItemStatic {
   getColoration(): Rgba {
     return this.color;
   }
+
+  getLastActionColor(): Rgba {
+    return this.color;
+  }
 }
