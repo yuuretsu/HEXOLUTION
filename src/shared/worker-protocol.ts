@@ -42,6 +42,7 @@ export type SelectedItemData = {
   program?: number[];
   pointer?: number;
   age?: number;
+  generation?: number;
   energy?: number;
   coloration?: Rgba;
 };

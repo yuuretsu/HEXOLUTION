@@ -35,6 +35,7 @@ export class Creature extends WorldItemDynamic {
   _direction: number = ~~(Math.random() * 6);
   readonly tape: Tape;
   age = 0;
+  generation = 0;
   energy: number;
   readonly color: Rgba;
   readonly coloration: Rgba;
@@ -78,6 +79,7 @@ export class Creature extends WorldItemDynamic {
     this.tape.pointer = 0;
     this.energy = energy;
     this.age = 0;
+    this.generation = 0;
     this._direction = ~~(Math.random() * 6);
     this.autotrophOrHeterotroph.right = autotrophOrHeterotroph;
     this.color[0] = color[0];
@@ -147,6 +149,7 @@ export class Creature extends WorldItemDynamic {
     child.tape.pointer = 0;
     child.energy = 0;
     child.age = 0;
+    child.generation = this.generation + 1;
     child._direction = ~~(Math.random() * 6);
 
     child.color[0] = this.color[0];

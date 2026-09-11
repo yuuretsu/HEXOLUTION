@@ -73,6 +73,10 @@ export const WorldEntityCreature: FC<{ item: any }> = ({ item }) => {
             <td><Text>{item.age}</Text></td>
           </tr>
           <tr>
+            <th><Text>GENERATION</Text></th>
+            <td><Text>{item.generation}</Text></td>
+          </tr>
+          <tr>
             <th><Text>COLORATION</Text></th>
             <td>
               <div className={styles.colorationRow}>
