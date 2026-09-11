@@ -7,15 +7,7 @@
 
 .programCell {
   text-align: center;
-  display: flex;
-  justify-content: space-around;
   font-weight: bold;
-}
-
-.creatureInfo {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
 }
 
 .infoTable {
@@ -23,9 +15,6 @@
 }
 
 .colorationRow {
-  display: flex;
-  align-items: center;
-  gap: 6px;
   width: fit-content;
   margin-left: auto;
 }
@@ -41,12 +30,6 @@
   font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.7);
   font-style: italic;
-}
-
-.selectedHeader {
-  display: flex;
-  gap: 6px;
-  align-items: center;
 }
 
 .entitySwatch {

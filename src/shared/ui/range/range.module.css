@@ -42,12 +42,6 @@
   background-color: var(--main-color);
 }
 
-.captionAndValue {
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
-}
-
 .value {
   text-align: right;
 }

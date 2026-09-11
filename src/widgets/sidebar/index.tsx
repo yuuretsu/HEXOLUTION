@@ -16,6 +16,7 @@ import type { WorldData } from "@/shared/worker-protocol";
 import { Block } from "@/shared/ui/block";
 import { Entries } from "@/shared/ui/entries";
 import { SelectedEntity } from "@/entities/selected-entity";
+import { Stack } from "@/shared/ui/stack";
 
 type SidebarProps = {
   data: WorldData;
@@ -37,59 +38,61 @@ export const Sidebar: FC<SidebarProps> = ({ data, chartData, isOpen }) => {
         [styles.sidebarHidden]: !isOpen,
       })}
     >
-      <Block title={{ Icon: HiAdjustmentsHorizontal, text: "Settings" }}>
-        <div>
-          <div>SIMULATION STEPS PER FRAME</div>
-          <ChangeSimulationSpeed />
-        </div>
-        <div>
-          <div>VIEW MODE</div>
-          <ChangeViewMode />
-        </div>
-        <div>
-          <div>CONTROL MODE</div>
-          <ChangeControlMode />
-        </div>
-      </Block>
-      <Block title={{ Icon: HiSun, text: "Energy" }}>
-        <Entries
-          entries={[
-            ["World", data.worldEnergy],
-            ["Creature", data.creaturesEnergy],
-            ["Food", data.foodEnergy],
-          ]}
-        />
-      </Block>
-      <Block title={{ Icon: HiSquaresPlus, text: "Entities" }}>
-        <Entries entries={data.worldEntries} />
-        <div className={styles.chartWrapper}>
-          <Chart
-            height={128}
-            series={[
-              {
-                label: "creatures",
-                data: chartData.creatures,
-                color: "rgb(100, 255, 200)",
-              },
-              {
-                label: "food",
-                data: chartData.food,
-                color: "rgb(255, 255, 150)",
-              },
+      <Stack dir="column" gap={16}>
+        <Block title={{ Icon: HiAdjustmentsHorizontal, text: "Settings" }}>
+          <Stack dir="column" gap={4}>
+            <div>SIMULATION STEPS PER FRAME</div>
+            <ChangeSimulationSpeed />
+          </Stack>
+          <Stack dir="column" gap={4}>
+            <div>VIEW MODE</div>
+            <ChangeViewMode />
+          </Stack>
+          <Stack dir="column" gap={4}>
+            <div>CONTROL MODE</div>
+            <ChangeControlMode />
+          </Stack>
+        </Block>
+        <Block title={{ Icon: HiSun, text: "Energy" }}>
+          <Entries
+            entries={[
+              ["World", data.worldEnergy],
+              ["Creature", data.creaturesEnergy],
+              ["Food", data.foodEnergy],
             ]}
           />
-        </div>
-        <div className={styles.worldAgeRow}>
-          <div>world age</div>
-          <div className={styles.worldAgeValue}>
-            {fullAge}
-            <span className={styles.worldAgeFraction}>.{fractionalPart}</span>
+        </Block>
+        <Block title={{ Icon: HiSquaresPlus, text: "Entities" }}>
+          <Entries entries={data.worldEntries} />
+          <div className={styles.chartWrapper}>
+            <Chart
+              height={128}
+              series={[
+                {
+                  label: "creatures",
+                  data: chartData.creatures,
+                  color: "rgb(100, 255, 200)",
+                },
+                {
+                  label: "food",
+                  data: chartData.food,
+                  color: "rgb(255, 255, 150)",
+                },
+              ]}
+            />
           </div>
-        </div>
-      </Block>
-      <Block title={{ Icon: HiFingerPrint, text: "Selected" }}>
-        <SelectedEntity />
-      </Block>
+          <Stack dir="row" gap={0} align="center" justify="between">
+            <div>world age</div>
+            <div className={styles.worldAgeValue}>
+              {fullAge}
+              <span className={styles.worldAgeFraction}>.{fractionalPart}</span>
+            </div>
+          </Stack>
+        </Block>
+        <Block title={{ Icon: HiFingerPrint, text: "Selected" }}>
+          <SelectedEntity />
+        </Block>
+      </Stack>
     </div>
   );
 };

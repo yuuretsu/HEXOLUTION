@@ -7,9 +7,6 @@
   border-radius: 16px;
   color: white;
   overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
   transition-duration: 0.3s;
 }
 
@@ -31,12 +28,6 @@
   border-radius: 8px;
   overflow: hidden;
   background-color: rgba(255, 255, 255, 0.1);
-}
-
-.worldAgeRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
 }
 
 .worldAgeValue {

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Radio } from "@/shared/ui/radio";
+import { Stack } from "@/shared/ui/stack";
 import styles from "./change-control-mode.module.css";
 
 export const ChangeControlMode: React.FC = () => {
@@ -17,23 +18,21 @@ export const ChangeControlMode: React.FC = () => {
   };
 
   return (
-    <div className={styles.wrapper}>
-      <div className={styles.radioRow}>
-        <Radio
-          options={[
-            { text: "Mouse", value: "mouse" },
-            { text: "Touchpad", value: "touchpad" }
-          ]}
-          value={isTouchpadMode ? "touchpad" : "mouse"}
-          onChange={handleChange}
-        />
-      </div>
+    <Stack dir="column" gap={8}>
+      <Radio
+        options={[
+          { text: "Mouse", value: "mouse" },
+          { text: "Touchpad", value: "touchpad" }
+        ]}
+        value={isTouchpadMode ? "touchpad" : "mouse"}
+        onChange={handleChange}
+      />
       <div className={styles.hint}>
         {isTouchpadMode
           ? "Use two fingers to pan, pinch to zoom"
           : "Left click + drag to pan, wheel to zoom"
         }
       </div>
-    </div>
+    </Stack>
   );
 };

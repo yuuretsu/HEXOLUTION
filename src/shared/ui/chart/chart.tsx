@@ -1,4 +1,5 @@
 import { memo, useMemo } from "react";
+import { Stack } from "@/shared/ui/stack";
 import styles from "./chart.module.css";
 
 type DataPoint = [number, number];
@@ -159,15 +160,16 @@ export const Chart = ({
         ))}
       </svg>
       <div className={styles.legend}>
-        {series.map((s) => (
-          <div
-            key={s.label}
-            className={styles.legendItem}
-          >
-            <div className={styles.legendSwatch} style={{ backgroundColor: s.color }} />
-            {s.label}
-          </div>
-        ))}
+        <Stack dir="row" gap={8}>
+          {series.map((s) => (
+            <div key={s.label} className={styles.legendItem}>
+              <Stack dir="row" gap={4} align="center">
+                <div className={styles.legendSwatch} style={{ backgroundColor: s.color }} />
+                {s.label}
+              </Stack>
+            </div>
+          ))}
+        </Stack>
       </div>
     </div>
   );

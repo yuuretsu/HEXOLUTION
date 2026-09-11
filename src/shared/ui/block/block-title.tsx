@@ -1,11 +1,12 @@
 import type { FC, PropsWithChildren } from "react";
 import type { IconType } from "react-icons";
+import { Stack } from "@/shared/ui/stack";
 import styles from "./block-title.module.css";
 
 const gradientId = "block-title-gradient";
 
 export const BlockTitle: FC<PropsWithChildren<{ Icon?: IconType }>> = ({ Icon, children }) => (
-  <div className={styles.wrapper}>
+  <Stack dir="row" gap={8} align="center">
     <svg width="0" height="0" className={styles.gradientSvg}>
       <defs>
         <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
@@ -18,5 +19,5 @@ export const BlockTitle: FC<PropsWithChildren<{ Icon?: IconType }>> = ({ Icon, c
     <h3 className={styles.title}>
       {children}
     </h3>
-  </div>
+  </Stack>
 );

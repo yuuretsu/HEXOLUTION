@@ -1,5 +1,6 @@
 import type { FC, PropsWithChildren } from "react";
 import clsx from "clsx";
+import { Stack } from "@/shared/ui/stack";
 import styles from "./radio.module.css";
 
 export type RadioItemProps = PropsWithChildren & {
@@ -27,12 +28,12 @@ export type RadioProps<T = string> = {
 
 export const Radio = <T,>({ options, value, onChange }: RadioProps<T>) => {
   return (
-    <div className={styles.wrapper}>
+    <Stack dir="row" gap={4} isWrap>
       {options.map((option, i) => (
         <RadioItem key={i} isActive={option.value === value} onClick={() => onChange(option.value)}>
           {option.text}
         </RadioItem>
       ))}
-    </div>
+    </Stack>
   );
 };

@@ -1,6 +1,7 @@
 import { attackForward, inspectForward, COLOR_ATTACK, COLOR_MOVE_FORWARD, COLOR_PHOTOSYNTHESIS, COLOR_PUSH, getGeneHandler, moveForward, absorbLight, displaceForward, reproduce } from "@/simulation/creature/genes";
 import type { FC } from "react";
 import { useWorkerEvent } from "@/shared/hooks/use-worker-event";
+import { Stack } from "@/shared/ui/stack";
 import { base4toInt, chunk } from "@/shared/utils";
 import styles from "./selected-entity.module.css";
 
@@ -41,11 +42,11 @@ const Program: FC<ProgramProps> = ({ program, pointer }) => {
                 }}
                 title={handler.name}
               >
-                {symbols.map((x, i) => {
-                  return (
+                <Stack dir="row" gap={0} justify="around">
+                  {symbols.map((x, i) => (
                     <div key={i}>{x}</div>
-                  )
-                })}
+                  ))}
+                </Stack>
               </div>
             </div>
           );
@@ -59,7 +60,7 @@ const Program: FC<ProgramProps> = ({ program, pointer }) => {
 export const WorldEntityCreature: FC<{ item: any }> = ({ item }) => {
   const program = item.program as number[];
   return (
-    <div className={styles.creatureInfo}>
+    <Stack dir="column" gap={16}>
       <table className={styles.infoTable}>
         <tbody>
           <tr>
@@ -74,20 +75,22 @@ export const WorldEntityCreature: FC<{ item: any }> = ({ item }) => {
             <th>COLORATION</th>
             <td>
               <div className={styles.colorationRow}>
-                <span
-                  className={styles.colorationSwatch}
-                  style={{ backgroundColor: `rgba(${item.coloration[0]}, ${item.coloration[1]}, ${item.coloration[2]}, ${item.coloration[3] / 255})` }}
-                />
-                <span>
-                  {item.coloration[0]}, {item.coloration[1]}, {item.coloration[2]}
-                </span>
+                <Stack dir="row" gap={6} align="center">
+                  <span
+                    className={styles.colorationSwatch}
+                    style={{ backgroundColor: `rgba(${item.coloration[0]}, ${item.coloration[1]}, ${item.coloration[2]}, ${item.coloration[3] / 255})` }}
+                  />
+                  <span>
+                    {item.coloration[0]}, {item.coloration[1]}, {item.coloration[2]}
+                  </span>
+                </Stack>
               </div>
             </td>
           </tr>
         </tbody>
       </table>
       <Program program={program} pointer={item.pointer} />
-    </div>
+    </Stack>
   );
 };
 
@@ -103,15 +106,15 @@ export const SelectedEntity: FC = () => {
   const [r, g, b] = selectedItem.color;
 
   return (
-    <div className={styles.creatureInfo}>
-      <div className={styles.selectedHeader}>
+    <Stack dir="column" gap={16}>
+      <Stack dir="row" gap={6} align="center">
         <div
           className={styles.entitySwatch}
           style={{ backgroundColor: `rgb(${r}, ${g}, ${b})` }}
         />
         <h3 className={styles.selectedTitle}>{selectedItem.type.toUpperCase()}</h3>
-      </div>
+      </Stack>
       {selectedItem.type === "Creature" && <WorldEntityCreature item={selectedItem} />}
-    </div>
+    </Stack>
   );
 };
