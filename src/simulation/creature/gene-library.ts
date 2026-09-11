@@ -3,7 +3,7 @@ import type { Rgba } from "@/shared/types";
 import { sendEnergy, World } from "@/simulation/world";
 import type { WorldItem } from "@/simulation/world";
 import { Creature } from "./creature";
-import { Food } from "@/simulation/food";
+import { Organic } from "@/simulation/organic";
 import { Stone } from "@/simulation/stone";
 import { GENE_CONTINUE, GENE_FINISHED, type GeneHandler } from "./gene-types";
 import {
@@ -25,7 +25,7 @@ import {
 } from "./constants";
 import { scanRay } from "./utils";
 
-type ScanCategory = "empty" | "friend" | "enemy" | "food" | "stone";
+type ScanCategory = "empty" | "friend" | "enemy" | "organic" | "stone";
 
 const coordsA: [number, number] = [0, 0];
 const coordsB: [number, number] = [0, 0];
@@ -33,7 +33,7 @@ const scanJumps = {
   empty: 0,
   friend: 0,
   enemy: 0,
-  food: 0,
+  organic: 0,
   stone: 0,
 };
 
@@ -49,7 +49,7 @@ const classifyTarget = (target: WorldItem | null, creature: Creature): ScanCateg
   if (target instanceof Creature) {
     return colorationDiff(creature.coloration, target.coloration) > FRIEND_COLORATION_THRESHOLD ? "enemy" : "friend";
   }
-  if (target instanceof Food) return "food";
+  if (target instanceof Organic) return "organic";
   if (target instanceof Stone) return "stone";
   return "stone";
 };
@@ -120,7 +120,7 @@ export const scanForward: GeneHandler = (creature, world, x, y) => {
   scanJumps.empty = creature.tape.readInt();
   scanJumps.friend = creature.tape.readInt();
   scanJumps.enemy = creature.tape.readInt();
-  scanJumps.food = creature.tape.readInt();
+  scanJumps.organic = creature.tape.readInt();
   scanJumps.stone = creature.tape.readInt();
 
   const target = scanRay(creature, world, x, y, distance);
@@ -134,7 +134,7 @@ export const inspectForward: GeneHandler = (creature, world, x, y) => {
   scanJumps.empty = creature.tape.readInt();
   scanJumps.friend = creature.tape.readInt();
   scanJumps.enemy = creature.tape.readInt();
-  scanJumps.food = creature.tape.readInt();
+  scanJumps.organic = creature.tape.readInt();
   scanJumps.stone = creature.tape.readInt();
 
   const target = scanRay(creature, world, x, y, 1);

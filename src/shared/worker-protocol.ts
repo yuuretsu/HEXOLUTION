@@ -23,7 +23,7 @@ export type WorkerApiResults = {
 export type WorldData = {
   worldEnergy: number;
   creaturesEnergy: number;
-  foodEnergy: number;
+  organicEnergy: number;
   worldAge: number;
   worldSize: { width: number; height: number };
   worldEntries: [string, number][];

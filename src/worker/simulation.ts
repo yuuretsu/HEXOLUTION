@@ -91,13 +91,13 @@ export class Simulation {
   };
 
   private render() {
-    const { entries, creaturesEnergy, foodEnergy, selectedItem } = this.renderer.render(this.viewMode, this.selectedId);
+    const { entries, creaturesEnergy, organicEnergy, selectedItem } = this.renderer.render(this.viewMode, this.selectedId);
     if (!selectedItem) this.selectedId = 0;
     this.pendingSelectedItem = selectedItem;
     this.pendingData = {
       worldEnergy: this.world.energy,
       creaturesEnergy,
-      foodEnergy,
+      organicEnergy,
       worldAge: this.age,
       worldSize: { width: WORLD_WIDTH, height: WORLD_HEIGHT },
       worldEntries: entries.getMostCommon(5),

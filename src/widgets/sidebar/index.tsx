@@ -59,7 +59,7 @@ export const Sidebar: FC<SidebarProps> = ({ data, chartData, isOpen }) => {
             entries={[
               ["World", data.worldEnergy],
               ["Creature", data.creaturesEnergy],
-              ["Food", data.foodEnergy],
+              ["Organic", data.organicEnergy],
             ]}
           />
         </Block>
@@ -75,8 +75,8 @@ export const Sidebar: FC<SidebarProps> = ({ data, chartData, isOpen }) => {
                   color: "rgb(100, 255, 200)",
                 },
                 {
-                  label: "food",
-                  data: chartData.food,
+                  label: "organic",
+                  data: chartData.organic,
                   color: "rgb(255, 255, 150)",
                 },
               ]}

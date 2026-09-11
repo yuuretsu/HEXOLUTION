@@ -26,7 +26,7 @@ export class FrameRenderer {
   render(viewMode: ViewMode, selectedId = 0) {
     const entries = new Counter<string>();
     let creaturesEnergy = 0;
-    let foodEnergy = 0;
+    let organicEnergy = 0;
     let selectedItem: WorldItem | null = null;
     const { width, height } = this.world.grid;
 
@@ -45,11 +45,11 @@ export class FrameRenderer {
         this.pixelView[index] = (255 << 24) | (color[2] << 16) | (color[1] << 8) | color[0];
         if ("energy" in item && typeof item.energy === "number") {
           if (item.CLASS_NAME === "Creature") creaturesEnergy += item.energy;
-          else if (item.CLASS_NAME === "Food") foodEnergy += item.energy;
+          else if (item.CLASS_NAME === "Organic") organicEnergy += item.energy;
         }
       }
     }
-    return { entries, creaturesEnergy, foodEnergy, selectedItem };
+    return { entries, creaturesEnergy, organicEnergy, selectedItem };
   }
 
   getFrame() {

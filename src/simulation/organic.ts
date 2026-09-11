@@ -4,15 +4,15 @@ import { ObjectPool } from "@/shared/utils/object-pool";
 import { sendEnergy, WorldItemDynamic, type World } from "@/simulation/world";
 import { MAX_CELL_ENERGY } from "@/shared/constants";
 
-const foodPool = new ObjectPool(() => new Food(0));
+const organicPool = new ObjectPool(() => new Organic(0));
 const attackResult = { energy: 0 };
 const colorScratch: Rgba = [25, 25, 50, 0];
 const energyColorScratch: Rgba = [0, 0, 100, 255];
 const ENERGY_COLOR_HOT: Rgba = [255, 255, 0, 255];
-const FOOD_COLOR_FULL: Rgba = [75, 75, 50, 255];
+const ORGANIC_COLOR_FULL: Rgba = [75, 75, 50, 255];
 
-export class Food extends WorldItemDynamic {
-  readonly CLASS_NAME = "Food";
+export class Organic extends WorldItemDynamic {
+  readonly CLASS_NAME = "Organic";
 
   energy: number;
 
@@ -21,15 +21,15 @@ export class Food extends WorldItemDynamic {
     this.energy = energy;
   }
 
-  static acquire(energy: number): Food {
-    const food = foodPool.acquire();
-    food.energy = energy;
-    food.rebindId();
-    return food;
+  static acquire(energy: number): Organic {
+    const organic = organicPool.acquire();
+    organic.energy = energy;
+    organic.rebindId();
+    return organic;
   }
 
   release(): void {
-    foodPool.release(this);
+    organicPool.release(this);
   }
 
   getColor(): Rgba {
@@ -37,7 +37,7 @@ export class Food extends WorldItemDynamic {
     colorScratch[1] = 25;
     colorScratch[2] = 50;
     colorScratch[3] = 0;
-    lerpRgb(colorScratch, FOOD_COLOR_FULL, (this.energy / MAX_CELL_ENERGY) ** 2);
+    lerpRgb(colorScratch, ORGANIC_COLOR_FULL, (this.energy / MAX_CELL_ENERGY) ** 2);
     return colorScratch;
   }
 

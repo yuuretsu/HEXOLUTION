@@ -19,7 +19,7 @@ import {
   GENOME_MUTATION_RATE,
   MAX_CELL_ENERGY,
 } from "@/shared/constants";
-import { Food } from "@/simulation/food";
+import { Organic } from "@/simulation/organic";
 
 const creaturePool = new ObjectPool(
   () => new Creature(0, new Tape(new Uint8Array(GENOME_LENGTH)), 0, [0, 0, 0, 255], [0, 0, 0, 255]),
@@ -128,7 +128,7 @@ export class Creature extends WorldItemDynamic {
   die(world: World, x: number, y: number) {
     const energy = this.energy;
     this.energy = 0;
-    world.grid.set(x, y, Food.acquire(energy));
+    world.grid.set(x, y, Organic.acquire(energy));
     this.release();
   }
 
