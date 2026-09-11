@@ -1,6 +1,7 @@
 import type { Rgba } from "@/shared/types";
 import { clampCycle } from "@/shared/utils";
-import { World, WorldItemDynamic } from "@/simulation/world";
+import type { World} from "@/simulation/world";
+import { WorldItemDynamic } from "@/simulation/world";
 
 export class DebugCreature extends WorldItemDynamic {
   readonly CLASS_NAME = "DebugCreature";
