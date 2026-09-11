@@ -1,10 +1,10 @@
-import { getGeneColor, getGeneHandler } from "@/simulation/creature/genes";
 import type { FC } from "react";
 import { useWorkerEvent } from "@/shared/hooks/use-worker-event";
 import type { SelectedCreatureData } from "@/shared/worker-protocol";
 import { Stack } from "@/shared/ui/stack";
 import { Text } from "@/shared/ui/text";
-import { base4toInt, chunk } from "@/shared/utils";
+import { chunk } from "@/shared/utils";
+import { ProgramTriplet } from "./ui/program-triplet";
 import styles from "./selected-entity.module.css";
 
 type ProgramProps = {
@@ -20,41 +20,14 @@ const Program: FC<ProgramProps> = ({ program, activeGeneIndices = [] }) => {
   return (
     <div>
       <div className={styles.programGrid}>
-        {triplets.map((triplet, i) => {
-          const n = base4toInt(triplet[0], triplet[1], triplet[2]);
-          const handler = getGeneHandler(n);
-          const geneColor = getGeneColor(handler);
-          const symbols = triplet.map((x) => ["A", "T", "G", "C"][x]);
-          const backgroundColor = `rgba(${geneColor[0]}, ${geneColor[1]}, ${geneColor[2]}, 0.3)`;
-          const activityColor = i === lastGeneIndex
-            ? "#ffffff"
-            : activeSet.has(i)
-              ? "#888888"
-              : undefined;
-
-          return (
-            <div key={i}>
-              <div
-                className={styles.programCell}
-                style={{
-                  backgroundColor,
-                  color: `rgba(${geneColor[0]}, ${geneColor[1]}, ${geneColor[2]})`,
-                }}
-                title={handler.name}
-              >
-                <Stack dir="row" justify="around">
-                  {symbols.map((x, i) => (
-                    <Text key={i}>{x}</Text>
-                  ))}
-                </Stack>
-                <div
-                  className={styles.programCellActivity}
-                  style={activityColor ? { backgroundColor: activityColor } : undefined}
-                />
-              </div>
-            </div>
-          );
-        })}
+        {triplets.map((bases, i) => (
+          <ProgramTriplet
+            key={i}
+            bases={bases}
+            isActive={activeSet.has(i)}
+            isLast={i === lastGeneIndex}
+          />
+        ))}
       </div>
     </div>
   );
