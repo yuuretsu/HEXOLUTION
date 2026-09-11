@@ -1,0 +1,15 @@
+.infoTable {
+  width: 100%;
+}
+
+.colorationRow {
+  width: fit-content;
+  margin-left: auto;
+}
+
+.colorationSwatch {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+}

@@ -1,0 +1,6 @@
+.programGrid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  border-radius: 8px;
+  overflow: hidden;
+}
