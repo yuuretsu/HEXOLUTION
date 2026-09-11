@@ -1,5 +1,15 @@
-.hint {
+.size-sm {
   font-size: 0.75rem;
+}
+
+.muted {
   color: rgba(255, 255, 255, 0.7);
+}
+
+.italic {
   font-style: italic;
+}
+
+.uppercase {
+  text-transform: uppercase;
 }

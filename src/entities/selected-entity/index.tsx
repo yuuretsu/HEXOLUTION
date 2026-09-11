@@ -2,6 +2,7 @@ import { attackForward, inspectForward, COLOR_ATTACK, COLOR_MOVE_FORWARD, COLOR_
 import type { FC } from "react";
 import { useWorkerEvent } from "@/shared/hooks/use-worker-event";
 import { Stack } from "@/shared/ui/stack";
+import { Text } from "@/shared/ui/text";
 import { base4toInt, chunk } from "@/shared/utils";
 import styles from "./selected-entity.module.css";
 
@@ -44,7 +45,7 @@ const Program: FC<ProgramProps> = ({ program, pointer }) => {
               >
                 <Stack dir="row" justify="around">
                   {symbols.map((x, i) => (
-                    <div key={i}>{x}</div>
+                    <Text key={i}>{x}</Text>
                   ))}
                 </Stack>
               </div>
@@ -64,15 +65,15 @@ export const WorldEntityCreature: FC<{ item: any }> = ({ item }) => {
       <table className={styles.infoTable}>
         <tbody>
           <tr>
-            <th>ENERGY</th>
-            <td>{item.energy}</td>
+            <th><Text>ENERGY</Text></th>
+            <td><Text>{item.energy}</Text></td>
           </tr>
           <tr>
-            <th>AGE</th>
-            <td>{item.age}</td>
+            <th><Text>AGE</Text></th>
+            <td><Text>{item.age}</Text></td>
           </tr>
           <tr>
-            <th>COLORATION</th>
+            <th><Text>COLORATION</Text></th>
             <td>
               <div className={styles.colorationRow}>
                 <Stack dir="row" gap={6} align="center">
@@ -80,9 +81,9 @@ export const WorldEntityCreature: FC<{ item: any }> = ({ item }) => {
                     className={styles.colorationSwatch}
                     style={{ backgroundColor: `rgba(${item.coloration[0]}, ${item.coloration[1]}, ${item.coloration[2]}, ${item.coloration[3] / 255})` }}
                   />
-                  <span>
+                  <Text>
                     {item.coloration[0]}, {item.coloration[1]}, {item.coloration[2]}
-                  </span>
+                  </Text>
                 </Stack>
               </div>
             </td>
@@ -98,9 +99,9 @@ export const SelectedEntity: FC = () => {
   const selectedItem = useWorkerEvent("selectedItemUpdate");
 
   if (!selectedItem) return (
-    <div className={styles.emptyHint}>
+    <Text size="sm" isMuted isItalic>
       Click an entity to view its properties
-    </div>
+    </Text>
   )
 
   const [r, g, b] = selectedItem.color;
@@ -112,7 +113,9 @@ export const SelectedEntity: FC = () => {
           className={styles.entitySwatch}
           style={{ backgroundColor: `rgb(${r}, ${g}, ${b})` }}
         />
-        <h3 className={styles.selectedTitle}>{selectedItem.type.toUpperCase()}</h3>
+        <Text as="h3" isUppercase className={styles.selectedTitle}>
+          {selectedItem.type}
+        </Text>
       </Stack>
       {selectedItem.type === "Creature" && <WorldEntityCreature item={selectedItem} />}
     </Stack>

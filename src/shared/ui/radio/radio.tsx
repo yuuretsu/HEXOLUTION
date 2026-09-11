@@ -1,6 +1,7 @@
 import type { FC, PropsWithChildren } from "react";
 import clsx from "clsx";
 import { Stack } from "@/shared/ui/stack";
+import { Text } from "@/shared/ui/text";
 import styles from "./radio.module.css";
 
 export type RadioItemProps = PropsWithChildren & {
@@ -15,7 +16,7 @@ const RadioItem: FC<RadioItemProps> = ({ isActive, onClick, children }) => {
       onClick={onClick}
     >
       <input type="radio" name="" id="" className={styles.input} />
-      <span>{children}</span>
+      <Text>{children}</Text>
     </label>
   );
 };

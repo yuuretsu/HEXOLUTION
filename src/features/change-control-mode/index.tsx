@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Radio } from "@/shared/ui/radio";
 import { Stack } from "@/shared/ui/stack";
-import styles from "./change-control-mode.module.css";
+import { Text } from "@/shared/ui/text";
 
 export const ChangeControlMode: React.FC = () => {
   const [isTouchpadMode, setIsTouchpadMode] = useState(() => {
@@ -27,12 +27,12 @@ export const ChangeControlMode: React.FC = () => {
         value={isTouchpadMode ? "touchpad" : "mouse"}
         onChange={handleChange}
       />
-      <div className={styles.hint}>
+      <Text size="sm" isMuted isItalic>
         {isTouchpadMode
           ? "Use two fingers to pan, pinch to zoom"
           : "Left click + drag to pan, wheel to zoom"
         }
-      </div>
+      </Text>
     </Stack>
   );
 };

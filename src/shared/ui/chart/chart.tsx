@@ -1,5 +1,6 @@
 import { memo, useMemo } from "react";
 import { Stack } from "@/shared/ui/stack";
+import { Text } from "@/shared/ui/text";
 import styles from "./chart.module.css";
 
 type DataPoint = [number, number];
@@ -165,7 +166,7 @@ export const Chart = ({
             <div key={s.label} className={styles.legendItem}>
               <Stack dir="row" gap={4} align="center">
                 <div className={styles.legendSwatch} style={{ backgroundColor: s.color }} />
-                {s.label}
+                <Text size="sm" isUppercase>{s.label}</Text>
               </Stack>
             </div>
           ))}

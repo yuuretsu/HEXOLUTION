@@ -1,6 +1,7 @@
 import type { FC, PropsWithChildren } from "react";
 import type { IconType } from "react-icons";
 import { Stack } from "@/shared/ui/stack";
+import { Text } from "@/shared/ui/text";
 import styles from "./block-title.module.css";
 
 const gradientId = "block-title-gradient";
@@ -16,8 +17,8 @@ export const BlockTitle: FC<PropsWithChildren<{ Icon?: IconType }>> = ({ Icon, c
       </defs>
     </svg>
     {Icon && <Icon size="1.5rem" className={styles.icon} />}
-    <h3 className={styles.title}>
+    <Text as="h3" className={styles.title}>
       {children}
-    </h3>
+    </Text>
   </Stack>
 );

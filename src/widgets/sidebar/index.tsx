@@ -17,6 +17,7 @@ import { Block } from "@/shared/ui/block";
 import { Entries } from "@/shared/ui/entries";
 import { SelectedEntity } from "@/entities/selected-entity";
 import { Stack } from "@/shared/ui/stack";
+import { Text } from "@/shared/ui/text";
 
 type SidebarProps = {
   data: WorldData;
@@ -41,15 +42,15 @@ export const Sidebar: FC<SidebarProps> = ({ data, chartData, isOpen }) => {
       <Stack dir="column" gap={16}>
         <Block title={{ Icon: HiAdjustmentsHorizontal, text: "Settings" }}>
           <Stack dir="column" gap={4}>
-            <div>SIMULATION STEPS PER FRAME</div>
+            <Text>SIMULATION STEPS PER FRAME</Text>
             <ChangeSimulationSpeed />
           </Stack>
           <Stack dir="column" gap={4}>
-            <div>VIEW MODE</div>
+            <Text>VIEW MODE</Text>
             <ChangeViewMode />
           </Stack>
           <Stack dir="column" gap={4}>
-            <div>CONTROL MODE</div>
+            <Text>CONTROL MODE</Text>
             <ChangeControlMode />
           </Stack>
         </Block>
@@ -82,11 +83,11 @@ export const Sidebar: FC<SidebarProps> = ({ data, chartData, isOpen }) => {
             />
           </div>
           <Stack dir="row" align="center" justify="between">
-            <div>world age</div>
-            <div className={styles.worldAgeValue}>
+            <Text>world age</Text>
+            <Text className={styles.worldAgeValue}>
               {fullAge}
-              <span className={styles.worldAgeFraction}>.{fractionalPart}</span>
-            </div>
+              <Text className={styles.worldAgeFraction}>.{fractionalPart}</Text>
+            </Text>
           </Stack>
         </Block>
         <Block title={{ Icon: HiFingerPrint, text: "Selected" }}>
