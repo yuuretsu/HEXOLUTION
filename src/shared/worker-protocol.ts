@@ -35,15 +35,22 @@ export type WorkerApiEvents = {
   speedChanged: number;
 };
 
-export type SelectedItemData = {
-  type: string;
+export type SelectedCreatureData = {
+  type: "Creature";
   color: Rgba;
-  direction?: number;
-  program?: number[];
-  pointer?: number;
-  age?: number;
-  generation?: number;
-  energy?: number;
-  coloration?: Rgba;
-  activeGeneIndices?: number[];
+  direction: number;
+  program: number[];
+  pointer: number;
+  age: number;
+  generation: number;
+  energy: number;
+  coloration: Rgba;
+  activeGeneIndices: number[];
 };
+
+export type SelectedItemData =
+  | SelectedCreatureData
+  | {
+      type: "Organic" | "Stone";
+      color: Rgba;
+    };

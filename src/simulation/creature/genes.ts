@@ -6,6 +6,6 @@ export * from "./gene-colors";
 export * from "./gene-library";
 export type { GeneHandler, GeneHandlerResult } from "./gene-types";
 
-const GENES = Object.values(GeneLibrary) as GeneHandler[];
+const GENES: GeneHandler[] = Object.values(GeneLibrary);
 
 export const getGeneHandler = (index: number): GeneHandler => GENES[index % GENES.length];

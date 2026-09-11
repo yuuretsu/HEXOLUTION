@@ -1,6 +1,7 @@
 import { getGeneColor, getGeneHandler } from "@/simulation/creature/genes";
 import type { FC } from "react";
 import { useWorkerEvent } from "@/shared/hooks/use-worker-event";
+import type { SelectedCreatureData } from "@/shared/worker-protocol";
 import { Stack } from "@/shared/ui/stack";
 import { Text } from "@/shared/ui/text";
 import { base4toInt, chunk } from "@/shared/utils";
@@ -59,9 +60,7 @@ const Program: FC<ProgramProps> = ({ program, activeGeneIndices = [] }) => {
   );
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const WorldEntityCreature: FC<{ item: any }> = ({ item }) => {
-  const program = item.program as number[];
+export const WorldEntityCreature: FC<{ item: SelectedCreatureData }> = ({ item }) => {
   return (
     <Stack dir="column" gap={16}>
       <table className={styles.infoTable}>
@@ -97,7 +96,7 @@ export const WorldEntityCreature: FC<{ item: any }> = ({ item }) => {
         </tbody>
       </table>
       <Program
-        program={program}
+        program={item.program}
         activeGeneIndices={item.activeGeneIndices}
       />
     </Stack>

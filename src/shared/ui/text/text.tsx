@@ -32,7 +32,7 @@ export function Text<E extends ElementType = "span">({
   children,
   ...props
 }: TextProps<E>): ReactElement {
-  const Tag = (as || "span") as ElementType;
+  const Tag: ElementType = as || "span";
 
   return (
     <Tag

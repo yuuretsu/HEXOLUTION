@@ -22,6 +22,8 @@ export class Tape {
   private read(): Base4 {
     const value = this.data[this.pointer];
     this.pointer = (this.pointer + 1) % this.data.length;
+    // Hot path: genome reads skip a runtime range check.
+    // eslint-disable-next-line no-restricted-syntax -- performance-critical tape reads
     return value as Base4;
   }
 

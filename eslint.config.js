@@ -21,6 +21,17 @@ export default defineConfig([
     },
     rules: {
       '@typescript-eslint/no-unused-vars': 'off',
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: 'TSTypeAssertion',
+          message: 'Type assertions are forbidden. Prefer proper typing or type guards.',
+        },
+        {
+          selector: 'TSAsExpression:not([typeAnnotation.typeName.name="const"])',
+          message: 'Type assertions (`as`) are forbidden, except `as const`.',
+        },
+      ],
     },
   },
 ])

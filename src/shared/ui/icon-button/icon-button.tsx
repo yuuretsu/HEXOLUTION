@@ -20,7 +20,7 @@ export function IconButton<E extends ElementType = "button">({
   className,
   ...props
 }: IconButtonProps<E>): ReactElement {
-  const Tag = (as || "button") as ElementType;
+  const Tag: ElementType = as || "button";
 
   return (
     <Tag

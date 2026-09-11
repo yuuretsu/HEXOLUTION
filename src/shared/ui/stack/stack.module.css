@@ -1,6 +1,5 @@
 .stack {
   display: flex;
-  gap: var(--stack-gap);
 }
 
 .row {

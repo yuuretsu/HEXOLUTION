@@ -1,4 +1,4 @@
-import type { CSSProperties, FC, PropsWithChildren } from "react";
+import type { FC, PropsWithChildren } from "react";
 import clsx from "clsx";
 import styles from "./stack.module.css";
 
@@ -36,7 +36,7 @@ export const Stack: FC<StackProps> = ({
       justify && styles[`justify-${justify}`],
       isWrap && styles.wrap,
     )}
-    style={{ "--stack-gap": `${gap}px` } as CSSProperties}
+    style={{ gap: `${gap}px` }}
   >
     {children}
   </div>

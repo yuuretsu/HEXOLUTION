@@ -1,12 +1,34 @@
 import { Creature } from "@/simulation/creature";
+import { Organic } from "@/simulation/organic";
+import { Stone } from "@/simulation/stone";
+import type { SelectedItemData } from "@/shared/worker-protocol";
 import type { WorldItem } from "@/simulation/world";
 
-export const serializeSelectedItem = (item: WorldItem | null) => {
+export const serializeSelectedItem = (item: WorldItem | null): SelectedItemData | null => {
   if (!item) return null;
 
-  const commonData = { type: item.CLASS_NAME, color: item.getColor() };
   if (item instanceof Creature) {
-    return { ...commonData, direction: item.direction, program: [...item.tape.data], pointer: item.tape.pointer, age: item.age, generation: item.generation, energy: item.energy, coloration: item.getColoration(), activeGeneIndices: [...item.activeGeneIndices] };
+    return {
+      type: "Creature",
+      color: item.getColor(),
+      direction: item.direction,
+      program: [...item.tape.data],
+      pointer: item.tape.pointer,
+      age: item.age,
+      generation: item.generation,
+      energy: item.energy,
+      coloration: item.getColoration(),
+      activeGeneIndices: [...item.activeGeneIndices],
+    };
   }
-  return commonData;
+
+  if (item instanceof Organic) {
+    return { type: "Organic", color: item.getColor() };
+  }
+
+  if (item instanceof Stone) {
+    return { type: "Stone", color: item.getColor() };
+  }
+
+  throw new Error(`Unknown world item: ${item.CLASS_NAME}`);
 };

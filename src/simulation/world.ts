@@ -47,6 +47,9 @@ export abstract class WorldItemDynamic extends WorldItemStatic {
 
 export type WorldItem = WorldItemStatic | WorldItemDynamic;
 
+const isWorldItemDynamic = (item: WorldItem): item is WorldItemDynamic =>
+  "process" in item;
+
 export const sendEnergy = (from: { energy: number }, to: { energy: number }, amount: number) => {
   const energy = Math.min(from.energy, amount);
   from.energy -= energy;
@@ -67,8 +70,8 @@ export class World {
     const dynamicItems: [x: number, y: number, item: WorldItemDynamic][] = [];
 
     for (const [x, y, item] of this.grid.entries()) {
-      if ("process" in item) {
-        dynamicItems.push([x, y, item as WorldItemDynamic]);
+      if (isWorldItemDynamic(item)) {
+        dynamicItems.push([x, y, item]);
       }
     }
 

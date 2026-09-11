@@ -1,3 +1,5 @@
+const trust = <T,>(_value: unknown): _value is T => true;
+
 export class WorkerClient<
   Methods extends Record<string, unknown[]>,
   Results extends { [Method in keyof Methods]: unknown },
@@ -5,8 +7,10 @@ export class WorkerClient<
 > {
   private seq = 0;
   private readonly pending = new Map<number, (v: unknown) => void>();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private readonly eventHandlers = new Map<keyof Events, ((data: any) => void)[]>();
+  private readonly eventHandlers = new Map<
+    keyof Events,
+    Set<(data: unknown) => void>
+  >();
   private readonly worker: Worker;
 
   constructor(worker: Worker) {
@@ -14,18 +18,19 @@ export class WorkerClient<
   }
 
   on<K extends keyof Events>(event: K, handler: (data: Events[K]) => void) {
-    const handlers = this.eventHandlers.get(event) ?? [];
-    handlers.push(handler);
+    const wrapped = (data: unknown) => {
+      if (trust<Events[K]>(data)) handler(data);
+    };
+    const handlers = this.eventHandlers.get(event) ?? new Set();
+    handlers.add(wrapped);
     this.eventHandlers.set(event, handlers);
 
     return () => {
       const currentHandlers = this.eventHandlers.get(event);
       if (!currentHandlers) return;
-      const index = currentHandlers.indexOf(handler);
-      if (index === -1) return;
-      currentHandlers.splice(index, 1);
-      if (currentHandlers.length === 0) this.eventHandlers.delete(event);
-    }
+      currentHandlers.delete(wrapped);
+      if (currentHandlers.size === 0) this.eventHandlers.delete(event);
+    };
   }
 
   listen() {
@@ -51,12 +56,22 @@ export class WorkerClient<
     transfer: Transferable[] = []
   ): Promise<Results[Method]> {
     const id = this.seq++;
-    return new Promise((res) => {
-      this.pending.set(id, res as (v: unknown) => void);
+    return new Promise((resolve) => {
+      this.pending.set(id, (value) => {
+        if (trust<Results[Method]>(value)) resolve(value);
+      });
       this.worker.postMessage({ id, method, params }, transfer);
     });
   }
 }
+
+type ClientRequest<Methods extends Record<string, unknown[]>> = {
+  [Method in keyof Methods]: {
+    id: number;
+    method: Method;
+    params: Methods[Method];
+  };
+}[keyof Methods];
 
 export class WorkerServer<
   Methods extends Record<string, unknown[]>,
@@ -72,17 +87,19 @@ export class WorkerServer<
     }
   ) {
     this.worker = worker;
-    worker.addEventListener("message", (e) => {
-      const { id, method, params } = e.data;
-      if (id === undefined) return;
+    worker.addEventListener(
+      "message",
+      (e: MessageEvent<ClientRequest<Methods> | { id?: undefined }>) => {
+        const message = e.data;
+        if (message.id === undefined) return;
 
-      const result = handlers[method as keyof Methods](
-        ...(params as Methods[keyof Methods])
-      );
-      Promise.resolve(result).then((v) =>
-        this.worker.postMessage({ id, result: v })
-      );
-    });
+        const { id, method, params } = message;
+        const result = handlers[method](...params);
+        Promise.resolve(result).then((v) =>
+          this.worker.postMessage({ id, result: v })
+        );
+      },
+    );
   }
 
   emit<K extends keyof Events>(
