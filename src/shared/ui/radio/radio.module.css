@@ -1,4 +1,6 @@
 .item {
+  position: relative;
+  overflow: hidden;
   padding: 0px 4px;
   border-radius: 4px;
   cursor: pointer;
@@ -14,4 +16,9 @@
 
 .input {
   all: unset;
+}
+
+.label {
+  position: relative;
+  z-index: 1;
 }

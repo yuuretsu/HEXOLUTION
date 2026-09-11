@@ -1,7 +1,8 @@
-import type { FC, PropsWithChildren } from "react";
+import type { FC, MouseEvent, PropsWithChildren } from "react";
 import clsx from "clsx";
 import { Stack } from "@/shared/ui/stack";
 import { Text } from "@/shared/ui/text";
+import { RippleLayer, useRipple } from "@/shared/ui/ripple";
 import styles from "./radio.module.css";
 
 export type RadioItemProps = PropsWithChildren & {
@@ -10,13 +11,21 @@ export type RadioItemProps = PropsWithChildren & {
 };
 
 const RadioItem: FC<RadioItemProps> = ({ isActive, onClick, children }) => {
+  const { ripples, spawnRipple, removeRipple } = useRipple();
+
+  const handleClick = (event: MouseEvent<HTMLLabelElement>) => {
+    spawnRipple(event);
+    onClick?.();
+  };
+
   return (
     <label
       className={clsx(styles.item, isActive ? styles.itemActive : styles.itemInactive)}
-      onClick={onClick}
+      onClick={handleClick}
     >
       <input type="radio" name="" id="" className={styles.input} />
-      <Text>{children}</Text>
+      <Text className={styles.label}>{children}</Text>
+      <RippleLayer ripples={ripples} onRemove={removeRipple} />
     </label>
   );
 };

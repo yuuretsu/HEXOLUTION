@@ -24,6 +24,7 @@ export default defineConfig([
       },
     },
     rules: {
+      'func-style': ['error', 'expression'],
       '@typescript-eslint/no-unused-vars': 'off',
       '@typescript-eslint/naming-convention': [
         'error',

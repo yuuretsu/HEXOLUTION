@@ -1,4 +1,6 @@
 .button {
+  position: relative;
+  overflow: hidden;
   width: 48px;
   height: 48px;
   background-color: transparent;
@@ -12,5 +14,7 @@
 }
 
 .icon {
+  position: relative;
+  z-index: 1;
   display: block;
 }

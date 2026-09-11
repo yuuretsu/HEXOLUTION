@@ -22,7 +22,7 @@ type TextOwnProps<E extends ElementType> = {
 export type TextProps<E extends ElementType = "span"> = TextOwnProps<E> &
   Omit<ComponentPropsWithoutRef<E>, keyof TextOwnProps<E>>;
 
-export function Text<E extends ElementType = "span">({
+export const Text = <E extends ElementType = "span",>({
   as,
   size,
   isMuted,
@@ -31,7 +31,7 @@ export function Text<E extends ElementType = "span">({
   className,
   children,
   ...props
-}: TextProps<E>): ReactElement {
+}: TextProps<E>): ReactElement => {
   const Tag: ElementType = as || "span";
 
   return (
@@ -48,4 +48,4 @@ export function Text<E extends ElementType = "span">({
       {children}
     </Tag>
   );
-}
+};
