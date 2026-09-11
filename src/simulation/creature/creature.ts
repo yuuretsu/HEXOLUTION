@@ -128,7 +128,11 @@ export class Creature extends WorldItemDynamic {
   die(world: World, x: number, y: number) {
     const energy = this.energy;
     this.energy = 0;
-    world.grid.set(x, y, Food.acquire(energy));
+    if (energy > 0) {
+      world.grid.set(x, y, Food.acquire(energy));
+    } else {
+      world.grid.set(x, y, undefined);
+    }
     this.release();
   }
 
