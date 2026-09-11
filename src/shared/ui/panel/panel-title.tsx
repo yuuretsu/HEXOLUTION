@@ -2,11 +2,11 @@ import type { FC, PropsWithChildren } from "react";
 import type { IconType } from "react-icons";
 import { Stack } from "@/shared/ui/stack";
 import { Text } from "@/shared/ui/text";
-import styles from "./block-title.module.css";
+import styles from "./panel-title.module.css";
 
-const gradientId = "block-title-gradient";
+const gradientId = "panel-title-gradient";
 
-export const BlockTitle: FC<PropsWithChildren<{ Icon?: IconType }>> = ({ Icon, children }) => (
+export const PanelTitle: FC<PropsWithChildren<{ Icon?: IconType }>> = ({ Icon, children }) => (
   <Stack dir="row" gap={8} align="center">
     <svg width="0" height="0" className={styles.gradientSvg}>
       <defs>

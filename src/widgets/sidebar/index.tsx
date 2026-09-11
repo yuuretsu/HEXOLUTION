@@ -13,7 +13,7 @@ import { Chart } from "@/shared/ui/chart";
 import styles from "./sidebar.module.css";
 import type { ChartData } from "@/shared/hooks/use-world-data";
 import type { WorldData } from "@/shared/worker-protocol";
-import { Block } from "@/shared/ui/block";
+import { Panel } from "@/shared/ui/panel";
 import { Entries } from "@/shared/ui/entries";
 import { SelectedEntity } from "@/entities/selected-entity";
 import { Stack } from "@/shared/ui/stack";
@@ -40,7 +40,7 @@ export const Sidebar: FC<SidebarProps> = ({ data, chartData, isOpen }) => {
       })}
     >
       <Stack dir="column" gap={16}>
-        <Block title={{ Icon: HiAdjustmentsHorizontal, text: "Settings" }}>
+        <Panel title={{ Icon: HiAdjustmentsHorizontal, text: "Settings" }}>
           <Stack dir="column" gap={4}>
             <Text>SIMULATION STEPS PER FRAME</Text>
             <ChangeSimulationSpeed />
@@ -53,8 +53,8 @@ export const Sidebar: FC<SidebarProps> = ({ data, chartData, isOpen }) => {
             <Text>CONTROL MODE</Text>
             <ChangeControlMode />
           </Stack>
-        </Block>
-        <Block title={{ Icon: HiSun, text: "Energy" }}>
+        </Panel>
+        <Panel title={{ Icon: HiSun, text: "Energy" }}>
           <Entries
             entries={[
               ["World", data.worldEnergy],
@@ -62,8 +62,8 @@ export const Sidebar: FC<SidebarProps> = ({ data, chartData, isOpen }) => {
               ["Organic", data.organicEnergy],
             ]}
           />
-        </Block>
-        <Block title={{ Icon: HiSquaresPlus, text: "Entities" }}>
+        </Panel>
+        <Panel title={{ Icon: HiSquaresPlus, text: "Entities" }}>
           <Entries entries={data.worldEntries} />
           <div className={styles.chartWrapper}>
             <Chart
@@ -89,10 +89,10 @@ export const Sidebar: FC<SidebarProps> = ({ data, chartData, isOpen }) => {
               <Text className={styles.worldAgeFraction}>.{fractionalPart}</Text>
             </Text>
           </Stack>
-        </Block>
-        <Block title={{ Icon: HiFingerPrint, text: "Selected" }}>
+        </Panel>
+        <Panel title={{ Icon: HiFingerPrint, text: "Selected" }}>
           <SelectedEntity />
-        </Block>
+        </Panel>
       </Stack>
     </div>
   );
