@@ -14,13 +14,19 @@ export const WorldImage: FC<WorldImageProps> = ({ onClickPixel, isTouchpadMode =
     let active = true;
     const poll = async () => {
       while (active) {
-        const result = await workerApi.call("getLatestFrame", []);
-        if (result && active) {
-          updateBuffer(
-            new Uint8Array(result.buffer),
-            result.width,
-            result.height
-          );
+        try {
+          const result = await workerApi.call("getLatestFrame", []);
+          if (result && active) {
+            updateBuffer(
+              new Uint8Array(result.buffer),
+              result.width,
+              result.height
+            );
+          }
+        } catch {
+          await new Promise((resolve) => setTimeout(resolve, 500));
+          if (!active) break;
+          continue;
         }
         await new Promise((resolve) => setTimeout(resolve, 1000 / 30));
       }
