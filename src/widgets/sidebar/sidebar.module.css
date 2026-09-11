@@ -22,18 +22,3 @@
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
-
-.chartWrapper {
-  margin-bottom: 0;
-  border-radius: 8px;
-  overflow: hidden;
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-.worldAgeValue {
-  font-variant-numeric: tabular-nums;
-}
-
-.worldAgeFraction {
-  opacity: 0.5;
-}
