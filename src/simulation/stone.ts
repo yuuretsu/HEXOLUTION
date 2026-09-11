@@ -13,6 +13,18 @@ export class Stone extends WorldItemStatic {
   }
 
   getColor(): Rgba {
-    return this.color
+    return this.color;
+  }
+
+  getEnergyColor(): Rgba {
+    return this.color;
+  }
+
+  getGenomeHashColor(): Rgba {
+    return this.color;
+  }
+
+  getColoration(): Rgba {
+    return this.color;
   }
 }
