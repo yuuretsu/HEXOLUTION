@@ -12,7 +12,7 @@ export const Entries: FC<{ entries: [string, number][] }> = ({ entries }) => {
           <tr key={name}>
             <th className={styles.name}><Text>{name}</Text></th>
             <td className={styles.count}><Text>{new Intl.NumberFormat("en-US").format(count)}</Text></td>
-            <td className={styles.percent}><Text>{total ? ((count / total) * 100).toFixed(1) : "0.0"}%</Text></td>
+            <td className={styles.percent}><Text isMuted>{total ? ((count / total) * 100).toFixed(1) : "0.0"}%</Text></td>
           </tr>
         ))}
       </tbody>
