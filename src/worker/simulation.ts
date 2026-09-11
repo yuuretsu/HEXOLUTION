@@ -24,9 +24,9 @@ export class Simulation {
 
   private pendingData: WorldData | null = null;
   private pendingSelectedItem: WorldItem | null = null;
-  private dataDirty = false;
-  private uiReadyForData = true;
-  private backpressureEnabled = false;
+  private isDataDirty = false;
+  private isUiReadyForData = true;
+  private isBackpressureEnabled = false;
 
   constructor(events: SimulationEvents) {
     this.events = events;
@@ -66,8 +66,8 @@ export class Simulation {
   getLatestFrame() { return this.renderer.getFrame(); }
 
   ackData() {
-    this.backpressureEnabled = true;
-    this.uiReadyForData = true;
+    this.isBackpressureEnabled = true;
+    this.isUiReadyForData = true;
     this.flushDataIfReady();
   }
 
@@ -102,16 +102,16 @@ export class Simulation {
       worldSize: { width: WORLD_WIDTH, height: WORLD_HEIGHT },
       worldEntries: entries.getMostCommon(5),
     };
-    this.dataDirty = true;
+    this.isDataDirty = true;
     this.flushDataIfReady();
   }
 
   private flushDataIfReady() {
-    if (!this.dataDirty || !this.pendingData) return;
-    if (this.backpressureEnabled && !this.uiReadyForData) return;
+    if (!this.isDataDirty || !this.pendingData) return;
+    if (this.isBackpressureEnabled && !this.isUiReadyForData) return;
 
-    this.dataDirty = false;
-    if (this.backpressureEnabled) this.uiReadyForData = false;
+    this.isDataDirty = false;
+    if (this.isBackpressureEnabled) this.isUiReadyForData = false;
 
     this.events.onData(this.pendingData);
     this.events.onSelectedItemUpdate(serializeSelectedItem(this.pendingSelectedItem));

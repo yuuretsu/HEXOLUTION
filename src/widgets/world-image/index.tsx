@@ -11,11 +11,11 @@ export const WorldImage: FC<WorldImageProps> = ({ onClickPixel, isTouchpadMode =
   const [apiRef, updateBuffer] = useHexagonsApi();
 
   useEffect(() => {
-    let active = true;
+    let isActive = true;
     const poll = async () => {
-      while (active) {
+      while (isActive) {
         const result = await workerApi.call("getLatestFrame", []);
-        if (result && active) {
+        if (result && isActive) {
           updateBuffer(
             new Uint8Array(result.buffer),
             result.width,
@@ -26,7 +26,7 @@ export const WorldImage: FC<WorldImageProps> = ({ onClickPixel, isTouchpadMode =
       }
     };
     poll();
-    return () => { active = false; };
+    return () => { isActive = false; };
   }, [updateBuffer]);
 
   return (

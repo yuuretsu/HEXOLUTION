@@ -18,9 +18,36 @@ export default defineConfig([
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
     },
     rules: {
       '@typescript-eslint/no-unused-vars': 'off',
+      '@typescript-eslint/naming-convention': [
+        'error',
+        {
+          selector: ['variable', 'parameter', 'classProperty', 'typeProperty', 'accessor'],
+          types: ['boolean'],
+          format: ['PascalCase'],
+          prefix: [
+            'is',
+            'are',
+            'was',
+            'were',
+            'has',
+            'have',
+            'had',
+            'can',
+            'could',
+            'should',
+            'did',
+            'will',
+            'needs',
+          ],
+        },
+      ],
       'no-restricted-syntax': [
         'error',
         {

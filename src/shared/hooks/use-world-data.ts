@@ -21,12 +21,12 @@ export const useWorldData = () => {
   const [chartData, setChartData] = useState<ChartData>({ creatures: [], organic: [] });
 
   useEffect(() => {
-    let active = true;
+    let isActive = true;
 
     void workerApi.call("ackData", []);
 
     const unsubscribe = workerApi.on("data", (nextData) => {
-      if (!active) {
+      if (!isActive) {
         void workerApi.call("ackData", []);
         return;
       }
@@ -49,7 +49,7 @@ export const useWorldData = () => {
     });
 
     return () => {
-      active = false;
+      isActive = false;
       unsubscribe();
       void workerApi.call("ackData", []);
     };
