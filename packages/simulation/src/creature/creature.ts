@@ -31,7 +31,9 @@ const ENERGY_COLOR_HOT: Rgba = [255, 255, 0, 255];
 const energyColorScratch: Rgba = [0, 0, 100, 255];
 
 export class Creature extends WorldItemDynamic {
-  readonly CLASS_NAME = "Creature";
+  override get CLASS_NAME() {
+    return "Creature";
+  }
 
   _direction: number = ~~(Math.random() * 6);
   readonly tape: Tape;

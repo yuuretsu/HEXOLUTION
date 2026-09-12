@@ -2,7 +2,9 @@ import type { Rgba } from "@hexolution/shared";
 import { WorldItemStatic } from "./world";
 
 export class Stone extends WorldItemStatic {
-  readonly CLASS_NAME = "Stone";
+  override get CLASS_NAME() {
+    return "Stone";
+  }
 
   color: Rgba;
 

@@ -6,7 +6,10 @@ const staticAttackResult = { energy: 0 };
 let nextWorldItemId = 1;
 
 export abstract class WorldItemStatic {
-  readonly CLASS_NAME: string = "WorldItemStatic";
+  get CLASS_NAME(): string {
+    return "WorldItemStatic";
+  }
+
   id = nextWorldItemId++;
 
   rebindId() {
@@ -40,7 +43,10 @@ export abstract class WorldItemStatic {
 }
 
 export abstract class WorldItemDynamic extends WorldItemStatic {
-  readonly CLASS_NAME: string = "WorldItemDynamic";
+  override get CLASS_NAME(): string {
+    return "WorldItemDynamic";
+  }
+
   abstract process(world: World, x: number, y: number): void;
 }
 

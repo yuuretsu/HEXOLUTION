@@ -12,7 +12,9 @@ const ENERGY_COLOR_HOT: Rgba = [255, 255, 0, 255];
 const ORGANIC_COLOR_FULL: Rgba = [75, 75, 50, 255];
 
 export class Organic extends WorldItemDynamic {
-  readonly CLASS_NAME = "Organic";
+  override get CLASS_NAME() {
+    return "Organic";
+  }
 
   energy: number;
 
