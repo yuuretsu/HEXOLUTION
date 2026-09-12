@@ -1,3 +1,6 @@
+import { SQRT3 } from "@/shared/constants";
+import type { CameraState, WorldSize } from "./types";
+
 export const getDpr = () => window.devicePixelRatio || 1;
 
 export const getZoomFactor = (deltaY: number) => (deltaY > 0 ? 0.95 : 1.05);
@@ -31,4 +34,26 @@ export const resolveClickCell = (
 
   if (col < 0 || col >= width || row < 0 || row >= height) return null;
   return { col: Math.floor(col), row: Math.floor(row) };
+};
+
+export const pickHexCell = (
+  clientX: number,
+  clientY: number,
+  rect: DOMRect,
+  camera: CameraState,
+  deviceScale: number,
+  world: WorldSize,
+  isWrapEnabled: boolean,
+): { col: number; row: number } | null => {
+  if (world.width <= 0) return null;
+
+  const dpr = getDpr();
+  const size = deviceScale / SQRT3;
+  const pixelX = (clientX - rect.left) * dpr - camera.x;
+  const pixelY = (clientY - rect.top) * dpr - camera.y;
+  const q = (SQRT3 / 3.0 * pixelX - 1.0 / 3.0 * pixelY) / size;
+  const r = (2.0 / 3.0 * pixelY) / size;
+  const rounded = cubeRound(q, -q - r, r);
+  const col = rounded.x + (rounded.z - (Math.abs(rounded.z) % 2)) / 2;
+  return resolveClickCell(col, rounded.z, world.width, world.height, isWrapEnabled);
 };
