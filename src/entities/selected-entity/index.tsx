@@ -6,7 +6,7 @@ import { WorldEntityCreature } from "./ui/world-entity-creature";
 import styles from "./selected-entity.module.css";
 
 export const SelectedEntity: FC = () => {
-  const selectedItem = useWorkerEvent("selectedItemUpdate");
+  const selectedItem = useWorkerEvent("selection");
 
   if (!selectedItem) {
     return (

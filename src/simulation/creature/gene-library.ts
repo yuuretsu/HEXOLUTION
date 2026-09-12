@@ -161,3 +161,17 @@ export const displaceForward: GeneHandler = (creature, world, x, y) => {
   world.grid.swap(coordsA[0], coordsA[1], coordsB[0], coordsB[1]);
   return GENE_FINISHED;
 };
+
+/** Stable handler order — matches historical `Object.values` enumeration order. */
+export const GENE_HANDLERS: readonly GeneHandler[] = [
+  moveForward,
+  rotateRight,
+  reproduce,
+  absorbLight,
+  attackForward,
+  checkSelfEnergy,
+  scanForward,
+  inspectForward,
+  resetGenomePointer,
+  displaceForward,
+];

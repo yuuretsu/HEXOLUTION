@@ -1,10 +1,11 @@
 import { WorkerServer, withTransfer } from "@/shared/utils/worker-api";
 import type { WorkerApi, WorkerApiEvents, WorkerApiResults } from "@/shared/worker-protocol";
+import { getGeneMeta } from "@/simulation/api/gene-meta";
 import { Simulation } from "./simulation";
 
 const simulation = new Simulation({
-  onData: (data) => server.emit("data", data),
-  onSelectedItemUpdate: (item) => server.emit("selectedItemUpdate", item),
+  onStats: (data) => server.emit("stats", data),
+  onSelection: (item) => server.emit("selection", item),
   onSpeedChanged: (speed) => server.emit("speedChanged", speed),
 });
 
@@ -12,15 +13,15 @@ const server = new WorkerServer<WorkerApi, WorkerApiResults, WorkerApiEvents>(se
   selectItem: (...params) => simulation.selectItem(...params),
   setSpeed: (speed) => simulation.setSpeed(speed),
   getSpeed: () => simulation.getSpeed(),
-  setViewMode: (mode) => simulation.setViewMode(mode),
-  getLatestFrame: () => {
-    const frame = simulation.getLatestFrame();
-    if (!frame) return null;
-    return withTransfer(frame, [frame.buffer]);
+  getLatestGrid: () => {
+    const grid = simulation.getLatestGrid();
+    if (!grid) return null;
+    return withTransfer(grid, [grid.buffer]);
   },
-  returnFrame: (buffer) => simulation.returnFrame(buffer),
+  returnGrid: (buffer) => simulation.returnGrid(buffer),
   getObjectAt: (position) => simulation.getObjectAt(position),
-  ackData: () => simulation.ackData(),
+  ackStats: () => simulation.ackStats(),
+  getGeneMeta: () => getGeneMeta(),
 });
 
 simulation.init();

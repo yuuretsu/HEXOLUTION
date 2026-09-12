@@ -1,20 +1,14 @@
-import { useState } from "react";
-import { workerApi } from "@/shared/worker-client";
 import { Radio } from "@/shared/ui/radio";
 import type { ViewMode } from "@/shared/types";
+import { useViewMode } from "./use-view-mode";
 
 export const ChangeViewMode = () => {
-  const [viewMode, setViewMode] = useState<ViewMode>("normal");
-
-  const handleChange = (value: ViewMode) => {
-    workerApi.call("setViewMode", [value]);
-    setViewMode(value);
-  };
+  const { viewMode, setViewMode } = useViewMode();
 
   return (
     <Radio
       value={viewMode}
-      onChange={handleChange}
+      onChange={(value: ViewMode) => setViewMode(value)}
       options={[
         { text: "Normal", value: "normal" },
         { text: "Energy", value: "energy" },
@@ -23,5 +17,5 @@ export const ChangeViewMode = () => {
         { text: "Last Action", value: "last-action" },
       ]}
     />
-  )
+  );
 };

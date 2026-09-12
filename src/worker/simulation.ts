@@ -1,23 +1,22 @@
 import { INITIAL_SIMULATION_SPEED, WORLD_HEIGHT, WORLD_WIDTH } from "@/shared/constants";
-import type { ViewMode } from "@/shared/types";
 import type { WorldData } from "@/shared/worker-protocol";
+import { GridPublisher } from "@/simulation/api/grid-publisher";
+import type { GridBufferMeta } from "@/simulation/api/types";
 import { World, WorldItemDynamic, type WorldItem } from "@/simulation/world";
-import { FrameRenderer } from "./frame-renderer";
 import { serializeSelectedItem } from "./selected-item";
 import { populateWorld } from "./world-generator";
 
 type SimulationEvents = {
-  onData: (data: WorldData) => void;
-  onSelectedItemUpdate: (item: ReturnType<typeof serializeSelectedItem>) => void;
+  onStats: (data: WorldData) => void;
+  onSelection: (item: ReturnType<typeof serializeSelectedItem>) => void;
   onSpeedChanged: (speed: number) => void;
 };
 
 export class Simulation {
   private readonly events: SimulationEvents;
   private readonly world = new World(WORLD_WIDTH, WORLD_HEIGHT);
-  private readonly renderer = new FrameRenderer(this.world);
+  private readonly publisher = new GridPublisher(this.world);
   private speedMultiplier = INITIAL_SIMULATION_SPEED;
-  private viewMode: ViewMode = "normal";
   private selectedId = 0;
   private age = 0;
   private loopTimer: ReturnType<typeof setTimeout> | null = null;
@@ -33,8 +32,8 @@ export class Simulation {
   }
 
   async init() {
-    await populateWorld(this.world, () => this.render());
-    this.render();
+    await populateWorld(this.world, () => this.publish());
+    this.publish();
     this.loop();
   }
 
@@ -47,7 +46,7 @@ export class Simulation {
       this.selectedId = item?.id ?? 0;
       this.pendingSelectedItem = item;
     }
-    this.events.onSelectedItemUpdate(serializeSelectedItem(this.pendingSelectedItem));
+    this.events.onSelection(serializeSelectedItem(this.pendingSelectedItem));
   }
 
   setSpeed(speed: number) {
@@ -58,16 +57,15 @@ export class Simulation {
 
   getSpeed() { return this.speedMultiplier; }
 
-  setViewMode(mode: ViewMode) {
-    this.viewMode = mode;
-    this.render();
+  getLatestGrid(): GridBufferMeta | null {
+    return this.publisher.getLatest();
   }
 
-  getLatestFrame() { return this.renderer.getFrame(); }
+  returnGrid(buffer: ArrayBuffer) {
+    this.publisher.returnBuffer(buffer);
+  }
 
-  returnFrame(buffer: ArrayBuffer) { this.renderer.returnFrame(buffer); }
-
-  ackData() {
+  ackStats() {
     this.isBackpressureEnabled = true;
     this.isUiReadyForData = true;
     this.flushDataIfReady();
@@ -88,21 +86,21 @@ export class Simulation {
       const item = this.world.grid.get(x, y);
       if (item instanceof WorldItemDynamic) item.process(this.world, x, y);
     }
-    this.render();
+    this.publish();
     this.scheduleLoop();
   };
 
-  private render() {
-    const { entries, creaturesEnergy, organicEnergy, selectedItem } = this.renderer.render(this.viewMode, this.selectedId);
+  private publish() {
+    const { stats, selectedItem } = this.publisher.publish(this.selectedId, this.age);
     if (!selectedItem) this.selectedId = 0;
     this.pendingSelectedItem = selectedItem;
     this.pendingData = {
-      worldEnergy: this.world.energy,
-      creaturesEnergy,
-      organicEnergy,
-      worldAge: this.age,
+      worldEnergy: stats.worldEnergy,
+      creaturesEnergy: stats.creaturesEnergy,
+      organicEnergy: stats.organicEnergy,
+      worldAge: stats.worldAge,
       worldSize: { width: WORLD_WIDTH, height: WORLD_HEIGHT },
-      worldEntries: entries.getMostCommon(5),
+      worldEntries: stats.worldEntries,
     };
     this.isDataDirty = true;
     this.flushDataIfReady();
@@ -115,8 +113,8 @@ export class Simulation {
     this.isDataDirty = false;
     if (this.isBackpressureEnabled) this.isUiReadyForData = false;
 
-    this.events.onData(this.pendingData);
-    this.events.onSelectedItemUpdate(serializeSelectedItem(this.pendingSelectedItem));
+    this.events.onStats(this.pendingData);
+    this.events.onSelection(serializeSelectedItem(this.pendingSelectedItem));
   }
 
   private scheduleLoop() {

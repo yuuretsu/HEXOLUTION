@@ -19,11 +19,11 @@ export const useSubscribeWorldData = () => {
   useEffect(() => {
     let isActive = true;
 
-    void workerApi.call("ackData", []);
+    void workerApi.call("ackStats", []);
 
-    const unsubscribe = workerApi.on("data", (nextData) => {
+    const unsubscribe = workerApi.on("stats", (nextData) => {
       if (!isActive) {
-        void workerApi.call("ackData", []);
+        void workerApi.call("ackStats", []);
         return;
       }
 
@@ -41,13 +41,13 @@ export const useSubscribeWorldData = () => {
         organic: [...previousData.organic, organic].slice(-1000),
       }));
 
-      void workerApi.call("ackData", []);
+      void workerApi.call("ackStats", []);
     });
 
     return () => {
       isActive = false;
       unsubscribe();
-      void workerApi.call("ackData", []);
+      void workerApi.call("ackStats", []);
     };
   }, []);
 

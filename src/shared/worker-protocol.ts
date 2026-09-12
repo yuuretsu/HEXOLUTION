@@ -1,25 +1,26 @@
-import type { Rgba, ViewMode } from "@/shared/types";
+import type { Rgba } from "@/shared/types";
+import type { GeneMeta, GridBufferMeta } from "@/simulation/api/types";
 
 export type WorkerApi = {
   selectItem: [x: number, y: number] | [];
-  setViewMode: [mode: ViewMode];
   setSpeed: [speed: number];
   getSpeed: [];
-  getLatestFrame: [];
-  returnFrame: [buffer: ArrayBuffer];
-  getObjectAt: [{ x: number, y: number }];
-  ackData: [];
+  getLatestGrid: [];
+  returnGrid: [buffer: ArrayBuffer];
+  getObjectAt: [{ x: number; y: number }];
+  ackStats: [];
+  getGeneMeta: [];
 };
 
 export type WorkerApiResults = {
   selectItem: void;
-  setViewMode: void;
   setSpeed: void;
   getSpeed: number;
-  getLatestFrame: { buffer: ArrayBuffer; width: number; height: number } | null;
-  returnFrame: void;
+  getLatestGrid: GridBufferMeta | null;
+  returnGrid: void;
   getObjectAt: { type: string; color: Rgba } | null;
-  ackData: void;
+  ackStats: void;
+  getGeneMeta: GeneMeta[];
 };
 
 export type WorldData = {
@@ -32,8 +33,8 @@ export type WorldData = {
 };
 
 export type WorkerApiEvents = {
-  data: WorldData;
-  selectedItemUpdate: SelectedItemData | null;
+  stats: WorldData;
+  selection: SelectedItemData | null;
   speedChanged: number;
 };
 

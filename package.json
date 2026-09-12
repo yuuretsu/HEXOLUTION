@@ -13,7 +13,9 @@
     "deploy": "npx tsx deploy.mts",
     "lint": "eslint .",
     "preview": "vite preview",
-    "build-icon": "electron-icon-builder --input=./public/icon.png --output=build --flatten"
+    "build-icon": "electron-icon-builder --input=./public/icon.png --output=build --flatten",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "clsx": "^2.1.1",
@@ -40,6 +42,7 @@
     "typescript-eslint": "^8.67.0",
     "vite": "^8.2.2",
     "vite-plugin-checker": "^0.14.5",
+    "vitest": "^5.0.0",
     "wait-on": "^9.1.0"
   },
   "build": {
