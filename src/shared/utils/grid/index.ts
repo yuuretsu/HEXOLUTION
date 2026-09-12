@@ -1,3 +1,1 @@
-export { GridMap } from "./grid-map";
-export { GridMatrix } from "./grid-matrix";
-export type { IGrid } from "./types";
+export { GridMap, GridMatrix, type IGrid } from "@hexolution/shared";

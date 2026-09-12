@@ -1,2 +1,2 @@
-export type Rgba = [r: number, g: number, b: number, a: number];
+export type { Rgba } from "@hexolution/shared";
 export type ViewMode = "normal" | "energy" | "genome-hash" | "coloration" | "last-action";
