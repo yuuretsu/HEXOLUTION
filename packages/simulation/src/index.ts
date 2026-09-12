@@ -9,10 +9,11 @@ export {
 } from "./constants";
 export { geneIdFromBases } from "./gene-id";
 export {
-  World,
+  createWorld,
   WorldItemStatic,
   WorldItemDynamic,
   sendEnergy,
+  type World,
   type WorldItem,
 } from "./world";
 export { Creature } from "./creature";

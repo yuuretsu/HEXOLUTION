@@ -1,6 +1,5 @@
 import { lerp, lerpRgb } from "@hexolution/shared";
 import type { Rgba } from "@hexolution/shared";
-import { sendEnergy, World } from "../world";
 import type { WorldItem } from "../world";
 import { Creature } from "./creature";
 import { Organic } from "../organic";
@@ -23,12 +22,9 @@ import {
   REPRODUCE_MIN_ENERGY,
   SPECIALIZATION_LEARN_RATE,
 } from "./constants";
-import { scanRay } from "./utils";
 
 type ScanCategory = "empty" | "friend" | "enemy" | "organic" | "stone";
 
-const coordsA: [number, number] = [0, 0];
-const coordsB: [number, number] = [0, 0];
 const scanJumps = {
   empty: 0,
   friend: 0,
@@ -37,6 +33,10 @@ const scanJumps = {
   stone: 0,
 };
 
+const lookCoords: [number, number] = [0, 0];
+const pushFwd: [number, number] = [0, 0];
+const pushBwd: [number, number] = [0, 0];
+
 const colorationDiff = (a: Rgba, b: Rgba): number => {
   const dr = Math.abs(a[0] - b[0]);
   const dg = Math.abs(a[1] - b[1]);
@@ -44,7 +44,7 @@ const colorationDiff = (a: Rgba, b: Rgba): number => {
   return (dr + dg + db) / (3 * 255);
 };
 
-const classifyTarget = (target: WorldItem | null, creature: Creature): ScanCategory => {
+const classifyTarget = (target: WorldItem | null | undefined, creature: Creature): ScanCategory => {
   if (!target) return "empty";
   if (target instanceof Creature) {
     return colorationDiff(creature.coloration, target.coloration) > FRIEND_COLORATION_THRESHOLD ? "enemy" : "friend";
@@ -54,56 +54,61 @@ const classifyTarget = (target: WorldItem | null, creature: Creature): ScanCateg
   return "stone";
 };
 
-export const moveForward: GeneHandler = (creature, world, x, y) => {
+export const moveForward: GeneHandler = (ctx) => {
+  const { creature } = ctx;
   lerpRgb(creature.color, COLOR_MOVE_FORWARD, 0.01);
-  sendEnergy(creature, world, MOVE_ENERGY_COST);
-  world.grid.getCoordsByNarrow(x, y, creature.direction, 1, coordsA);
-  if (world.grid.get(coordsA[0], coordsA[1])) return GENE_FINISHED;
-  world.grid.swap(x, y, coordsA[0], coordsA[1]);
+  ctx.pay(MOVE_ENERGY_COST);
+  const [nx, ny] = ctx.cellCoords(creature.direction, 1, lookCoords);
+  if (ctx.getAt(nx, ny)) return GENE_FINISHED;
+  ctx.swapHere(nx, ny);
   return GENE_FINISHED;
 };
 
-export const rotateRight: GeneHandler = (creature, _grid, _x, _y) => {
-  creature.direction += 1;
+export const rotateRight: GeneHandler = (ctx) => {
+  ctx.creature.direction += 1;
   return GENE_CONTINUE;
 };
 
-export const reproduce: GeneHandler = (creature, world, x, y) => {
+export const reproduce: GeneHandler = (ctx) => {
+  const { creature } = ctx;
   const amount = creature.tape.readFloat();
-  sendEnergy(creature, world, REPRODUCE_ENERGY_COST);
+  ctx.pay(REPRODUCE_ENERGY_COST);
   if (creature.energy < REPRODUCE_MIN_ENERGY) return GENE_FINISHED;
-  world.grid.getCoordsByNarrow(x, y, creature.direction, 1, coordsA);
-  if (world.grid.get(coordsA[0], coordsA[1])) return GENE_FINISHED;
+  const [nx, ny] = ctx.cellCoords(creature.direction, 1, lookCoords);
+  if (ctx.getAt(nx, ny)) return GENE_FINISHED;
   const child = creature.reproduce();
-  sendEnergy(creature, child, Math.round(creature.energy * amount));
-  world.grid.set(coordsA[0], coordsA[1], child);
+  ctx.give(child, Math.round(creature.energy * amount));
+  ctx.setAt(nx, ny, child);
   return GENE_FINISHED;
 };
 
-export const absorbLight: GeneHandler = (creature, world, _x, _y) => {
+export const absorbLight: GeneHandler = (ctx) => {
+  const { creature } = ctx;
   lerpRgb(creature.color, COLOR_PHOTOSYNTHESIS, 0.01);
-  sendEnergy(creature, world, PHOTOSYNTHESIS_ENERGY_COST);
-  const abundance = Math.min(1, world.energy / (world.totalEnergy * PHOTOSYNTHESIS_ABUNDANCE_RATIO)) ** 2;
+  ctx.pay(PHOTOSYNTHESIS_ENERGY_COST);
+  const abundance = ctx.ambientAbundance(PHOTOSYNTHESIS_ABUNDANCE_RATIO);
   const e = Math.round(PHOTOSYNTHESIS_MAX_YIELD * abundance * creature.autotrophOrHeterotroph.left ** 2);
   creature.autotrophOrHeterotroph.left = lerp(creature.autotrophOrHeterotroph.left, 1, SPECIALIZATION_LEARN_RATE);
-  sendEnergy(world, creature, e);
+  ctx.absorb(e);
   return GENE_FINISHED;
 };
 
-export const attackForward: GeneHandler = (creature, world, x, y) => {
+export const attackForward: GeneHandler = (ctx) => {
+  const { creature } = ctx;
   lerpRgb(creature.color, COLOR_ATTACK, 0.02);
-  sendEnergy(creature, world, ATTACK_ENERGY_COST);
-  world.grid.getCoordsByNarrow(x, y, creature.direction, 1, coordsA);
-  const target = world.grid.get(coordsA[0], coordsA[1]);
+  ctx.pay(ATTACK_ENERGY_COST);
+  const [nx, ny] = ctx.cellCoords(creature.direction, 1, lookCoords);
+  const target = ctx.getAt(nx, ny);
   if (!target) return GENE_FINISHED;
   const strength = Math.round(ATTACK_MAX_STRENGTH * creature.autotrophOrHeterotroph.right ** 2);
   creature.autotrophOrHeterotroph.right = lerp(creature.autotrophOrHeterotroph.right, 1, SPECIALIZATION_LEARN_RATE);
-  const result = target.handleAttack(world, strength);
-  sendEnergy(result, creature, result.energy);
+  const stolen = target.handleAttack(ctx.energyPool, strength);
+  ctx.take(stolen, stolen.energy);
   return GENE_FINISHED;
 };
 
-export const checkSelfEnergy: GeneHandler = (creature, _world, _x, _y) => {
+export const checkSelfEnergy: GeneHandler = (ctx) => {
+  const { creature } = ctx;
   const treshold = creature.tape.readFloat();
   const jumpA = creature.tape.readInt();
   const jumpB = creature.tape.readInt();
@@ -115,7 +120,8 @@ export const checkSelfEnergy: GeneHandler = (creature, _world, _x, _y) => {
   return GENE_CONTINUE;
 };
 
-export const scanForward: GeneHandler = (creature, world, x, y) => {
+export const scanForward: GeneHandler = (ctx) => {
+  const { creature } = ctx;
   const distance = Math.floor(creature.tape.readFloat() * 10) + 1;
   scanJumps.empty = creature.tape.readInt();
   scanJumps.friend = creature.tape.readInt();
@@ -123,42 +129,43 @@ export const scanForward: GeneHandler = (creature, world, x, y) => {
   scanJumps.organic = creature.tape.readInt();
   scanJumps.stone = creature.tape.readInt();
 
-  const target = scanRay(creature, world, x, y, distance);
-  const category = classifyTarget(target, creature);
-  creature.tape.jump(scanJumps[category]);
-
+  let target: WorldItem | undefined;
+  for (let d = 1; d <= distance; d++) {
+    const [nx, ny] = ctx.cellCoords(creature.direction, d, lookCoords);
+    target = ctx.getAt(nx, ny);
+    if (target) break;
+  }
+  creature.tape.jump(scanJumps[classifyTarget(target, creature)]);
   return GENE_CONTINUE;
 };
 
-export const inspectForward: GeneHandler = (creature, world, x, y) => {
+export const inspectForward: GeneHandler = (ctx) => {
+  const { creature } = ctx;
   scanJumps.empty = creature.tape.readInt();
   scanJumps.friend = creature.tape.readInt();
   scanJumps.enemy = creature.tape.readInt();
   scanJumps.organic = creature.tape.readInt();
   scanJumps.stone = creature.tape.readInt();
 
-  const target = scanRay(creature, world, x, y, 1);
-  const category = classifyTarget(target, creature);
-  creature.tape.jump(scanJumps[category]);
-
+  const [nx, ny] = ctx.cellCoords(creature.direction, 1, lookCoords);
+  creature.tape.jump(scanJumps[classifyTarget(ctx.getAt(nx, ny), creature)]);
   return GENE_CONTINUE;
 };
 
-export const resetGenomePointer: GeneHandler = (creature, _world, _x, _y) => {
-  creature.tape.pointer = 0;
+export const resetGenomePointer: GeneHandler = (ctx) => {
+  ctx.creature.tape.pointer = 0;
   return GENE_FINISHED;
 };
 
-export const displaceForward: GeneHandler = (creature, world, x, y) => {
+export const displaceForward: GeneHandler = (ctx) => {
+  const { creature } = ctx;
   lerpRgb(creature.color, COLOR_PUSH, 0.01);
-  sendEnergy(creature, world, PUSH_ENERGY_COST);
-  world.grid.getCoordsByNarrow(x, y, creature.direction, 1, coordsA);
-  const objFwd = world.grid.get(coordsA[0], coordsA[1]);
-  if (!objFwd) return GENE_FINISHED;
-  world.grid.getCoordsByNarrow(x, y, (creature.direction + 3) % 6, 1, coordsB);
-  const objBwd = world.grid.get(coordsB[0], coordsB[1]);
-  if (objBwd) return GENE_FINISHED;
-  world.grid.swap(coordsA[0], coordsA[1], coordsB[0], coordsB[1]);
+  ctx.pay(PUSH_ENERGY_COST);
+  const [fx, fy] = ctx.cellCoords(creature.direction, 1, pushFwd);
+  if (!ctx.getAt(fx, fy)) return GENE_FINISHED;
+  const [bx, by] = ctx.cellCoords((creature.direction + 3) % 6, 1, pushBwd);
+  if (ctx.getAt(bx, by)) return GENE_FINISHED;
+  ctx.swapCells(fx, fy, bx, by);
   return GENE_FINISHED;
 };
 

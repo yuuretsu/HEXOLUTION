@@ -1,7 +1,7 @@
 import { INITIAL_SIMULATION_SPEED, WORLD_HEIGHT, WORLD_WIDTH } from "@/shared/constants";
 import type { WorldData } from "@/shared/api";
 import {
-  World,
+  createWorld,
   WorldItemDynamic,
   type WorldItem,
   GridPublisher,
@@ -18,7 +18,7 @@ type SimulationEvents = {
 
 export class Simulation {
   private readonly events: SimulationEvents;
-  private readonly world = new World(WORLD_WIDTH, WORLD_HEIGHT);
+  private readonly world = createWorld(WORLD_WIDTH, WORLD_HEIGHT);
   private readonly publisher = new GridPublisher(this.world);
   private speedMultiplier = INITIAL_SIMULATION_SPEED;
   private selectedId = 0;

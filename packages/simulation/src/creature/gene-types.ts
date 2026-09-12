@@ -1,5 +1,4 @@
-import type { World } from "../world";
-import type { Creature } from "./creature";
+import type { GeneContext } from "./gene-context";
 
 export type GeneHandlerResult = Readonly<{
   isFinished: boolean;
@@ -8,4 +7,4 @@ export type GeneHandlerResult = Readonly<{
 export const GENE_FINISHED: GeneHandlerResult = Object.freeze({ isFinished: true });
 export const GENE_CONTINUE: GeneHandlerResult = Object.freeze({ isFinished: false });
 
-export type GeneHandler = (creature: Creature, world: World, x: number, y: number) => GeneHandlerResult;
+export type GeneHandler = (ctx: GeneContext) => GeneHandlerResult;

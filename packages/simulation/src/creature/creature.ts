@@ -21,6 +21,7 @@ import { geneIdFromBases } from "../gene-id";
 import { Organic } from "../organic";
 import { sendEnergy, WorldItemDynamic, type World } from "../world";
 import { DEFAULT_GENE_COLOR, getGeneColor, getGeneHandler } from "./genes";
+import { geneContext } from "./gene-context";
 
 const creaturePool = new ObjectPool(
   () => new Creature(0, new Tape(new Uint8Array(GENOME_LENGTH)), 0, [0, 0, 0, 255], [0, 0, 0, 255]),
@@ -125,8 +126,8 @@ export class Creature extends WorldItemDynamic {
     this._direction = ((value % 6) + 6) % 6;
   }
 
-  handleAttack(world: World, strength: number): { energy: number } {
-    sendEnergy(this, world, 1);
+  handleAttack(ambient: { energy: number }, strength: number): { energy: number } {
+    sendEnergy(this, ambient, 1);
     attackResult.energy = 0;
     sendEnergy(this, attackResult, strength);
     return attackResult;
@@ -175,12 +176,13 @@ export class Creature extends WorldItemDynamic {
     if (this.energy <= 0 || this.energy >= MAX_CELL_ENERGY) return this.die(world, x, y);
 
     this.activeGeneIndices.length = 0;
+    const ctx = geneContext.bind(this, world, x, y);
 
     for (let i = 0; i < GENES_PER_TICK; i++) {
       const geneIndex = Math.floor(this.tape.pointer / 3);
       const handle = getGeneHandler(this.tape.readInt());
       this.activeGeneIndices.push(geneIndex);
-      const result = handle(this, world, x, y);
+      const result = handle(ctx);
       if (result.isFinished) break;
     }
     sendEnergy(this, world, Math.floor(this.age * AGE_ENERGY_COST_FACTOR));

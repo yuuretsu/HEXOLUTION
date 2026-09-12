@@ -36,7 +36,7 @@ export abstract class WorldItemStatic {
     return [100, 100, 100, 255];
   }
 
-  handleAttack(_world: World, _strength: number): { energy: number } {
+  handleAttack(_ambient: { energy: number }, _strength: number): { energy: number } {
     staticAttackResult.energy = 0;
     return staticAttackResult;
   }
@@ -61,13 +61,18 @@ export const sendEnergy = (from: { energy: number }, to: { energy: number }, amo
   to.energy += energy;
 };
 
-export class World {
-  readonly grid: IGrid<WorldItem>;
-  readonly totalEnergy: number;
+export type World = {
+  grid: IGrid<WorldItem>;
   energy: number;
-  constructor(width: number, height: number) {
-    this.grid = new GridMap(width, height)
-    this.totalEnergy = width * height * ENERGY_PER_CELL;
-    this.energy = this.totalEnergy;
-  }
-}
+  readonly totalEnergy: number;
+};
+
+/** Create a world with an empty grid and full ambient energy pool. */
+export const createWorld = (width: number, height: number): World => {
+  const totalEnergy = width * height * ENERGY_PER_CELL;
+  return {
+    grid: new GridMap(width, height),
+    totalEnergy,
+    energy: totalEnergy,
+  };
+};

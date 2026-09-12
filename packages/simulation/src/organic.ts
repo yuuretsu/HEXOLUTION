@@ -60,7 +60,7 @@ export class Organic extends WorldItemDynamic {
     }
   }
 
-  handleAttack(_world: World, strength: number): { energy: number } {
+  handleAttack(_ambient: { energy: number }, strength: number): { energy: number } {
     attackResult.energy = 0;
     sendEnergy(this, attackResult, strength);
     return attackResult;

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { World } from "../world";
+import { createWorld } from "../world";
 import { Stone } from "../stone";
 import { GRID_CELL_STRIDE, GRID_LAYOUT_VERSION, readCell } from "./grid-layout";
 import { CellKind } from "./types";
@@ -7,7 +7,7 @@ import { GridPublisher } from "./grid-publisher";
 
 describe("GridPublisher", () => {
   it("writes stone cells and bumps generation", () => {
-    const world = new World(2, 2);
+    const world = createWorld(2, 2);
     world.grid.set(0, 0, new Stone());
     const publisher = new GridPublisher(world);
     const first = publisher.publish(0, 0);
