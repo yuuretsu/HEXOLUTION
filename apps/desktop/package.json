@@ -21,7 +21,7 @@
     "appId": "com.hexolution.app",
     "productName": "HEXOLUTION",
     "directories": {
-      "output": "../../release"
+      "output": "release"
     },
     "files": [
       "dist/**/*"

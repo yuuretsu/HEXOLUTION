@@ -8,14 +8,14 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "npm run dev -w @hexolution/web",
-    "dev:host": "npm run dev:host -w @hexolution/web",
-    "build": "npm run build -w @hexolution/web",
+    "dev:web": "npm run dev -w @hexolution/web",
+    "dev:web:host": "npm run dev:host -w @hexolution/web",
     "dev:desktop": "concurrently -k \"npm run dev -w @hexolution/web\" \"npm run dev -w @hexolution/desktop\"",
+    "build:web": "npm run build -w @hexolution/web",
     "build:desktop": "npm run build -w @hexolution/web && npm run build -w @hexolution/desktop",
-    "deploy": "npm run deploy -w @hexolution/web",
+    "preview:web": "npm run preview -w @hexolution/web",
+    "deploy:web": "npm run deploy -w @hexolution/web",
     "lint": "eslint .",
-    "preview": "npm run preview -w @hexolution/web",
     "test": "vitest run",
     "test:watch": "vitest"
   },

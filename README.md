@@ -8,28 +8,31 @@ npm workspaces: `apps/web`, `apps/desktop`, `packages/*`.
 npm install
 ```
 
-For deploy, copy `apps/web/.env.example` → `apps/web/.env` and set `REMOTE_USER`, `REMOTE_HOST`, `REMOTE_PATH`.
-
 ## Dev
 
 ```bash
-npm run dev
+npm run dev:web
+npm run dev:desktop
 ```
 
-Desktop (Electron wrapping web): `npm run dev:desktop`
+`dev:desktop` starts the web Vite server and Electron together.
 
 ## Build
 
 ```bash
-npm run build
+npm run build:web
+npm run build:desktop
 ```
 
-Web output: `apps/web/dist/`. Desktop: `npm run build:desktop` → `release/`.
+- Web → `apps/web/dist/`
+- Desktop → `apps/desktop/release/` (builds web first, then packages Electron)
 
 ## Deploy
 
-Builds web and uploads `apps/web/dist/` to the server:
+Copy `apps/web/.env.example` → `apps/web/.env` and set `REMOTE_USER`, `REMOTE_HOST`, `REMOTE_PATH`.
 
 ```bash
-npm run deploy
+npm run deploy:web
 ```
+
+Builds web and uploads `apps/web/dist/` to the server.
