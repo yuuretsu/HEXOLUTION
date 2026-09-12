@@ -39,9 +39,15 @@ const sharedTsRules = {
 }
 
 export default defineConfig([
-  globalIgnores(['dist', 'release', '**/node_modules/**', 'packages/*/dist/**']),
+  globalIgnores([
+    'dist',
+    'release',
+    '**/node_modules/**',
+    'packages/*/dist/**',
+    'apps/*/dist/**',
+  ]),
   {
-    files: ['packages/**/*.{ts,tsx}', 'src/**/*.{ts,tsx}'],
+    files: ['packages/**/*.{ts,tsx}', 'apps/web/src/**/*.{ts,tsx}'],
     extends: [js.configs.recommended, tseslint.configs.recommended],
     languageOptions: {
       ecmaVersion: 2020,
@@ -54,7 +60,7 @@ export default defineConfig([
     rules: sharedTsRules,
   },
   {
-    files: ['src/**/*.{ts,tsx}'],
+    files: ['apps/web/src/**/*.{ts,tsx}'],
     extends: [
       reactHooks.configs.flat.recommended,
       reactRefresh.configs.vite,

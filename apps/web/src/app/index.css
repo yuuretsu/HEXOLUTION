@@ -61,26 +61,3 @@ td {
   box-shadow: inset 0 0 32px rgba(131, 131, 131, 0.3);
   backdrop-filter: blur(32px) saturate(2) brightness(0.5);
 }
-
-.drag-region-container {
-  display: none;
-}
-
-.is-electron .drag-region-container {
-  display: flex;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 38px;
-  -webkit-app-region: drag;
-}
-
-.drag-handle {
-  mask-image: linear-gradient(to bottom, black, transparent);
-  width: 100%;
-}
-
-.is-fullscreen .drag-region-container {
-  display: none !important;
-}

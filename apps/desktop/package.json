@@ -1,0 +1,36 @@
+{
+  "name": "@hexolution/desktop",
+  "private": true,
+  "version": "0.1.0",
+  "main": "main.cjs",
+  "scripts": {
+    "dev": "wait-on tcp:5173 && cross-env VITE_DEV_SERVER_URL=http://localhost:5173 electron .",
+    "build": "electron-builder",
+    "start": "electron ."
+  },
+  "devDependencies": {
+    "cross-env": "^10.1.0",
+    "electron": "^37.7.1",
+    "electron-builder": "^26.15.3",
+    "wait-on": "^9.1.0"
+  },
+  "build": {
+    "appId": "com.hexolution.app",
+    "productName": "HEXOLUTION",
+    "directories": {
+      "output": "../../release"
+    },
+    "files": [
+      "main.cjs"
+    ],
+    "extraResources": [
+      {
+        "from": "../web/dist",
+        "to": "web-dist"
+      }
+    ],
+    "mac": {
+      "icon": "../web/public/icon.png"
+    }
+  }
+}

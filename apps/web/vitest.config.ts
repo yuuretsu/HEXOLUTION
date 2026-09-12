@@ -1,12 +1,10 @@
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
+  resolve: { tsconfigPaths: true },
   test: {
     environment: "node",
-    include: [
-      "apps/web/src/**/*.test.ts",
-      "packages/*/src/**/*.test.ts",
-    ],
+    include: ["src/**/*.test.ts"],
     passWithNoTests: true,
   },
 });
