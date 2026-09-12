@@ -23,21 +23,25 @@ Turn the repo into an npm workspaces monorepo and extract the simulation into `@
 | Packages | `packages/shared`, `packages/simulation` |
 | Dev linking | Source exports; Vite resolves workspace packages without a separate sim build |
 | Root scripts | Unchanged entry points; orchestrate workspace as needed under the hood |
+| Lint / TS | One shared ESLint + shared TypeScript baseline for app and packages |
 
 ## Layout
 
 ```
 /
   package.json                 # workspaces: ["packages/*"], existing scripts
+  eslint.config.js             # single flat config covering app + packages/*
+  tsconfig.base.json           # shared compilerOptions (strict, module, etc.)
+  tsconfig.json                # project references: app + packages
   packages/
     shared/                    # @hexolution/shared
       package.json
       src/
-      tsconfig.json
+      tsconfig.json            # extends base
     simulation/                # @hexolution/simulation
       package.json
       src/                     # former src/simulation + sim constants
-      tsconfig.json
+      tsconfig.json            # extends base
   src/                         # app (simulation/ removed)
   ...
 ```
@@ -100,21 +104,37 @@ Everything else simulation currently takes from `@/shared` stays inside packages
 - Root `package.json`: `"workspaces": ["packages/*"]`
 - Each package: `"name"`, `"private": true`, `"type": "module"`, `exports` pointing at TypeScript sources for Vite
 - App imports: replace `@/simulation/...` with `@hexolution/simulation` (and subpath exports if needed)
-- Root `npm test` runs vitest across app + packages (simulation tests move with the package)
+- Root `npm test` runs vitest across app + packages (simulation tests move with the package; include `packages/*/src/**/*.test.ts`)
 - Root `npm run build` / `dev` continue to build/serve the app; workspace packages are consumed as source
+
+### Shared ESLint
+
+- Keep a **single** root `eslint.config.js` that lints `src/**` and `packages/*/src/**`
+- Same rule set for everyone (complexity, naming-convention, no `as` assertions, type imports, etc.)
+- React Hooks / React Refresh plugins apply only to app/React files (e.g. `src/**/*.{ts,tsx}`); packages stay on the shared TS rules without React-specific constraints
+- Root `npm run lint` remains the one command
+
+### Shared TypeScript
+
+- Extract common `compilerOptions` into root `tsconfig.base.json` (strictness, moduleResolution bundler, verbatimModuleSyntax, target, etc.)
+- App (`tsconfig.app.json`) and each package `tsconfig.json` **extend** the base; packages omit DOM/JSX unless needed (`shared` / `simulation` are DOM-free)
+- Root `tsconfig.json` project references include app + packages so `tsc -b` typechecks the workspace
+- Vite checker / build continue to typecheck the app graph, which pulls in workspace packages via imports
 
 ## Migration outline
 
-1. Add workspace root config and scaffold `packages/shared`, `packages/simulation`
-2. Move shared primitives into `@hexolution/shared`; update simulation imports
-3. Move `src/simulation` into `@hexolution/simulation`; add public exports (`geneIdFromBases`, constants)
-4. Point app + worker at the new packages; drop `@/simulation` path usage
-5. Apply UI-local `lerpRgb` and program gene grouping; wire `geneIdFromBases` / `MAX_CELL_ENERGY` / `Rgba`
-6. Ensure `npm run dev`, `npm test`, `npm run build` work from root
+1. Add workspace root config, shared `tsconfig.base.json`, and scaffold `packages/shared`, `packages/simulation`
+2. Point root ESLint + vitest at `packages/*`; wire TS project references
+3. Move shared primitives into `@hexolution/shared`; update simulation imports
+4. Move `src/simulation` into `@hexolution/simulation`; add public exports (`geneIdFromBases`, constants)
+5. Point app + worker at the new packages; drop `@/simulation` path usage
+6. Apply UI-local `lerpRgb` and program gene grouping; wire `geneIdFromBases` / `MAX_CELL_ENERGY` / `Rgba`
+7. Ensure `npm run dev`, `npm test`, `npm run build`, `npm run lint` work from root
 
 ## Success criteria
 
-- From repo root: `npm run dev`, `npm test`, `npm run build` work as before
+- From repo root: `npm run dev`, `npm test`, `npm run build`, `npm run lint` work as before
+- App and packages share one ESLint rule baseline and one TS base config
 - Simulation has no imports from app source
 - Program UI uses `geneIdFromBases`; colorizer uses local `lerpRgb` and imported `MAX_CELL_ENERGY`
 - No `World` refactor in this change
