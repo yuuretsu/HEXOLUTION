@@ -1,5 +1,4 @@
 import type { FC } from "react";
-import { chunk } from "@/shared/utils";
 import { ProgramTriplet } from "./program-triplet";
 import styles from "./program.module.css";
 
@@ -8,11 +7,19 @@ type ProgramProps = {
   activeGeneIndices?: number[];
 };
 
+const groupIntoGenes = (program: number[]): number[][] => {
+  const genes: number[][] = [];
+  for (let i = 0; i < program.length; i += 3) {
+    genes.push(program.slice(i, i + 3));
+  }
+  return genes;
+};
+
 export const Program: FC<ProgramProps> = ({
   program,
   activeGeneIndices = [],
 }) => {
-  const triplets = chunk(program, 3);
+  const triplets = groupIntoGenes(program);
   const activeSet = new Set(activeGeneIndices);
   const lastGeneIndex = activeGeneIndices.at(-1);
 

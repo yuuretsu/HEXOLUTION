@@ -1,8 +1,8 @@
 import type { FC } from "react";
 import { Stack } from "@/shared/ui/stack";
 import { Text } from "@/shared/ui/text";
-import { base4toInt } from "@/shared/utils";
 import { useGeneMeta } from "@/shared/hooks/use-gene-meta";
+import { geneIdFromBases } from "@hexolution/simulation";
 import styles from "./program-triplet.module.css";
 
 type ProgramTripletProps = {
@@ -17,7 +17,7 @@ export const ProgramTriplet: FC<ProgramTripletProps> = ({
   isLast,
 }) => {
   const genes = useGeneMeta();
-  const n = base4toInt(bases[0], bases[1], bases[2]);
+  const n = geneIdFromBases(bases[0], bases[1], bases[2]);
   const gene = genes.length ? genes[n % genes.length] : null;
   const geneColor = gene?.color ?? [100, 100, 100, 255];
   const symbols = bases.map((x) => ["A", "T", "G", "C"][x]);

@@ -1,10 +1,10 @@
-import { MAX_CELL_ENERGY } from "@/shared/constants";
-import type { Rgba, ViewMode } from "@/shared/types";
-import { lerpRgb } from "@/shared/utils";
+import type { ViewMode } from "@/shared/types";
+import type { Rgba } from "@hexolution/shared";
 import {
   CellKind,
   GRID_LAYOUT_VERSION,
   LAST_GENE_NONE,
+  MAX_CELL_ENERGY,
   readCell,
   type GeneMeta,
   type Rgb,
@@ -32,6 +32,14 @@ export type ColorizeGridResult = {
   buffer: ArrayBuffer;
   width: number;
   height: number;
+};
+
+const lerp = (a: number, b: number, t: number) => a * (1 - t) + b * t;
+
+const lerpRgb = (a: Rgba, b: Rgba, t: number) => {
+  a[0] = lerp(a[0], b[0], t);
+  a[1] = lerp(a[1], b[1], t);
+  a[2] = lerp(a[2], b[2], t);
 };
 
 const packRgba = (r: number, g: number, b: number, a = 255) =>

@@ -22,13 +22,3 @@ export const CREATURE_SPAWN_ATTEMPTS = 50_000;
 
 /** How often to refresh render progress while spawning creatures. */
 export const CREATURE_SPAWN_PROGRESS_EVERY = 10_000;
-
-export {
-  MAX_CELL_ENERGY,
-  ENERGY_PER_CELL,
-  GENOME_LENGTH,
-  GENES_PER_TICK,
-  GENOME_MUTATION_RATE,
-  COLORATION_MUTATION_RATE,
-  AGE_ENERGY_COST_FACTOR,
-} from "@hexolution/simulation";

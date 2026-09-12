@@ -1,7 +1,6 @@
 import {
   CREATURE_SPAWN_ATTEMPTS,
   CREATURE_SPAWN_PROGRESS_EVERY,
-  GENOME_LENGTH,
   HEX_ASPECT,
   INITIAL_CREATURE_ENERGY,
   STONE_BLOB_COUNT,
@@ -9,6 +8,7 @@ import {
 import type { IGrid } from "@hexolution/shared";
 import {
   Creature,
+  GENOME_LENGTH,
   Stone,
   Tape,
   sendEnergy,
