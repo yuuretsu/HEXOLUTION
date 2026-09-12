@@ -1,5 +1,5 @@
 import type { GeneMeta } from "@hexolution/simulation";
-import { workerApi } from "@/shared/worker-client";
+import { workerApi } from "./worker-client";
 
 let meta: GeneMeta[] | null = null;
 let pending: Promise<GeneMeta[]> | null = null;

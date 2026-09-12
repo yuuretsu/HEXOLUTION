@@ -2,6 +2,7 @@ import "./index.css";
 import { createRoot } from "react-dom/client";
 import { StrictMode } from "react";
 import { App } from "./app";
+import { startWorkerApi } from "@/shared/api";
 
 type ElectronApi = {
   ipcRenderer: {
@@ -16,32 +17,40 @@ type ElectronWindow = Window & {
   electron?: ElectronApi;
 };
 
-const isElectron = navigator.userAgent.toLowerCase().includes('electron');
+const bootstrap = () => {
+  const isElectron = navigator.userAgent.toLowerCase().includes("electron");
 
-if (isElectron) {
-  document.body.classList.add('is-electron');
+  if (isElectron) {
+    document.body.classList.add("is-electron");
 
-  const electronWindow: ElectronWindow = window;
-  electronWindow.electron?.ipcRenderer?.on('fullscreen-state', (_event, isFullscreen) => {
-    console.log(isFullscreen);
-    if (isFullscreen) {
-      document.body.classList.add('is-fullscreen');
-    } else {
-      document.body.classList.remove('is-fullscreen');
-    }
-  });
-}
-
-document.addEventListener('wheel', function (event) {
-  if (event.ctrlKey) {
-    event.preventDefault();
+    const electronWindow: ElectronWindow = window;
+    electronWindow.electron?.ipcRenderer?.on("fullscreen-state", (_event, isFullscreen) => {
+      console.log(isFullscreen);
+      if (isFullscreen) {
+        document.body.classList.add("is-fullscreen");
+      } else {
+        document.body.classList.remove("is-fullscreen");
+      }
+    });
   }
-}, { passive: false });
 
+  document.addEventListener(
+    "wheel",
+    (event) => {
+      if (event.ctrlKey) {
+        event.preventDefault();
+      }
+    },
+    { passive: false },
+  );
 
+  startWorkerApi();
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-)
+  createRoot(document.getElementById("root")!).render(
+    <StrictMode>
+      <App />
+    </StrictMode>,
+  );
+};
+
+bootstrap();

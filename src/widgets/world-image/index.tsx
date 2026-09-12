@@ -1,11 +1,10 @@
 import { useEffect, useRef, type FC } from "react";
-import { useViewMode } from "@/features/change-view-mode/use-view-mode";
-import { useGeneMeta } from "@/shared/hooks/use-gene-meta";
+import { useViewMode } from "@/features/change-view-mode";
+import { useGeneMeta, workerApi } from "@/shared/api";
 import { colorizeGrid } from "@/shared/render/grid-colorizer";
 import { HexagonsGl, useHexagonsApi } from "@/shared/ui/hexagons-gl";
 import type { GridBufferMeta, GeneMeta } from "@hexolution/simulation";
 import type { ViewMode } from "@/shared/types";
-import { workerApi } from "@/shared/worker-client";
 
 export type WorldImageProps = {
   onClickPixel?: (x: number, y: number) => void;

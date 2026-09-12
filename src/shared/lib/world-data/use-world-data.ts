@@ -1,5 +1,5 @@
 import { createContext, useContext } from "react";
-import type { WorldData } from "@/shared/worker-protocol";
+import type { WorldData } from "@/shared/api";
 
 export type ChartData = {
   creatures: [number, number][];

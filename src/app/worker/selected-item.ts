@@ -1,4 +1,4 @@
-import type { SelectedItemData } from "@/shared/worker-protocol";
+import type { SelectedItemData } from "@/shared/api";
 import {
   Creature,
   Organic,

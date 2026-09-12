@@ -1,7 +1,7 @@
 import type { FC } from "react";
 import { Stack } from "@/shared/ui/stack";
 import { Text } from "@/shared/ui/text";
-import { useGeneMeta } from "@/shared/hooks/use-gene-meta";
+import { useGeneMeta } from "@/shared/api";
 import { geneIdFromBases } from "@hexolution/simulation";
 import styles from "./program-triplet.module.css";
 

@@ -1,5 +1,5 @@
 import type { FC } from "react";
-import { useWorkerEvent } from "@/shared/hooks/use-worker-event";
+import { useWorkerEvent } from "@/shared/lib/world-data";
 import { Stack } from "@/shared/ui/stack";
 import { Text } from "@/shared/ui/text";
 import { WorldEntityCreature } from "./ui/world-entity-creature";

@@ -57,7 +57,11 @@ export class WorkerClient<
     };
   }
 
+  private isListening = false;
+
   listen() {
+    if (this.isListening) return;
+    this.isListening = true;
     this.worker.onmessage = (e) => {
       const { id, result, event, data } = e.data;
 
@@ -104,7 +108,13 @@ export class WorkerServer<
   Results extends { [Method in keyof Methods]: unknown },
   Events extends Record<string, unknown> = Record<string, unknown>
 > {
-  worker: Window & typeof globalThis;
+  private readonly worker: Window & typeof globalThis;
+  private readonly handlers: {
+    [Method in keyof Methods]: (
+      ...params: Methods[Method]
+    ) => HandlerReturn<Results[Method]>;
+  };
+  private isListening = false;
 
   constructor(
     worker: Window & typeof globalThis,
@@ -115,14 +125,20 @@ export class WorkerServer<
     }
   ) {
     this.worker = worker;
-    worker.addEventListener(
+    this.handlers = handlers;
+  }
+
+  listen() {
+    if (this.isListening) return;
+    this.isListening = true;
+    this.worker.addEventListener(
       "message",
       (e: MessageEvent<ClientRequest<Methods> | { id?: undefined }>) => {
         const message = e.data;
         if (message.id === undefined) return;
 
         const { id, method, params } = message;
-        const result = handlers[method](...params);
+        const result = this.handlers[method](...params);
         Promise.resolve(result).then((v) => {
           if (isTransferResult(v)) {
             this.worker.postMessage({ id, result: v.result }, { transfer: v.transfer });

@@ -1,5 +1,5 @@
 import type { FC } from "react";
-import type { SelectedCreatureData } from "@/shared/worker-protocol";
+import type { SelectedCreatureData } from "@/shared/api";
 import { Stack } from "@/shared/ui/stack";
 import { Text } from "@/shared/ui/text";
 import { Program } from "./program";

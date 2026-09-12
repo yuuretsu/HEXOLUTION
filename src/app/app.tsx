@@ -1,10 +1,10 @@
 import { useState, type FC } from "react";
 import { WorldImage } from "@/widgets/world-image";
-import { WorldDataProvider } from "@/shared/hooks/world-data-provider";
-import { ViewModeProvider } from "@/features/change-view-mode/view-mode-provider";
+import { WorldDataProvider } from "@/shared/lib/world-data";
+import { ViewModeProvider } from "@/features/change-view-mode";
 import { AppControls } from "@/widgets/app-controls";
 import { Sidebar } from "@/widgets/sidebar";
-import { workerApi } from "@/shared/worker-client";
+import { workerApi } from "@/shared/api";
 
 export const App: FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);

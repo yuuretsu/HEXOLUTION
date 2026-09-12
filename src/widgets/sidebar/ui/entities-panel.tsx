@@ -1,6 +1,7 @@
 import type { FC } from "react";
 import { HiSquaresPlus } from "react-icons/hi2";
-import { useWorldData } from "@/shared/hooks/use-world-data";
+import { useWorldData } from "@/shared/lib/world-data";
+
 import { Chart } from "@/shared/ui/chart";
 import { Entries } from "@/shared/ui/entries";
 import { Panel } from "@/shared/ui/panel";

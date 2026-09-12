@@ -1,6 +1,6 @@
 import type { FC } from "react";
 import { HiSun } from "react-icons/hi2";
-import { useWorldData } from "@/shared/hooks/use-world-data";
+import { useWorldData } from "@/shared/lib/world-data";
 import { Panel } from "@/shared/ui/panel";
 import { Entries } from "@/shared/ui/entries";
 

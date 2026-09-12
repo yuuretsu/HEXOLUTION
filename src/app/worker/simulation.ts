@@ -1,5 +1,5 @@
 import { INITIAL_SIMULATION_SPEED, WORLD_HEIGHT, WORLD_WIDTH } from "@/shared/constants";
-import type { WorldData } from "@/shared/worker-protocol";
+import type { WorldData } from "@/shared/api";
 import {
   World,
   WorldItemDynamic,

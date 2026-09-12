@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { INITIAL_SIMULATION_SPEED } from "@/shared/constants";
-import { workerApi } from "@/shared/worker-client";
+import { workerApi } from "@/shared/api";
 
 export const useSimulationSpeed = () => {
   const [speed, setSpeed] = useState(INITIAL_SIMULATION_SPEED);
