@@ -1,10 +1,10 @@
-import { lerp, lerpRgb } from "@/shared/utils";
-import type { Rgba } from "@/shared/types";
-import { sendEnergy, World } from "@/simulation/world";
-import type { WorldItem } from "@/simulation/world";
+import { lerp, lerpRgb } from "@hexolution/shared";
+import type { Rgba } from "@hexolution/shared";
+import { sendEnergy, World } from "../world";
+import type { WorldItem } from "../world";
 import { Creature } from "./creature";
-import { Organic } from "@/simulation/organic";
-import { Stone } from "@/simulation/stone";
+import { Organic } from "../organic";
+import { Stone } from "../stone";
 import { GENE_CONTINUE, GENE_FINISHED, type GeneHandler } from "./gene-types";
 import {
   ATTACK_ENERGY_COST,

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { World } from "@/simulation/world";
-import { Stone } from "@/simulation/stone";
+import { World } from "../world";
+import { Stone } from "../stone";
 import { GRID_CELL_STRIDE, GRID_LAYOUT_VERSION, readCell } from "./grid-layout";
 import { CellKind } from "./types";
 import { GridPublisher } from "./grid-publisher";

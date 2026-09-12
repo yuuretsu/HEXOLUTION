@@ -1,1 +1,1 @@
-export { Creature } from "./creature";
+export { Creature } from "@hexolution/simulation";

@@ -1,0 +1,19 @@
+{
+  "name": "@hexolution/simulation",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./api/types": "./src/api/types.ts",
+    "./api/grid-layout": "./src/api/grid-layout.ts",
+    "./api/grid-publisher": "./src/api/grid-publisher.ts",
+    "./api/gene-meta": "./src/api/gene-meta.ts"
+  },
+  "dependencies": {
+    "@hexolution/shared": "*"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  }
+}

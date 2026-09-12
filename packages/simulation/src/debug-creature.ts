@@ -1,7 +1,7 @@
-import type { Rgba } from "@/shared/types";
-import { clampCycle } from "@/shared/utils";
-import type { World} from "@/simulation/world";
-import { WorldItemDynamic } from "@/simulation/world";
+import type { Rgba } from "@hexolution/shared";
+import { clampCycle } from "@hexolution/shared";
+import type { World} from "./world";
+import { WorldItemDynamic } from "./world";
 
 export class DebugCreature extends WorldItemDynamic {
   readonly CLASS_NAME = "DebugCreature";

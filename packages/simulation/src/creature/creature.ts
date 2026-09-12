@@ -1,17 +1,14 @@
-import { Dichotomy } from "@/simulation/dichotomy";
-import { getRandomBase4, Tape } from "@/simulation/tape";
-import type { Rgba } from "@/shared/types";
+import { Dichotomy } from "../dichotomy";
+import { getRandomBase4, Tape } from "../tape";
+import type { Rgba } from "@hexolution/shared";
 import {
   createRandom,
   hslaToRgba,
   lerpRgb,
   mutateColorInto,
   randomLightColorInto,
-  base4toInt,
-} from "@/shared/utils";
-import { ObjectPool } from "@/shared/utils/object-pool";
-import { sendEnergy, WorldItemDynamic, type World } from "@/simulation/world";
-import { DEFAULT_GENE_COLOR, getGeneColor, getGeneHandler } from "./genes";
+} from "@hexolution/shared";
+import { ObjectPool } from "@hexolution/shared";
 import {
   AGE_ENERGY_COST_FACTOR,
   COLORATION_MUTATION_RATE,
@@ -19,8 +16,11 @@ import {
   GENOME_LENGTH,
   GENOME_MUTATION_RATE,
   MAX_CELL_ENERGY,
-} from "@/shared/constants";
-import { Organic } from "@/simulation/organic";
+} from "../constants";
+import { geneIdFromBases } from "../gene-id";
+import { Organic } from "../organic";
+import { sendEnergy, WorldItemDynamic, type World } from "../world";
+import { DEFAULT_GENE_COLOR, getGeneColor, getGeneHandler } from "./genes";
 
 const creaturePool = new ObjectPool(
   () => new Creature(0, new Tape(new Uint8Array(GENOME_LENGTH)), 0, [0, 0, 0, 255], [0, 0, 0, 255]),
@@ -210,7 +210,7 @@ export class Creature extends WorldItemDynamic {
     const geneIndex = this.activeGeneIndices.at(-1);
     if (geneIndex === undefined) return DEFAULT_GENE_COLOR;
     const offset = geneIndex * 3;
-    const n = base4toInt(
+    const n = geneIdFromBases(
       this.tape.data[offset],
       this.tape.data[offset + 1],
       this.tape.data[offset + 2],

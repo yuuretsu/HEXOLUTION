@@ -1,4 +1,4 @@
-import type { Rgba } from "@/shared/types";
+import type { Rgba } from "@hexolution/shared";
 import {
   COLOR_ATTACK,
   COLOR_MOVE_FORWARD,
