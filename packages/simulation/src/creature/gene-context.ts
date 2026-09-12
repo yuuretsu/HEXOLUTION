@@ -43,7 +43,7 @@ export class GeneContext {
   }
 
   /** Ambient energy as a 0..1 abundance factor (squared). */
-  ambientAbundance(shareOfTotal: number): number {
+  getAmbientAbundance(shareOfTotal: number): number {
     return Math.min(1, this.world.energy / (this.world.totalEnergy * shareOfTotal)) ** 2;
   }
 
@@ -51,7 +51,7 @@ export class GeneContext {
    * Hex coords from current cell along an absolute facing `direction`.
    * Writes into `out` (or a shared scratch) and returns it.
    */
-  cellCoords(
+  getCellCoords(
     direction: number,
     distance = 1,
     out: [number, number] = scratch,
@@ -80,7 +80,7 @@ export class GeneContext {
   }
 
   /** Ambient energy pool (for `handleAttack` and similar). */
-  get energyPool(): { energy: number } {
+  getEnergyPool(): { energy: number } {
     return this.world;
   }
 }
