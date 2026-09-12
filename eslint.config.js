@@ -47,7 +47,7 @@ export default defineConfig([
     'apps/*/dist/**',
   ]),
   {
-    files: ['packages/**/*.{ts,tsx}', 'apps/web/src/**/*.{ts,tsx}'],
+    files: ['packages/**/*.{ts,tsx}', 'apps/web/src/**/*.{ts,tsx}', 'apps/desktop/src/**/*.{ts,tsx}'],
     extends: [js.configs.recommended, tseslint.configs.recommended],
     languageOptions: {
       ecmaVersion: 2020,
@@ -58,6 +58,12 @@ export default defineConfig([
       },
     },
     rules: sharedTsRules,
+  },
+  {
+    files: ['apps/desktop/src/**/*.{ts,tsx}'],
+    languageOptions: {
+      globals: globals.node,
+    },
   },
   {
     files: ['apps/web/src/**/*.{ts,tsx}'],

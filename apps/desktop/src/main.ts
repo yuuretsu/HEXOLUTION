@@ -1,5 +1,5 @@
-const { app, BrowserWindow, Menu } = require("electron");
-const path = require("path");
+import path from "node:path";
+import { app, BrowserWindow, Menu } from "electron";
 
 const DRAG_REGION_ID = "hexolution-desktop-drag";
 const FULLSCREEN_CLASS = "hexolution-desktop-fullscreen";
@@ -29,10 +29,10 @@ const ensureDragRegionScript = `
 })();
 `;
 
-const setFullscreenClassScript = (isFullscreen) =>
+const setFullscreenClassScript = (isFullscreen: boolean) =>
   `document.body.classList.toggle("${FULLSCREEN_CLASS}", ${isFullscreen ? "true" : "false"});`;
 
-const installDesktopChrome = async (win) => {
+const installDesktopChrome = async (win: BrowserWindow) => {
   await win.webContents.insertCSS(DESKTOP_CHROME_CSS);
   await win.webContents.executeJavaScript(ensureDragRegionScript);
 };
@@ -40,13 +40,13 @@ const installDesktopChrome = async (win) => {
 const createWindow = () => {
   const mainWindow = new BrowserWindow({
     titleBarStyle: "hiddenInset",
-    icon: path.join(__dirname, "../web/public/icon.png"),
+    icon: path.join(__dirname, "../../web/public/icon.png"),
     center: true,
+    acceptFirstMouse: true,
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false,
       backgroundThrottling: false,
-      acceptFirstMouse: true,
     },
   });
 
@@ -75,7 +75,7 @@ const createWindow = () => {
 
   const distIndex = app.isPackaged
     ? path.join(process.resourcesPath, "web-dist", "index.html")
-    : path.join(__dirname, "../web/dist/index.html");
+    : path.join(__dirname, "../../web/dist/index.html");
   void mainWindow.loadFile(distIndex);
 };
 
