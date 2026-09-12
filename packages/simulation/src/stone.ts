@@ -8,7 +8,8 @@ export class Stone extends WorldItemStatic {
 
   constructor() {
     super();
-    const br = Math.floor(Math.random() ** 5 * 20 + 50);
+    const offset = Math.floor(Math.random() ** 3 * 20);
+    const br = Math.random() < 0.5 ? 50 + offset : Math.max(25, 50 - offset);
     this.color = [br, br, br, 255];
   }
 
