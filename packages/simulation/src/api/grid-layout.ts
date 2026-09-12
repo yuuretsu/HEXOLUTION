@@ -1,10 +1,14 @@
 import { CellKind, type CellSnapshot } from "./types";
 
 export { CellKind };
+/** Bytes per packed grid cell. */
 export const GRID_CELL_STRIDE = 16;
+/** Packed layout version for buffer consumers. */
 export const GRID_LAYOUT_VERSION = 1;
+/** Sentinel: cell has no last gene. */
 export const LAST_GENE_NONE = 255;
 
+/** Write a cell snapshot into the packed grid buffer. */
 export const writeCell = (view: DataView, cellIndex: number, cell: CellSnapshot): void => {
   const o = cellIndex * GRID_CELL_STRIDE;
   view.setUint8(o + 0, cell.kind);
@@ -24,6 +28,7 @@ export const writeCell = (view: DataView, cellIndex: number, cell: CellSnapshot)
   view.setUint8(o + 15, 0);
 };
 
+/** Read a cell snapshot from the packed grid buffer. */
 export const readCell = (view: DataView, cellIndex: number): CellSnapshot => {
   const o = cellIndex * GRID_CELL_STRIDE;
   const kindByte = view.getUint8(o + 0);
@@ -43,6 +48,7 @@ export const readCell = (view: DataView, cellIndex: number): CellSnapshot => {
   };
 };
 
+/** Clear a packed cell to empty. */
 export const clearCell = (view: DataView, cellIndex: number): void => {
   writeCell(view, cellIndex, {
     kind: CellKind.Empty,

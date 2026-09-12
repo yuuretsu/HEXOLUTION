@@ -70,6 +70,7 @@ export class GridPublisher {
     this.activeView = new DataView(this.activeBuffer);
   }
 
+  /** Pack the world grid into the active buffer and collect stats. */
   publish(selectedId: number, worldAge: number): PublishResult {
     const entries = new Counter<string>();
     const energy = { creatures: 0, organic: 0 };
@@ -119,6 +120,7 @@ export class GridPublisher {
     };
   }
 
+  /** Take the latest unread packed buffer for transfer (or null). */
   getLatest(): GridBufferMeta | null {
     if (!this.hasUnread) return null;
 
@@ -142,6 +144,7 @@ export class GridPublisher {
     };
   }
 
+  /** Return a transferred buffer to the pool. */
   returnBuffer(buffer: ArrayBuffer) {
     if (buffer.byteLength !== this.byteLength) return;
     if (this.freeBuffers.length >= POOL_LIMIT) return;

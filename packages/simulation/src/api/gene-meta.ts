@@ -4,6 +4,7 @@ import type { GeneMeta } from "./types";
 
 let cached: GeneMeta[] | null = null;
 
+/** Gene id/name/color table for UI (cached). */
 export const getGeneMeta = (): GeneMeta[] => {
   if (cached) return cached;
   cached = GENE_HANDLERS.map((handler, id) => {
