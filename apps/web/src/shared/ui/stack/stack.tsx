@@ -1,5 +1,5 @@
 import type { FC, PropsWithChildren } from "react";
-import clsx from "clsx";
+import { clsx } from "clsx";
 import styles from "./stack.module.css";
 
 export type StackAlign = "start" | "center" | "end" | "stretch";

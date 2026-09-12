@@ -1,6 +1,6 @@
 import type { FC, PropsWithChildren } from "react";
 import type { IconType } from "react-icons";
-import clsx from "clsx";
+import { clsx } from "clsx";
 import { Stack } from "@/shared/ui/stack";
 import { PanelTitle } from "./panel-title";
 import styles from "./panel.module.css";

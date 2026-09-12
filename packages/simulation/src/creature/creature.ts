@@ -7,8 +7,8 @@ import {
   lerpRgb,
   mutateColorInto,
   randomLightColorInto,
+  ObjectPool,
 } from "@hexolution/shared";
-import { ObjectPool } from "@hexolution/shared";
 import {
   AGE_ENERGY_COST_FACTOR,
   COLORATION_MUTATION_RATE,

@@ -4,7 +4,7 @@ import type {
   ReactElement,
   ReactNode,
 } from "react";
-import clsx from "clsx";
+import { clsx } from "clsx";
 import styles from "./text.module.css";
 
 export type TextSize = "sm";

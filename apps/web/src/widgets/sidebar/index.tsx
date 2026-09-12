@@ -1,5 +1,5 @@
 import type { FC } from "react";
-import clsx from "clsx";
+import { clsx } from "clsx";
 import { Stack } from "@/shared/ui/stack";
 import styles from "./sidebar.module.css";
 import { EnergyPanel } from "./ui/energy-panel";

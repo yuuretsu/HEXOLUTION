@@ -1,6 +1,6 @@
 import { ENERGY_PER_CELL } from "./constants";
-import type { Rgba } from "@hexolution/shared";
-import { GridMap, type IGrid } from "@hexolution/shared";
+import type { Rgba, IGrid } from "@hexolution/shared";
+import { GridMap } from "@hexolution/shared";
 
 const staticAttackResult = { energy: 0 };
 let nextWorldItemId = 1;

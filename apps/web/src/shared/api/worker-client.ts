@@ -1,6 +1,6 @@
 import type { WorkerApi, WorkerApiEvents, WorkerApiResults } from "./worker-protocol";
 import { WorkerClient } from "./worker-rpc";
-import SimulationWorker from "@/app/worker/index.ts?worker";
+import { SimulationWorker } from "./simulation-worker";
 
 export type { WorkerApiEvents, WorldData } from "./worker-protocol";
 

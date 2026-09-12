@@ -1,5 +1,5 @@
-import { sendEnergy, type World } from "../world";
-import type { WorldItem } from "../world";
+import { sendEnergy } from "../world";
+import type { WorldItem, World } from "../world";
 import type { Creature } from "./creature";
 
 const scratch: [number, number] = [0, 0];

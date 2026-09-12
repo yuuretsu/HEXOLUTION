@@ -4,6 +4,8 @@ import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
 import tseslint from 'typescript-eslint'
 import { defineConfig, globalIgnores } from 'eslint/config'
+import { createNodeResolver, importX } from 'eslint-plugin-import-x'
+import { createTypeScriptImportResolver } from 'eslint-import-resolver-typescript'
 
 const sharedTsRules = {
   'func-style': ['error', 'expression'],
@@ -48,7 +50,12 @@ export default defineConfig([
   ]),
   {
     files: ['packages/**/*.{ts,tsx}', 'apps/web/src/**/*.{ts,tsx}', 'apps/desktop/src/**/*.{ts,tsx}'],
-    extends: [js.configs.recommended, tseslint.configs.recommended],
+    extends: [
+      js.configs.recommended,
+      tseslint.configs.recommended,
+      importX.flatConfigs.recommended,
+      importX.flatConfigs.typescript,
+    ],
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
@@ -56,6 +63,20 @@ export default defineConfig([
         projectService: true,
         tsconfigRootDir: import.meta.dirname,
       },
+    },
+    settings: {
+      'import-x/resolver-next': [
+        createTypeScriptImportResolver({
+          project: [
+            'apps/web/tsconfig.app.json',
+            'apps/desktop/tsconfig.json',
+            'packages/shared/tsconfig.json',
+            'packages/simulation/tsconfig.json',
+          ],
+          noWarnOnMultipleProjects: true,
+        }),
+        createNodeResolver(),
+      ],
     },
     rules: sharedTsRules,
   },

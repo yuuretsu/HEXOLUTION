@@ -1,5 +1,5 @@
 import type { FC, MouseEvent, PropsWithChildren } from "react";
-import clsx from "clsx";
+import { clsx } from "clsx";
 import { Stack } from "@/shared/ui/stack";
 import { Text } from "@/shared/ui/text";
 import { RippleLayer, useRipple } from "@/shared/ui/ripple";

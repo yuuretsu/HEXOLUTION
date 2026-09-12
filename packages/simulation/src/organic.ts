@@ -1,6 +1,5 @@
 import type { Rgba } from "@hexolution/shared";
-import { lerpRgb } from "@hexolution/shared";
-import { ObjectPool } from "@hexolution/shared";
+import { lerpRgb, ObjectPool } from "@hexolution/shared";
 import { sendEnergy, WorldItemDynamic, type World } from "./world";
 import { MAX_CELL_ENERGY } from "./constants";
 

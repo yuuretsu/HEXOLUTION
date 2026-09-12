@@ -1,6 +1,6 @@
 import { type ElementType, type ComponentPropsWithoutRef, type ReactElement, type MouseEvent } from "react";
 import type { IconType } from "react-icons";
-import clsx from "clsx";
+import { clsx } from "clsx";
 import { RippleLayer, useRipple } from "@/shared/ui/ripple";
 import styles from "./icon-button.module.css";
 
