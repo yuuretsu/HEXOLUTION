@@ -1,4 +1,4 @@
-import type { GeneMeta } from "@/simulation/api/types";
+import type { GeneMeta } from "@hexolution/simulation";
 import { workerApi } from "@/shared/worker-client";
 
 let meta: GeneMeta[] | null = null;

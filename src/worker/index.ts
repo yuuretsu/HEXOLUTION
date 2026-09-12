@@ -1,6 +1,6 @@
 import { WorkerServer, withTransfer } from "@/shared/utils/worker-api";
 import type { WorkerApi, WorkerApiEvents, WorkerApiResults } from "@/shared/worker-protocol";
-import { getGeneMeta } from "@/simulation/api/gene-meta";
+import { getGeneMeta } from "@hexolution/simulation";
 import { Simulation } from "./simulation";
 
 const simulation = new Simulation({

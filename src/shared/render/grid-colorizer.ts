@@ -6,8 +6,9 @@ import {
   GRID_LAYOUT_VERSION,
   LAST_GENE_NONE,
   readCell,
-} from "@/simulation/api/grid-layout";
-import type { GeneMeta, Rgb } from "@/simulation/api/types";
+  type GeneMeta,
+  type Rgb,
+} from "@hexolution/simulation";
 import {
   DEFAULT_GENE_DISPLAY,
   ENERGY_COLOR_COLD,

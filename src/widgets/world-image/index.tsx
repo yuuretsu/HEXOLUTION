@@ -3,8 +3,7 @@ import { useViewMode } from "@/features/change-view-mode/use-view-mode";
 import { useGeneMeta } from "@/shared/hooks/use-gene-meta";
 import { colorizeGrid } from "@/shared/render/grid-colorizer";
 import { HexagonsGl, useHexagonsApi } from "@/shared/ui/hexagons-gl";
-import type { GridBufferMeta } from "@/simulation/api/types";
-import type { GeneMeta } from "@/simulation/api/types";
+import type { GridBufferMeta, GeneMeta } from "@hexolution/simulation";
 import type { ViewMode } from "@/shared/types";
 import { workerApi } from "@/shared/worker-client";
 

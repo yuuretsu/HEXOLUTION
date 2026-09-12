@@ -1,5 +1,5 @@
 import type { Rgba } from "@/shared/types";
-import type { GeneMeta, GridBufferMeta } from "@/simulation/api/types";
+import type { GeneMeta, GridBufferMeta } from "@hexolution/simulation";
 
 export type WorkerApi = {
   selectItem: [x: number, y: number] | [];

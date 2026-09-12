@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { GeneMeta } from "@/simulation/api/types";
+import type { GeneMeta } from "@hexolution/simulation";
 import { getCachedGeneMeta, loadGeneMeta } from "@/shared/gene-meta-store";
 
 export const useGeneMeta = (): GeneMeta[] => {

@@ -1,8 +1,10 @@
-import { Creature } from "@/simulation/creature";
-import { Organic } from "@/simulation/organic";
-import { Stone } from "@/simulation/stone";
 import type { SelectedItemData } from "@/shared/worker-protocol";
-import type { WorldItem } from "@/simulation/world";
+import {
+  Creature,
+  Organic,
+  Stone,
+  type WorldItem,
+} from "@hexolution/simulation";
 
 export const serializeSelectedItem = (item: WorldItem | null): SelectedItemData | null => {
   if (!item) return null;

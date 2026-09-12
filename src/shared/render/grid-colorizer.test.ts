@@ -4,7 +4,7 @@ import {
   writeCell,
   CellKind,
   LAST_GENE_NONE,
-} from "@/simulation/api/grid-layout";
+} from "@hexolution/simulation";
 import { colorizeGrid } from "./grid-colorizer";
 
 describe("colorizeGrid", () => {

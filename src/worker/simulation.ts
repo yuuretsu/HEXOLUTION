@@ -1,8 +1,12 @@
 import { INITIAL_SIMULATION_SPEED, WORLD_HEIGHT, WORLD_WIDTH } from "@/shared/constants";
 import type { WorldData } from "@/shared/worker-protocol";
-import { GridPublisher } from "@/simulation/api/grid-publisher";
-import type { GridBufferMeta } from "@/simulation/api/types";
-import { World, WorldItemDynamic, type WorldItem } from "@/simulation/world";
+import {
+  World,
+  WorldItemDynamic,
+  type WorldItem,
+  GridPublisher,
+  type GridBufferMeta,
+} from "@hexolution/simulation";
 import { serializeSelectedItem } from "./selected-item";
 import { populateWorld } from "./world-generator";
 
