@@ -12,11 +12,7 @@ type SidebarProps = {
 };
 
 export const Sidebar: FC<SidebarProps> = ({ isOpen }) => (
-  <div
-    className={clsx(styles.sidebar, {
-      [styles.sidebarHidden]: !isOpen,
-    })}
-  >
+  <div className={clsx(styles.sidebar, !isOpen && styles.sidebarHidden)}>
     <Stack dir="column" gap={16}>
       <SettingsPanel />
       <EnergyPanel />

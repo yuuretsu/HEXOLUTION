@@ -86,8 +86,8 @@ export class GridMap<T> implements IGrid<T> {
     const n = ((narrow % 6) + 6) % 6;
     for (let i = 0; i < distance; i++) {
       const isOdd = curY % 2 !== 0;
-      const dx = isOdd ? DX_ODD[n] : DX_EVEN[n];
-      const dy = DY[n];
+      const dx = isOdd ? DX_ODD[n]! : DX_EVEN[n]!;
+      const dy = DY[n]!;
       curX = this.mapX(curX + dx);
       curY = this.mapY(curY + dy);
     }

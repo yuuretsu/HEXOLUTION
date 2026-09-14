@@ -37,9 +37,9 @@ const resolveLastGene = (creature: Creature): number => {
   if (geneIndex === undefined) return LAST_GENE_NONE;
   const offset = geneIndex * 3;
   const n = geneIdFromBases(
-    creature.tape.data[offset],
-    creature.tape.data[offset + 1],
-    creature.tape.data[offset + 2],
+    creature.tape.data[offset]!,
+    creature.tape.data[offset + 1]!,
+    creature.tape.data[offset + 2]!,
   );
   return n % GENE_HANDLERS.length;
 };

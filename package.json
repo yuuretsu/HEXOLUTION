@@ -16,6 +16,7 @@
     "preview:web": "npm run preview -w @hexolution/web",
     "deploy:web": "npm run deploy -w @hexolution/web",
     "lint": "eslint .",
+    "typecheck": "tsc -b",
     "test": "vitest run",
     "test:watch": "vitest"
   },

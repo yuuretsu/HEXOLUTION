@@ -150,7 +150,7 @@ export class Creature extends WorldItemDynamic {
       child.tape.data = dst;
     }
     for (let i = 0; i < src.length; i++) {
-      dst[i] = Math.random() > GENOME_MUTATION_RATE ? src[i] : getRandomBase4();
+      dst[i] = Math.random() > GENOME_MUTATION_RATE ? src[i]! : getRandomBase4();
     }
     child.tape.pointer = 0;
     child.energy = 0;
@@ -215,9 +215,9 @@ export class Creature extends WorldItemDynamic {
     if (geneIndex === undefined) return DEFAULT_GENE_COLOR;
     const offset = geneIndex * 3;
     const n = geneIdFromBases(
-      this.tape.data[offset],
-      this.tape.data[offset + 1],
-      this.tape.data[offset + 2],
+      this.tape.data[offset]!,
+      this.tape.data[offset + 1]!,
+      this.tape.data[offset + 2]!,
     );
     return getGeneColor(getGeneHandler(n));
   }

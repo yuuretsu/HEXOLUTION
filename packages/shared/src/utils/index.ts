@@ -1,8 +1,8 @@
 import type { Rgba } from "../types";
 
-export const choice = <A>(list: readonly A[]) => {
-  const index = Math.floor(Math.random() * list.length)
-  return list[index]
+export const choice = <A>(list: readonly A[]): A => {
+  const index = Math.floor(Math.random() * list.length);
+  return list[index]!;
 };
 
 export const lerp = (a: number, b: number, t: number) => a * (1 - t) + b * t;

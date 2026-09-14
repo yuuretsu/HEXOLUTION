@@ -5,8 +5,10 @@ import { useGeneMeta } from "@/shared/api";
 import { geneIdFromBases } from "@hexolution/simulation";
 import styles from "./program-triplet.module.css";
 
+export type Triplet = [number, number, number];
+
 type ProgramTripletProps = {
-  bases: number[];
+  bases: Triplet;
   isActive: boolean;
   isLast: boolean;
 };

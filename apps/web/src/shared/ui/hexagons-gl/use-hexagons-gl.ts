@@ -219,17 +219,18 @@ export const useHexagonsGl = (
 
   const handleTouchStart = (e: TouchEvent) => {
     if (e.touches.length === 1) {
+      const touch = e.touches[0]!;
       dragInfo.current.isDragging = true;
       dragInfo.current.hasMoved = false;
-      dragInfo.current.lastX = e.touches[0].clientX;
-      dragInfo.current.lastY = e.touches[0].clientY;
+      dragInfo.current.lastX = touch.clientX;
+      dragInfo.current.lastY = touch.clientY;
       return;
     }
 
     if (e.touches.length !== 2) return;
 
-    const t1 = e.touches[0];
-    const t2 = e.touches[1];
+    const t1 = e.touches[0]!;
+    const t2 = e.touches[1]!;
     const dx = t1.clientX - t2.clientX;
     const dy = t1.clientY - t2.clientY;
     dragInfo.current.lastDist = Math.sqrt(dx * dx + dy * dy);
@@ -277,18 +278,19 @@ export const useHexagonsGl = (
 
     const dpr = getDpr();
     if (e.touches.length === 1 && dragInfo.current.isDragging) {
-      panFromTouch(e.touches[0], dpr);
+      panFromTouch(e.touches[0]!, dpr);
       return;
     }
 
     if (e.touches.length === 2) {
-      pinchFromTouches(e.touches[0], e.touches[1], dpr, rect);
+      pinchFromTouches(e.touches[0]!, e.touches[1]!, dpr, rect);
     }
   };
 
   const handleTouchEnd = (e: TouchEvent) => {
     if (dragInfo.current.isDragging && !dragInfo.current.hasMoved && e.changedTouches.length > 0) {
-      handleCanvasClick(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+      const touch = e.changedTouches[0]!;
+      handleCanvasClick(touch.clientX, touch.clientY);
     }
     stopDragging();
   };

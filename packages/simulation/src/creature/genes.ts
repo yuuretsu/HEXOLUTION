@@ -7,4 +7,4 @@ export * from "./gene-library";
 export type { GeneHandler, GeneHandlerResult } from "./gene-types";
 
 export const getGeneHandler = (index: number): GeneHandler =>
-  GENE_HANDLERS[index % GENE_HANDLERS.length];
+  GENE_HANDLERS[index % GENE_HANDLERS.length]!;

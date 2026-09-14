@@ -27,25 +27,27 @@ export class GridMatrix<T> implements IGrid<T> {
   }
 
   get(x: number, y: number): T | undefined {
-    return this.cells[this.mapY(y)][this.mapX(x)];
+    return this.cells[this.mapY(y)]![this.mapX(x)];
   }
 
   set(x: number, y: number, value: T | undefined): void {
-    this.cells[this.mapY(y)][this.mapX(x)] = value;
+    this.cells[this.mapY(y)]![this.mapX(x)] = value;
   }
 
   *keys(): Generator<[number, number]> {
     for (let y = 0; y < this.height; y++) {
+      const row = this.cells[y]!;
       for (let x = 0; x < this.width; x++) {
-        if (this.cells[y][x] !== undefined) yield [x, y];
+        if (row[x] !== undefined) yield [x, y];
       }
     }
   }
 
   *entries(): Generator<[number, number, T]> {
     for (let y = 0; y < this.height; y++) {
+      const row = this.cells[y]!;
       for (let x = 0; x < this.width; x++) {
-        const val = this.cells[y][x];
+        const val = row[x];
         if (val !== undefined) yield [x, y, val];
       }
     }
@@ -56,9 +58,11 @@ export class GridMatrix<T> implements IGrid<T> {
     const ax0 = this.mapX(ax);
     const by0 = this.mapY(by);
     const bx0 = this.mapX(bx);
-    const tmp = this.cells[ay0][ax0];
-    this.cells[ay0][ax0] = this.cells[by0][bx0];
-    this.cells[by0][bx0] = tmp;
+    const rowA = this.cells[ay0]!;
+    const rowB = this.cells[by0]!;
+    const tmp = rowA[ax0];
+    rowA[ax0] = rowB[bx0];
+    rowB[bx0] = tmp;
   }
 
   getCoordsByNarrow(
@@ -73,8 +77,8 @@ export class GridMatrix<T> implements IGrid<T> {
     const n = ((narrow % 6) + 6) % 6;
     for (let i = 0; i < distance; i++) {
       const isOdd = curY % 2 !== 0;
-      const dx = isOdd ? DX_ODD[n] : DX_EVEN[n];
-      const dy = DY[n];
+      const dx = isOdd ? DX_ODD[n]! : DX_EVEN[n]!;
+      const dy = DY[n]!;
       curX = this.mapX(curX + dx);
       curY = this.mapY(curY + dy);
     }

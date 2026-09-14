@@ -28,8 +28,8 @@ const simplify = (data: DataPoint[], limit: number): DataPoint[] => {
   if (limit >= size || limit < 3) return data;
 
   const result: DataPoint[] = new Array(limit);
-  result[0] = data[0];
-  result[limit - 1] = data[size - 1];
+  result[0] = data[0]!;
+  result[limit - 1] = data[size - 1]!;
 
   const bucketSize = (size - 2) / (limit - 2);
   let a = 0;
@@ -40,8 +40,9 @@ const simplify = (data: DataPoint[], limit: number): DataPoint[] => {
     const end = Math.min(Math.floor((i + 2) * bucketSize) + 1, size);
 
     for (let j = start; j < end; j++) {
-      avgX += data[j][0];
-      avgY += data[j][1];
+      const point = data[j]!;
+      avgX += point[0];
+      avgY += point[1];
     }
     const len = end - start;
     avgX /= len; avgY /= len;
@@ -49,17 +50,18 @@ const simplify = (data: DataPoint[], limit: number): DataPoint[] => {
     const rStart = Math.floor(i * bucketSize) + 1;
     const rEnd = Math.min(Math.floor((i + 1) * bucketSize) + 1, size);
 
-    const [pAX, pAY] = data[a];
+    const [pAX, pAY] = data[a]!;
     let maxArea = -1, nextA = rStart;
 
     for (let j = rStart; j < rEnd; j++) {
-      const area = Math.abs((pAX - avgX) * (data[j][1] - pAY) - (pAX - data[j][0]) * (avgY - pAY));
+      const point = data[j]!;
+      const area = Math.abs((pAX - avgX) * (point[1] - pAY) - (pAX - point[0]) * (avgY - pAY));
       if (area > maxArea) {
         maxArea = area;
         nextA = j;
       }
     }
-    result[i + 1] = data[nextA];
+    result[i + 1] = data[nextA]!;
     a = nextA;
   }
   return result;
@@ -81,8 +83,9 @@ const ChartLine = memo(({ data, color, width, height, minX, scaleX, scaleY, maxP
     const points = simplify(data, maxPoints);
     let path = "";
     for (let i = 0; i < points.length; i++) {
-      const x = ((points[i][0] - minX) / scaleX) * width;
-      const y = height - (points[i][1] / scaleY) * height;
+      const point = points[i]!;
+      const x = ((point[0] - minX) / scaleX) * width;
+      const y = height - (point[1] / scaleY) * height;
       path += `${x.toFixed(1)},${y.toFixed(1)} `;
     }
     return path;
@@ -126,11 +129,12 @@ export const Chart = ({
     let hasData = false;
 
     for (let i = 0; i < series.length; i++) {
-      const d = series[i].data;
+      const d = series[i]!.data;
       for (let j = 0; j < d.length; j++) {
-        if (d[j][0] < minX) minX = d[j][0];
-        if (d[j][0] > maxX) maxX = d[j][0];
-        if (d[j][1] > maxY) maxY = d[j][1];
+        const point = d[j]!;
+        if (point[0] < minX) minX = point[0];
+        if (point[0] > maxX) maxX = point[0];
+        if (point[1] > maxY) maxY = point[1];
         hasData = true;
       }
     }
