@@ -1,16 +1,11 @@
-import type {
-  ComponentPropsWithoutRef,
-  ElementType,
-  ReactElement,
-  ReactNode,
-} from "react";
+import type { ElementType, ReactElement, ReactNode } from "react";
 import { clsx } from "clsx";
+import type { PolymorphicProps } from "@/shared/lib/polymorphic";
 import styles from "./text.module.css";
 
 export type TextSize = "sm";
 
-type TextOwnProps<E extends ElementType> = {
-  as?: E;
+type TextOwnProps = {
   size?: TextSize;
   isMuted?: boolean;
   isItalic?: boolean;
@@ -19,8 +14,10 @@ type TextOwnProps<E extends ElementType> = {
   children?: ReactNode;
 };
 
-export type TextProps<E extends ElementType = "span"> = TextOwnProps<E> &
-  Omit<ComponentPropsWithoutRef<E>, keyof TextOwnProps<E>>;
+export type TextProps<E extends ElementType = "span"> = PolymorphicProps<
+  E,
+  TextOwnProps
+>;
 
 export const Text = <E extends ElementType = "span",>({
   as,

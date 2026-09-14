@@ -1,18 +1,24 @@
-import { type ElementType, type ComponentPropsWithoutRef, type ReactElement, type MouseEvent } from "react";
+import {
+  type ElementType,
+  type ReactElement,
+  type MouseEvent,
+} from "react";
 import type { IconType } from "react-icons";
 import { clsx } from "clsx";
+import type { PolymorphicProps } from "@/shared/lib/polymorphic";
 import { RippleLayer, useRipple } from "@/shared/ui/ripple";
 import styles from "./icon-button.module.css";
 
-interface IconButtonOwnProps<E extends ElementType> {
-  as?: E;
+type IconButtonOwnProps = {
   Icon: IconType;
   onClick?: () => void;
   className?: string;
-}
+};
 
-type IconButtonProps<E extends ElementType> = IconButtonOwnProps<E> &
-  Omit<ComponentPropsWithoutRef<E>, keyof IconButtonOwnProps<E>>;
+type IconButtonProps<E extends ElementType = "button"> = PolymorphicProps<
+  E,
+  IconButtonOwnProps
+>;
 
 export const IconButton = <E extends ElementType = "button",>({
   as,
