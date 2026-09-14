@@ -6,6 +6,7 @@ import {
 import type { IconType } from "react-icons";
 import { clsx } from "clsx";
 import type { PolymorphicProps } from "@/shared/lib/polymorphic";
+import commonStyles from "@/shared/styles/common.module.css";
 import { RippleLayer, useRipple } from "@/shared/ui/ripple";
 import styles from "./icon-button.module.css";
 
@@ -37,7 +38,7 @@ export const IconButton = <E extends ElementType = "button",>({
 
   return (
     <Tag
-      className={clsx("blur-bg", styles.button, className)}
+      className={clsx(commonStyles.blurBg, styles.button, className)}
       {...(Tag === "button" ? { disabled: !onClick } : {})}
       {...props}
       onClick={handleClick}
